@@ -44,6 +44,8 @@ Game::~Game()
 	delete vertexShader;
 	delete pixelShader;
 
+	delete camera;
+
 	for (int i = 0; i < 5; ++i)
 	{
 		if (entities[i] != nullptr)
@@ -74,6 +76,9 @@ void Game::Init()
 	CreateMatrices();
 	CreateBasicGeometry();
 
+	camera = new Camera();
+	camera->transform.Position(0.0f, 0.0f, -5.0f);
+
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -103,31 +108,6 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateMatrices()
 {
-	// Set up world matrix
-	// - In an actual game, each object will need one of these and they should
-	//    update when/if the object moves (every frame)
-	// - You'll notice a "transpose" happening below, which is redundant for
-	//    an identity matrix.  This is just to show that HLSL expects a different
-	//    matrix (column major vs row major) than the DirectX Math library
-	XMMATRIX W = XMMatrixIdentity();
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W)); // Transpose for HLSL!
-
-	// Create the View matrix
-	// - In an actual game, recreate this matrix every time the camera 
-	//    moves (potentially every frame)
-	// - We're using the LOOK TO function, which takes the position of the
-	//    camera and the direction vector along which to look (as well as "up")
-	// - Another option is the LOOK AT function, to look towards a specific
-	//    point in 3D space
-	XMVECTOR pos = XMVectorSet(0, 0, -5, 0);
-	XMVECTOR dir = XMVectorSet(0, 0, 1, 0);
-	XMVECTOR up = XMVectorSet(0, 1, 0, 0);
-	XMMATRIX V = XMMatrixLookToLH(
-		pos,     // The position of the "camera"
-		dir,     // Direction the camera is looking
-		up);     // "Up" direction in 3D space (prevents roll)
-	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V)); // Transpose for HLSL!
-
 	// Create the Projection matrix
 	// - This should match the window's aspect ratio, and also update anytime
 	//    the window resizes (which is already happening in OnResize() below)
@@ -199,16 +179,16 @@ void Game::CreateBasicGeometry()
 	entities[3] = new Entity(meshes[1]);
 	entities[4] = new Entity(meshes[2]);
 
-	entities[0]->Position(-2.0f, -1.0f, 0.0f);
-	entities[1]->Position(2.0f, -1.0f, 0.0f);
+	entities[0]->transform.Position(-2.0f, -1.0f, 0.01f);
+	entities[1]->transform.Position(2.0f, -1.0f, 0.0f);
 
-	entities[2]->Position(-2.5f, 1.0f, 0.0f);
-	entities[2]->Scale(0.5f, 0.5f, 1);
-	entities[3]->Position(2.5f, 1.0f, 0.0f);
-	entities[3]->Scale(0.5f, 0.5f, 1);
+	entities[2]->transform.Position(-2.5f, 1.0f, 0.0f);
+	entities[2]->transform.Scale(0.5f, 0.5f, 1);
+	entities[3]->transform.Position(2.5f, 1.0f, 0.0f);
+	entities[3]->transform.Scale(0.5f, 0.5f, 1);
 
-	entities[4]->Position(0.0f, 0.11f, 0.0f);
-	entities[4]->Scale(0.1f, .75f, 1);
+	entities[4]->transform.Position(0.0f, 0.11f, 0.0f);
+	entities[4]->transform.Scale(0.1f, .75f, 1);
 }
 
 
@@ -231,20 +211,30 @@ void Game::OnResize()
 }
 
 float i = 0;
+float x = 0;
 
 // --------------------------------------------------------
 // Update your game here - user input, move objects, AI, etc.
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
-	entities[0]->Position(sin(i) * 3, entities[0]->Position().y, entities[0]->Position().z);
-	entities[1]->Position(cos(i) * 3, entities[1]->Position().y, entities[1]->Position().z);
-	entities[2]->Rotation(0.0f, 0.0, i);
-	entities[3]->Rotation(0.0f, 0.0, -i);
-	entities[4]->Rotation(0.0f, 0.0, (cos(i) + sin(i)) * 1.5f);
+	entities[0]->transform.Position(sin(i) * 3, entities[0]->transform.Position().y, entities[0]->transform.Position().z);
+	entities[1]->transform.Position(cos(i) * 3, entities[1]->transform.Position().y, entities[1]->transform.Position().z);
+	entities[2]->transform.Rotation(0.0f, 0.0f, i);
+	entities[3]->transform.Rotation(0.0f, 0.0f, -i);
+	entities[4]->transform.Rotation(0.0f, 0.0f, (cos(i) + sin(i)) * 1.5f);
 
 	i += deltaTime;
+	x += deltaTime;
 
+	DirectX::XMFLOAT3 pos = entities[4]->transform.Up();
+
+	camera->transform.Rotation(0.0f, cos(x), 0.0f);
+	camera->Update();
+
+	XMFLOAT3 forward = camera->transform.Forward();
+
+	printf("(%f, %f, %f)\n", forward.x, forward.y, forward.z);
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
@@ -274,7 +264,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	//  - This is actually a complex process of copying data to a local buffer
 	//    and then copying that entire buffer to the GPU.  
 	//  - The "SimpleShader" class handles all of that for you.
-	vertexShader->SetMatrix4x4("view", viewMatrix);
+	vertexShader->SetMatrix4x4("view", camera->ViewMatrix());
 	vertexShader->SetMatrix4x4("projection", projectionMatrix);
 
 	// Once you've set all of the data you care to change for
@@ -297,7 +287,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		vertexShader->SetMatrix4x4("world", entities[i]->WorldMatrix());
+		vertexShader->SetMatrix4x4("world", entities[i]->transform.WorldMatrix());
 		vertexShader->CopyAllBufferData();
 
 		context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer(), &stride, &offset);

@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 #include "Mesh.h"
 #include "Entity.h"
+#include "Camera.h"
 
 class Game 
 	: public DXCore
@@ -35,14 +36,13 @@ private:
 
 	Mesh* meshes[3];
 	Entity* entities[5];
+	Camera* camera;
 
 	// Wrappers for DirectX shaders to provide simplified functionality
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
 
 	// The matrices to go from model space to screen space
-	DirectX::XMFLOAT4X4 worldMatrix;
-	DirectX::XMFLOAT4X4 viewMatrix;
 	DirectX::XMFLOAT4X4 projectionMatrix;
 
 	// Keeps track of the old mouse position.  Useful for 
