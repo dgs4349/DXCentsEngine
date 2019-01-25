@@ -47,7 +47,7 @@ namespace Component
 
 	void Transform::Rotation(DirectX::XMFLOAT3 rotation)
 	{
-		this->scale = scale;
+		this->rotation = rotation;
 		dirty = true;
 	}
 
@@ -82,10 +82,22 @@ namespace Component
 		return forward;
 	}
 
+	DirectX::XMFLOAT3 Transform::Backward()
+	{
+		UpdateTransform();
+		return backward;
+	}
+
 	DirectX::XMFLOAT3 Transform::Up()
 	{
 		UpdateTransform();
 		return up;
+	}
+
+	DirectX::XMFLOAT3 Transform::Down()
+	{
+		UpdateTransform();
+		return down;
 	}
 
 	DirectX::XMFLOAT3 Transform::Left()
@@ -94,13 +106,22 @@ namespace Component
 		return left;
 	}
 
+	DirectX::XMFLOAT3 Transform::Right()
+	{
+		UpdateTransform();
+		return right;
+	}
+
 	void Transform::UpdateDirectionalVectors()
 	{
 		DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&worldMatrix);
 
 		DirectX::XMStoreFloat3(&forward, DirectX::XMVector3Normalize(mat.r[2]));
+		DirectX::XMStoreFloat3(&backward, DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[2]), -1));
 		DirectX::XMStoreFloat3(&up, DirectX::XMVector3Normalize(mat.r[1]));
-		DirectX::XMStoreFloat3(&left, DirectX::XMVector3Normalize(mat.r[0]));
+		DirectX::XMStoreFloat3(&down, DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[1]), -1));
+		DirectX::XMStoreFloat3(&right, DirectX::XMVector3Normalize(mat.r[0]));
+		DirectX::XMStoreFloat3(&left, DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[0]), -1));
 	}
 
 #pragma endregion
@@ -124,6 +145,11 @@ namespace Component
 	}
 
 #pragma endregion
+
+	void Transform::SetDirty()
+	{
+		dirty = true;
+	}
 
 	void Transform::UpdateTransform()
 	{

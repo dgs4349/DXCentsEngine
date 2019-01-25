@@ -12,9 +12,9 @@ public:
 	Camera();
 	~Camera();
 
-	DirectX::XMFLOAT4X4 ViewMatrix() const;
+	DirectX::XMFLOAT4X4 ViewMatrix();
 
-	void Update();
+	void Update(float deltatime);
 
 private:
 

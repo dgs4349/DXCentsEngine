@@ -24,6 +24,8 @@ Game::Game(HINSTANCE hInstance)
 	vertexShader = 0;
 	pixelShader = 0;
 
+	camera = new Camera();
+
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
 	CreateConsoleWindow(500, 120, 32, 120);
@@ -76,8 +78,7 @@ void Game::Init()
 	CreateMatrices();
 	CreateBasicGeometry();
 
-	camera = new Camera();
-	camera->transform.Position(0.0f, 0.0f, -5.0f);
+	camera->transform.Position(0.0f, 0.0f, -10.0f);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -229,12 +230,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	DirectX::XMFLOAT3 pos = entities[4]->transform.Up();
 
-	camera->transform.Rotation(0.0f, cos(x), 0.0f);
-	camera->Update();
-
-	XMFLOAT3 forward = camera->transform.Forward();
-
-	printf("(%f, %f, %f)\n", forward.x, forward.y, forward.z);
+	camera->Update(deltaTime);
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
@@ -344,6 +340,17 @@ void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 {
 	// Add any custom code here...
+	if (buttonState & 0x0001)
+	{
+		XMVECTOR camRot = XMLoadFloat3(&camera->transform.Rotation());
+		XMFLOAT3 newCamRot;
+		XMStoreFloat3(&newCamRot, XMVectorAdd(camRot, XMVectorScale({ (float)(prevMousePos.y - y), (float)(prevMousePos.x - x) }, 0.001f)));
+
+		XMFLOAT3 forward = camera->transform.Rotation();
+		printf("(%f, %f, %f)\n", forward.x, forward.y, forward.z);
+
+		camera->transform.Rotation(newCamRot);
+	}
 
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
