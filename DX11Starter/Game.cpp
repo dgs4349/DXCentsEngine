@@ -221,9 +221,9 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	entities[0]->transform.Position(sin(i) * 3, entities[0]->transform.Position().y, entities[0]->transform.Position().z);
 	entities[1]->transform.Position(cos(i) * 3, entities[1]->transform.Position().y, entities[1]->transform.Position().z);
-	entities[2]->transform.Rotation(0.0f, 0.0f, i);
-	entities[3]->transform.Rotation(0.0f, 0.0f, -i);
-	entities[4]->transform.Rotation(0.0f, 0.0f, (cos(i) + sin(i)) * 1.5f);
+	entities[2]->transform.Rotate(0.0f, 0.0f, 0.01f);
+	entities[3]->transform.Rotate(-0.01f, 0.0f, 0.0f);
+	entities[4]->transform.Rotate(0.0f, 0.0f, 0.001f);
 
 	i += deltaTime;
 	x += deltaTime;
@@ -342,14 +342,7 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	// Add any custom code here...
 	if (buttonState & 0x0001)
 	{
-		XMVECTOR camRot = XMLoadFloat3(&camera->transform.Rotation());
-		XMFLOAT3 newCamRot;
-		XMStoreFloat3(&newCamRot, XMVectorAdd(camRot, XMVectorScale({ (float)(prevMousePos.y - y), (float)(prevMousePos.x - x) }, 0.001f)));
-
-		XMFLOAT3 forward = camera->transform.Rotation();
-		printf("(%f, %f, %f)\n", forward.x, forward.y, forward.z);
-
-		camera->transform.Rotation(newCamRot);
+		camera->transform.Rotate((float)(y - prevMousePos.y) * 0.001f, (float)(x - prevMousePos.x) * 0.001f, 0.0f);
 	}
 
 	// Save the previous mouse position, so we have it for the future

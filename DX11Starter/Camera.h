@@ -18,6 +18,9 @@ public:
 
 private:
 
+	DirectX::XMFLOAT3 forward;
+	DirectX::XMFLOAT3 up;
+
 	DirectX::XMFLOAT4X4 viewMatrix;
 
 	void UpdateViewMatrix();
