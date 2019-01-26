@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Entity.h"
 #include "Camera.h"
+#include "Material.h"
 
 class Game 
 	: public DXCore
@@ -36,10 +37,7 @@ private:
 	Mesh* meshes[3];
 	Entity* entities[5];
 	Camera* camera;
-
-	// Wrappers for DirectX shaders to provide simplified functionality
-	SimpleVertexShader* vertexShader;
-	SimplePixelShader* pixelShader;
+	Material* material;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

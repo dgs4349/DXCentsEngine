@@ -20,9 +20,6 @@ Game::Game(HINSTANCE hInstance)
 		720,			// Height of the window's client area
 		true)			// Show extra stats (fps) in title bar?
 {
-	// Initialize fields
-	vertexShader = 0;
-	pixelShader = 0;
 
 	camera = new Camera();
 
@@ -41,12 +38,8 @@ Game::Game(HINSTANCE hInstance)
 // --------------------------------------------------------
 Game::~Game()
 {
-	// Delete our simple shader objects, which
-	// will clean up their own internal DirectX stuff
-	delete vertexShader;
-	delete pixelShader;
-
 	delete camera;
+	delete material;
 
 	for (int i = 0; i < 5; ++i)
 	{
@@ -78,6 +71,7 @@ void Game::Init()
 	CreateBasicGeometry();
 
 	camera->transform.Position(0.0f, 0.0f, -10.0f);
+	camera->SetScreenSize(width, height);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -93,11 +87,13 @@ void Game::Init()
 // --------------------------------------------------------
 void Game::LoadShaders()
 {
-	vertexShader = new SimpleVertexShader(device, context);
+	SimpleVertexShader* vertexShader = new SimpleVertexShader(device, context);
 	vertexShader->LoadShaderFile(L"VertexShader.cso");
 
-	pixelShader = new SimplePixelShader(device, context);
+	SimplePixelShader* pixelShader = new SimplePixelShader(device, context);
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
+
+	material = new Material(vertexShader, pixelShader);
 }
 
 // --------------------------------------------------------
@@ -125,19 +121,19 @@ void Game::CreateBasicGeometry()
 
 	Vertex vertices2[] =
 	{
-	{ XMFLOAT3(1.0f, 1.0f, 0.0f), red },
-	{ XMFLOAT3(-1.0f, 1.0f, 0.0f), blue },
-	{ XMFLOAT3(-1.0f, -1.0f, 0.0f), green },
-	{ XMFLOAT3(1.0f, -1.0f, 0.0f), white },
+		{ XMFLOAT3(1.0f, 1.0f, 0.0f), red },
+		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), blue },
+		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), green },
+		{ XMFLOAT3(1.0f, -1.0f, 0.0f), white },
 	};
 
 	Vertex vertices3[] =
 	{
 		{ XMFLOAT3(1.0f, 1.0f, 0.0f), red },
-	{ XMFLOAT3(-1.0f, 1.0f, 0.0f), blue },
-	{ XMFLOAT3(-1.0f, -1.0f, 0.0f), green },
-	{ XMFLOAT3(1.0f, -1.0f, 0.0f), white },
-	{ XMFLOAT3(0.0f, -2.0f, 0.0f), pink },
+		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), blue },
+		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), green },
+		{ XMFLOAT3(1.0f, -1.0f, 0.0f), white },
+		{ XMFLOAT3(0.0f, -2.0f, 0.0f), pink },
 	};
 
 	// Set up the indices, which tell us which vertices to use and in which order
@@ -153,11 +149,11 @@ void Game::CreateBasicGeometry()
 	meshes[1] = new Mesh(vertices2, 4, indices2, 6, device);
 	meshes[2] = new Mesh(vertices3, 5, indices3, 9, device);
 
-	entities[0] = new Entity(meshes[0]);
-	entities[1] = new Entity(meshes[0]);
-	entities[2] = new Entity(meshes[1]);
-	entities[3] = new Entity(meshes[1]);
-	entities[4] = new Entity(meshes[2]);
+	entities[0] = new Entity(meshes[0], material);
+	entities[1] = new Entity(meshes[0], material);
+	entities[2] = new Entity(meshes[1], material);
+	entities[3] = new Entity(meshes[1], material);
+	entities[4] = new Entity(meshes[2], material);
 
 	entities[0]->transform.Position(-2.0f, -1.0f, 0.01f);
 	entities[1]->transform.Position(2.0f, -1.0f, 0.0f);
@@ -184,7 +180,6 @@ void Game::OnResize()
 }
 
 float i = 0;
-float x = 0;
 
 // --------------------------------------------------------
 // Update your game here - user input, move objects, AI, etc.
@@ -193,12 +188,11 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	entities[0]->transform.Position(sin(i) * 3, entities[0]->transform.Position().y, entities[0]->transform.Position().z);
 	entities[1]->transform.Position(cos(i) * 3, entities[1]->transform.Position().y, entities[1]->transform.Position().z);
-	entities[2]->transform.Rotate(0.0f, 0.0f, 0.01f);
-	entities[3]->transform.Rotate(-0.01f, 0.0f, 0.0f);
+	entities[2]->transform.Rotate(0.0f, 0.0f, 0.001f);
+	entities[3]->transform.Rotate(0.0f, 0.0f, -0.001f);
 	entities[4]->transform.Rotate(0.0f, 0.0f, 0.001f);
 
 	i += deltaTime;
-	x += deltaTime;
 
 	DirectX::XMFLOAT3 pos = entities[4]->transform.Up();
 
@@ -227,26 +221,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-	// Send data to shader variables
-	//  - Do this ONCE PER OBJECT you're drawing
-	//  - This is actually a complex process of copying data to a local buffer
-	//    and then copying that entire buffer to the GPU.  
-	//  - The "SimpleShader" class handles all of that for you.
-	vertexShader->SetMatrix4x4("view", camera->ViewMatrix());
-	vertexShader->SetMatrix4x4("projection", camera->ProjectionMatrix());
-
-	// Once you've set all of the data you care to change for
-	// the next draw call, you need to actually send it to the GPU
-	//  - If you skip this, the "SetMatrix" calls above won't make it to the GPU!
-	vertexShader->CopyAllBufferData();
-
-	// Set the vertex and pixel shaders to use for the next Draw() command
-	//  - These don't technically need to be set every frame...YET
-	//  - Once you start applying different shaders to different objects,
-	//    you'll need to swap the current shaders before each draw
-	vertexShader->SetShader();
-	pixelShader->SetShader();
-
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
 	//    have different geometry.
@@ -255,8 +229,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		vertexShader->SetMatrix4x4("world", entities[i]->transform.WorldMatrix());
-		vertexShader->CopyAllBufferData();
+		entities[i]->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
 
 		context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer(), &stride, &offset);
 		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);

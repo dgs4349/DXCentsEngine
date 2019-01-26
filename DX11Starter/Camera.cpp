@@ -15,11 +15,6 @@ void Camera::Update(float deltaTime)
 	DirectX::XMVECTOR move = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
 
-	if (GetAsyncKeyState('R') & 0x8000)
-	{
-		transform.Rotate(0.1f, 0.0f, 0.0f);
-	}
-
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
 		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Forward()));
@@ -128,7 +123,7 @@ void Camera::UpdateProjectionMatrix()
 {
 	DirectX::XMMATRIX P = DirectX::XMMatrixPerspectiveFovLH(
 		0.25f * 3.1415926535f,
-		(float)(screenWidth / screenHeight),
+		(float)screenWidth / screenHeight,
 		0.1f,
 		100.0f);
 	DirectX::XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
