@@ -15,6 +15,11 @@ void Camera::Update(float deltaTime)
 	DirectX::XMVECTOR move = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
 
+	if (GetAsyncKeyState('R') & 0x8000)
+	{
+		transform.Rotate(0.1f, 0.0f, 0.0f);
+	}
+
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
 		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Forward()));
@@ -48,7 +53,6 @@ void Camera::Update(float deltaTime)
 	transform.Position(movement);
 }
 
-
 DirectX::XMFLOAT4X4 Camera::ViewMatrix()
 {
 	UpdateViewMatrix();
@@ -61,9 +65,9 @@ void Camera::UpdateViewMatrix()
 
 	DirectX::XMStoreFloat4x4(&viewMatrix,
 		DirectX::XMMatrixTranspose(
-			DirectX::XMMatrixLookAtLH(
+			DirectX::XMMatrixLookToLH(
 				DirectX::XMLoadFloat3(&transform.Position()),
-				DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&transform.Forward()), DirectX::XMLoadFloat3(&transform.Position())),
+				DirectX::XMLoadFloat3(&transform.Forward()),
 				DirectX::XMLoadFloat3(&transform.Up())
 			)
 		)

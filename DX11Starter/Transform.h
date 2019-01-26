@@ -15,9 +15,12 @@ namespace Component
 		void Position(float x, float y, float z);
 		void Position(DirectX::XMFLOAT3 position);
 
-		DirectX::XMFLOAT3 Rotation() const;
-		void Rotation(float x, float y, float z);
-		void Rotation(DirectX::XMFLOAT3 rotation);
+		DirectX::XMFLOAT4 Rotation() const;
+		DirectX::XMFLOAT3 Transform::EulerAngles() const;
+		void Rotation(float x, float y, float z, float w);
+		void Rotation(DirectX::XMFLOAT4 rotation);
+		void Rotate(float x, float y, float z);
+		void Rotate(DirectX::XMFLOAT3 rotation);
 
 		DirectX::XMFLOAT3 Scale() const;
 		void Scale(float x, float y, float z);
@@ -39,16 +42,17 @@ namespace Component
 
 		bool dirty;
 
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT3 rotation;
-		DirectX::XMFLOAT3 scale;
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 eulerAngle = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT4 rotation = { 0.0f, 0.0f, 0.0f, 0.0f};
+		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
 
-		DirectX::XMFLOAT3 forward;
-		DirectX::XMFLOAT3 backward;
-		DirectX::XMFLOAT3 up;
-		DirectX::XMFLOAT3 down;
-		DirectX::XMFLOAT3 left;
-		DirectX::XMFLOAT3 right;
+		DirectX::XMFLOAT3 forward = { 0.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT3 backward = { 0.0f, 0.0f, -1.0f };
+		DirectX::XMFLOAT3 up = { 0.0f, 1.0f, 0.0f };
+		DirectX::XMFLOAT3 down = { 0.0f, -1.0f, 0.0f };
+		DirectX::XMFLOAT3 left = { -1.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 right = { 1.0f, 0.0f, 0.0f };
 
 		DirectX::XMFLOAT4X4 worldMatrix;
 
