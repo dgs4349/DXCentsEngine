@@ -69,3 +69,64 @@ void Camera::UpdateViewMatrix()
 		)
 	);
 }
+
+#pragma region Screen Size Functions
+
+void Camera::SetScreenSize(int width, int height)
+{
+	screenWidth = width;
+	screenHeight = height;
+	UpdateProjectionMatrix();
+}
+
+void Camera::SetScreenSize(DirectX::XMFLOAT2 size)
+{
+	screenWidth = size.x;
+	screenHeight = size.y;
+	UpdateProjectionMatrix();
+}
+
+DirectX::XMFLOAT2 Camera::ScreenSize() const
+{
+	return DirectX::XMFLOAT2(screenWidth, screenHeight);
+}
+
+int Camera::ScreenWidth() const
+{
+	return screenWidth;
+}
+
+int Camera::ScreenHeight() const
+{
+	return screenHeight;
+}
+
+#pragma endregion
+
+#pragma region Projection Functions
+DirectX::XMFLOAT4X4 Camera::ProjectionMatrix()
+{
+	UpdateProjectionMatrix();
+	return projectionMatrix;
+}
+
+void Camera::OnResize()
+{
+	DirectX::XMMATRIX P = DirectX::XMMatrixPerspectiveFovLH(
+		0.25f * 3.1415926535f,
+		(float)screenWidth / screenHeight,
+		0.1f,
+		100.0f);
+	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+}
+
+void Camera::UpdateProjectionMatrix()
+{
+	DirectX::XMMATRIX P = DirectX::XMMatrixPerspectiveFovLH(
+		0.25f * 3.1415926535f,
+		(float)(screenWidth / screenHeight),
+		0.1f,
+		100.0f);
+	DirectX::XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+}
+#pragma endregion

@@ -75,7 +75,6 @@ void Game::Init()
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
-	CreateMatrices();
 	CreateBasicGeometry();
 
 	camera->transform.Position(0.0f, 0.0f, -10.0f);
@@ -100,26 +99,6 @@ void Game::LoadShaders()
 	pixelShader = new SimplePixelShader(device, context);
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
 }
-
-
-
-// --------------------------------------------------------
-// Initializes the matrices necessary to represent our geometry's 
-// transformations and our 3D camera
-// --------------------------------------------------------
-void Game::CreateMatrices()
-{
-	// Create the Projection matrix
-	// - This should match the window's aspect ratio, and also update anytime
-	//    the window resizes (which is already happening in OnResize() below)
-	XMMATRIX P = XMMatrixPerspectiveFovLH(
-		0.25f * 3.1415926535f,		// Field of View Angle
-		(float)width / height,		// Aspect ratio
-		0.1f,						// Near clip plane distance
-		100.0f);					// Far clip plane distance
-	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
-}
-
 
 // --------------------------------------------------------
 // Creates the geometry we're going to draw - a single triangle for now
@@ -201,14 +180,7 @@ void Game::OnResize()
 {
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
-
-	// Update our projection matrix since the window size changed
-	XMMATRIX P = XMMatrixPerspectiveFovLH(
-		0.25f * 3.1415926535f,	// Field of View Angle
-		(float)width / height,	// Aspect ratio
-		0.1f,				  	// Near clip plane distance
-		100.0f);			  	// Far clip plane distance
-	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
+	camera->OnResize();
 }
 
 float i = 0;
@@ -261,7 +233,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	//    and then copying that entire buffer to the GPU.  
 	//  - The "SimpleShader" class handles all of that for you.
 	vertexShader->SetMatrix4x4("view", camera->ViewMatrix());
-	vertexShader->SetMatrix4x4("projection", projectionMatrix);
+	vertexShader->SetMatrix4x4("projection", camera->ProjectionMatrix());
 
 	// Once you've set all of the data you care to change for
 	// the next draw call, you need to actually send it to the GPU
@@ -345,9 +317,6 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 		XMVECTOR camRot = XMLoadFloat3(&camera->transform.Rotation());
 		XMFLOAT3 newCamRot;
 		XMStoreFloat3(&newCamRot, XMVectorAdd(camRot, XMVectorScale({ (float)(prevMousePos.y - y), (float)(prevMousePos.x - x) }, 0.001f)));
-
-		XMFLOAT3 forward = camera->transform.Rotation();
-		printf("(%f, %f, %f)\n", forward.x, forward.y, forward.z);
 
 		camera->transform.Rotation(newCamRot);
 	}
