@@ -1,5 +1,7 @@
 #include "Transform.h"
 
+using namespace DirectX;
+
 namespace Component
 {
 	Transform::Transform()
@@ -8,7 +10,7 @@ namespace Component
 		eulerAngle = { 0.0f, 0.0f, 0.0f };
 		rotation = { 0.0f, 0.0f, 0.0f, 0.0f };
 		scale = { 1.0f, 1.0f, 1.0f };
-		DirectX::XMStoreFloat4x4(&worldMatrix, DirectX::XMMatrixIdentity());
+		XMStoreFloat4x4(&worldMatrix, XMMatrixIdentity());
 
 		forward = { 0.0f, 0.0f, 1.0f };
 		backward = { 0.0f, 0.0f, -1.0f };
@@ -21,18 +23,18 @@ namespace Component
 
 #pragma region Position Getter/Setter Functions
 
-	DirectX::XMFLOAT3 Transform::Position() const
+	XMFLOAT3 Transform::Position() const
 	{
 		return position;
 	}
 
 	void Transform::Position(float x, float y, float z)
 	{
-		position = DirectX::XMFLOAT3(x, y, z);
+		position = XMFLOAT3(x, y, z);
 		dirty = true;
 	}
 
-	void Transform::Position(DirectX::XMFLOAT3 position)
+	void Transform::Position(XMFLOAT3 position)
 	{
 		this->position = position;
 		dirty = true;
@@ -42,23 +44,23 @@ namespace Component
 
 #pragma region Rotation Getter/Setter Functions
 
-	DirectX::XMFLOAT4 Transform::Rotation() const
+	XMFLOAT4 Transform::Rotation() const
 	{
 		return rotation;
 	}
 
-	DirectX::XMFLOAT3 Transform::EulerAngles() const
+	XMFLOAT3 Transform::EulerAngles() const
 	{
 		return eulerAngle;
 	}
 
 	void Transform::Rotation(float x, float y, float z, float w)
 	{
-		rotation = DirectX::XMFLOAT4(x, y, z, w);
+		rotation = XMFLOAT4(x, y, z, w);
 		dirty = true;
 	}
 
-	void Transform::Rotation(DirectX::XMFLOAT4 rotation)
+	void Transform::Rotation(XMFLOAT4 rotation)
 	{
 		this->rotation = rotation;
 		dirty = true;
@@ -66,21 +68,21 @@ namespace Component
 
 	void Transform::Rotate(float x, float y, float z)
 	{
-		DirectX::XMVECTOR newRot = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&eulerAngle), { x, y, z });
-		DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(newRot);
+		XMVECTOR newRot = XMVectorAdd(XMLoadFloat3(&eulerAngle), { x, y, z });
+		XMVECTOR quat = XMQuaternionRotationRollPitchYawFromVector(newRot);
 
-		DirectX::XMStoreFloat4(&rotation, quat);
-		DirectX::XMStoreFloat3(&eulerAngle, newRot);
+		XMStoreFloat4(&rotation, quat);
+		XMStoreFloat3(&eulerAngle, newRot);
 		dirty = true;
 	}
 
-	void Transform::Rotate(DirectX::XMFLOAT3 rotate)
+	void Transform::Rotate(XMFLOAT3 rotate)
 	{
-		DirectX::XMVECTOR newRot = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&eulerAngle), DirectX::XMLoadFloat3(&rotate));
-		DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(newRot);
+		XMVECTOR newRot = XMVectorAdd(XMLoadFloat3(&eulerAngle), XMLoadFloat3(&rotate));
+		XMVECTOR quat = XMQuaternionRotationRollPitchYawFromVector(newRot);
 
-		DirectX::XMStoreFloat4(&rotation, quat);
-		DirectX::XMStoreFloat3(&eulerAngle, newRot);
+		XMStoreFloat4(&rotation, quat);
+		XMStoreFloat3(&eulerAngle, newRot);
 		dirty = true;
 	}
 
@@ -88,18 +90,18 @@ namespace Component
 
 #pragma region Scale Getter/Setter Functions
 
-	DirectX::XMFLOAT3 Transform::Scale() const
+	XMFLOAT3 Transform::Scale() const
 	{
 		return scale;
 	}
 
 	void Transform::Scale(float x, float y, float z)
 	{
-		scale = DirectX::XMFLOAT3(x, y, z);
+		scale = XMFLOAT3(x, y, z);
 		dirty = true;
 	}
 
-	void Transform::Scale(DirectX::XMFLOAT3 scale)
+	void Transform::Scale(XMFLOAT3 scale)
 	{
 		this->scale = scale;
 		dirty = true;
@@ -109,37 +111,37 @@ namespace Component
 
 #pragma region Directional Getter/Update Functions
 
-	DirectX::XMFLOAT3 Transform::Forward()
+	XMFLOAT3 Transform::Forward()
 	{
 		UpdateTransform();
 		return forward;
 	}
 
-	DirectX::XMFLOAT3 Transform::Backward()
+	XMFLOAT3 Transform::Backward()
 	{
 		UpdateTransform();
 		return backward;
 	}
 
-	DirectX::XMFLOAT3 Transform::Up()
+	XMFLOAT3 Transform::Up()
 	{
 		UpdateTransform();
 		return up;
 	}
 
-	DirectX::XMFLOAT3 Transform::Down()
+	XMFLOAT3 Transform::Down()
 	{
 		UpdateTransform();
 		return down;
 	}
 
-	DirectX::XMFLOAT3 Transform::Left()
+	XMFLOAT3 Transform::Left()
 	{
 		UpdateTransform();
 		return left;
 	}
 
-	DirectX::XMFLOAT3 Transform::Right()
+	XMFLOAT3 Transform::Right()
 	{
 		UpdateTransform();
 		return right;
@@ -147,30 +149,30 @@ namespace Component
 
 	void Transform::UpdateDirectionalVectors()
 	{
-		DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&worldMatrix);
-		DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&rotation));
+		XMMATRIX mat = XMLoadFloat4x4(&worldMatrix);
+		XMMATRIX rotationMat = XMMatrixRotationQuaternion(XMLoadFloat4(&rotation));
 
-		DirectX::XMVECTOR forwardVec = { 0.0f, 0.0f, 1.0f };
-		DirectX::XMVECTOR forwardTransform = DirectX::XMVector4Transform(forwardVec, rotationMat);
-		DirectX::XMStoreFloat3(&forward, forwardTransform);
-		DirectX::XMStoreFloat3(&backward, DirectX::XMVectorScale(forwardTransform, -1.0f));
+		XMVECTOR forwardVec = { 0.0f, 0.0f, 1.0f };
+		XMVECTOR forwardTransform = XMVector4Transform(forwardVec, rotationMat);
+		XMStoreFloat3(&forward, forwardTransform);
+		XMStoreFloat3(&backward, XMVectorScale(forwardTransform, -1.0f));
 
-		DirectX::XMVECTOR upVec = { 0.0f, 1.0f, 0.0f };
-		DirectX::XMVECTOR upTransform = DirectX::XMVector4Transform(upVec, rotationMat);
-		DirectX::XMStoreFloat3(&up, upTransform);
-		DirectX::XMStoreFloat3(&down, DirectX::XMVectorScale(upTransform, -1.0f));
+		XMVECTOR upVec = { 0.0f, 1.0f, 0.0f };
+		XMVECTOR upTransform = XMVector4Transform(upVec, rotationMat);
+		XMStoreFloat3(&up, upTransform);
+		XMStoreFloat3(&down, XMVectorScale(upTransform, -1.0f));
 
-		DirectX::XMVECTOR rightVec = { 1.0f, 0.0f, 0.0f };
-		DirectX::XMVECTOR rightTransform = DirectX::XMVector4Transform(rightVec, rotationMat);
-		DirectX::XMStoreFloat3(&right, rightTransform);
-		DirectX::XMStoreFloat3(&left, DirectX::XMVectorScale(rightTransform, -1.0f));
+		XMVECTOR rightVec = { 1.0f, 0.0f, 0.0f };
+		XMVECTOR rightTransform = XMVector4Transform(rightVec, rotationMat);
+		XMStoreFloat3(&right, rightTransform);
+		XMStoreFloat3(&left, XMVectorScale(rightTransform, -1.0f));
 	}
 
 #pragma endregion
 
 #pragma region World Matrix Getter/Updater Functions
 
-	DirectX::XMFLOAT4X4 Transform::WorldMatrix()
+	XMFLOAT4X4 Transform::WorldMatrix()
 	{
 		UpdateTransform();
 		return worldMatrix;
@@ -178,12 +180,12 @@ namespace Component
 
 	void Transform::UpdateWorldMatrix()
 	{
-		DirectX::XMMATRIX scaleMat = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&scale));
-		DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&rotation));
-		DirectX::XMMATRIX positionMat = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&position));
+		XMMATRIX scaleMat = XMMatrixScalingFromVector(XMLoadFloat3(&scale));
+		XMMATRIX rotationMat = XMMatrixRotationQuaternion(XMLoadFloat4(&rotation));
+		XMMATRIX positionMat = XMMatrixTranslationFromVector(XMLoadFloat3(&position));
 
-		DirectX::XMMATRIX worldMat = DirectX::XMMatrixIdentity() * scaleMat * rotationMat * positionMat;
-		DirectX::XMStoreFloat4x4(&worldMatrix, DirectX::XMMatrixTranspose(worldMat));
+		XMMATRIX worldMat = XMMatrixIdentity() * scaleMat * rotationMat * positionMat;
+		XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(worldMat));
 	}
 
 #pragma endregion

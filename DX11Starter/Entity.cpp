@@ -1,7 +1,5 @@
 #include "Entity.h"
 
-
-
 Entity::Entity(Mesh* const mesh, Material* const material)
 {
 	this->mesh = mesh;

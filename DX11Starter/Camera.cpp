@@ -1,8 +1,10 @@
 #include "Camera.h"
 
+using namespace DirectX;
+
 Camera::Camera()
 {
-	DirectX::XMStoreFloat4x4(&viewMatrix, DirectX::XMMatrixIdentity());
+	XMStoreFloat4x4(&viewMatrix, XMMatrixIdentity());
 }
 
 
@@ -12,43 +14,43 @@ Camera::~Camera()
 
 void Camera::Update(float deltaTime)
 {
-	DirectX::XMVECTOR move = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
+	XMVECTOR move = { 0.0f, 0.0f, 0.0f };
+	XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
 
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
-		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Forward()));
+		move = XMVectorAdd(move, XMLoadFloat3(&transform.Forward()));
 	}
 	if (GetAsyncKeyState('S') & 0x8000)
 	{
-		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Backward()));
+		move = XMVectorAdd(move, XMLoadFloat3(&transform.Backward()));
 	}
 	if (GetAsyncKeyState('A') & 0x8000)
 	{
-		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Left()));
+		move = XMVectorAdd(move, XMLoadFloat3(&transform.Left()));
 	}
 	if (GetAsyncKeyState('D') & 0x8000)
 	{
-		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Right()));
+		move = XMVectorAdd(move, XMLoadFloat3(&transform.Right()));
 	}
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 	{
-		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Up()));
+		move = XMVectorAdd(move, XMLoadFloat3(&transform.Up()));
 	}
 	if (GetAsyncKeyState('X') & 0x8000)
 	{
-		move = DirectX::XMVectorAdd(move, DirectX::XMLoadFloat3(&transform.Down()));
+		move = XMVectorAdd(move, XMLoadFloat3(&transform.Down()));
 	}
 
-	move = DirectX::XMVectorAdd(
-		DirectX::XMLoadFloat3(&transform.Position()),
-		DirectX::XMVectorScale(move, deltaTime * 5.0f)
+	move = XMVectorAdd(
+		XMLoadFloat3(&transform.Position()),
+		XMVectorScale(move, deltaTime * 5.0f)
 	);
-	DirectX::XMStoreFloat3(&movement, move);
+	XMStoreFloat3(&movement, move);
 	transform.Position(movement);
 }
 
-DirectX::XMFLOAT4X4 Camera::ViewMatrix()
+XMFLOAT4X4 Camera::ViewMatrix()
 {
 	UpdateViewMatrix();
 	return viewMatrix;
@@ -58,12 +60,12 @@ void Camera::UpdateViewMatrix()
 {
 	transform.SetDirty();
 
-	DirectX::XMStoreFloat4x4(&viewMatrix,
-		DirectX::XMMatrixTranspose(
-			DirectX::XMMatrixLookToLH(
-				DirectX::XMLoadFloat3(&transform.Position()),
-				DirectX::XMLoadFloat3(&transform.Forward()),
-				DirectX::XMLoadFloat3(&transform.Up())
+	XMStoreFloat4x4(&viewMatrix,
+		XMMatrixTranspose(
+			XMMatrixLookToLH(
+				XMLoadFloat3(&transform.Position()),
+				XMLoadFloat3(&transform.Forward()),
+				XMLoadFloat3(&transform.Up())
 			)
 		)
 	);
@@ -78,16 +80,16 @@ void Camera::SetScreenSize(int width, int height)
 	UpdateProjectionMatrix();
 }
 
-void Camera::SetScreenSize(DirectX::XMFLOAT2 size)
+void Camera::SetScreenSize(XMFLOAT2 size)
 {
 	screenWidth = size.x;
 	screenHeight = size.y;
 	UpdateProjectionMatrix();
 }
 
-DirectX::XMFLOAT2 Camera::ScreenSize() const
+XMFLOAT2 Camera::ScreenSize() const
 {
-	return DirectX::XMFLOAT2(screenWidth, screenHeight);
+	return XMFLOAT2(screenWidth, screenHeight);
 }
 
 int Camera::ScreenWidth() const
@@ -103,7 +105,7 @@ int Camera::ScreenHeight() const
 #pragma endregion
 
 #pragma region Projection Functions
-DirectX::XMFLOAT4X4 Camera::ProjectionMatrix()
+XMFLOAT4X4 Camera::ProjectionMatrix()
 {
 	UpdateProjectionMatrix();
 	return projectionMatrix;
@@ -111,7 +113,7 @@ DirectX::XMFLOAT4X4 Camera::ProjectionMatrix()
 
 void Camera::OnResize()
 {
-	DirectX::XMMATRIX P = DirectX::XMMatrixPerspectiveFovLH(
+	XMMATRIX P = XMMatrixPerspectiveFovLH(
 		0.25f * 3.1415926535f,
 		(float)screenWidth / screenHeight,
 		0.1f,
@@ -121,11 +123,11 @@ void Camera::OnResize()
 
 void Camera::UpdateProjectionMatrix()
 {
-	DirectX::XMMATRIX P = DirectX::XMMatrixPerspectiveFovLH(
+	XMMATRIX P = XMMatrixPerspectiveFovLH(
 		0.25f * 3.1415926535f,
 		(float)screenWidth / screenHeight,
 		0.1f,
 		100.0f);
-	DirectX::XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
 }
 #pragma endregion
