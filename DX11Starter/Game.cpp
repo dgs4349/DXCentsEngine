@@ -20,7 +20,6 @@ Game::Game(HINSTANCE hInstance)
 		720,			// Height of the window's client area
 		true)			// Show extra stats (fps) in title bar?
 {
-
 	camera = new Camera();
 
 #if defined(DEBUG) || defined(_DEBUG)
@@ -68,6 +67,7 @@ void Game::Init()
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
+	LoadModels();
 	CreateBasicGeometry();
 
 	camera->transform.Position(0.0f, 0.0f, -10.0f);
@@ -96,6 +96,14 @@ void Game::LoadShaders()
 	material = new Material(vertexShader, pixelShader);
 }
 
+void Game::LoadModels()
+{
+	char* path = "../Assets/Models/";
+	char* coneName = "cone";
+
+	meshes[0] = new Mesh("../Assets/Models/cone.obj", device);
+}
+
 // --------------------------------------------------------
 // Creates the geometry we're going to draw - a single triangle for now
 // --------------------------------------------------------
@@ -114,26 +122,26 @@ void Game::CreateBasicGeometry()
 	//    over to a DirectX-controlled data structure (the vertex buffer)
 	Vertex vertices[] =
 	{
-		{ XMFLOAT3(0.0f, 1.0f, 0.0f), red },
-		{ XMFLOAT3(1.5f, -1.0f, 0.0f), blue },
-		{ XMFLOAT3(-1.5f, -1.0f, 0.0f), green },
+		{ XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0)},
+		{ XMFLOAT3(1.5f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(-1.5f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
 	};
 
 	Vertex vertices2[] =
 	{
-		{ XMFLOAT3(1.0f, 1.0f, 0.0f), red },
-		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), blue },
-		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), green },
-		{ XMFLOAT3(1.0f, -1.0f, 0.0f), white },
+		{ XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
 	};
 
 	Vertex vertices3[] =
 	{
-		{ XMFLOAT3(1.0f, 1.0f, 0.0f), red },
-		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), blue },
-		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), green },
-		{ XMFLOAT3(1.0f, -1.0f, 0.0f), white },
-		{ XMFLOAT3(0.0f, -2.0f, 0.0f), pink },
+		{ XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
+		{ XMFLOAT3(0.0f, -2.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
 	};
 
 	// Set up the indices, which tell us which vertices to use and in which order
@@ -145,7 +153,6 @@ void Game::CreateBasicGeometry()
 	uint16_t indices2[] = { 1, 0, 2, 0, 3, 2 };
 	uint16_t indices3[] = { 1, 0, 2, 0, 3, 2, 2, 3, 4 };
 
-	meshes[0] = new Mesh(vertices, 3, indices, 3, device);
 	meshes[1] = new Mesh(vertices2, 4, indices2, 6, device);
 	meshes[2] = new Mesh(vertices3, 5, indices3, 9, device);
 

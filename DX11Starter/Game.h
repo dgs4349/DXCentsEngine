@@ -8,7 +8,7 @@
 #include "Camera.h"
 #include "Material.h"
 
-class Game 
+class Game
 	: public DXCore
 {
 
@@ -24,20 +24,21 @@ public:
 	void Draw(float deltaTime, float totalTime);
 
 	// Overridden mouse input helper methods
-	void OnMouseDown (WPARAM buttonState, int x, int y);
-	void OnMouseUp	 (WPARAM buttonState, int x, int y);
-	void OnMouseMove (WPARAM buttonState, int x, int y);
-	void OnMouseWheel(float wheelDelta,   int x, int y);
+	void OnMouseDown(WPARAM buttonState, int x, int y);
+	void OnMouseUp(WPARAM buttonState, int x, int y);
+	void OnMouseMove(WPARAM buttonState, int x, int y);
+	void OnMouseWheel(float wheelDelta, int x, int y);
 private:
 
 	// Initialization helper methods - feel free to customize, combine, etc.
-	void LoadShaders(); 
+	void LoadShaders();
+	void LoadModels();
 	void CreateBasicGeometry();
 
-	Mesh* meshes[3];
-	Entity* entities[5];
-	Camera* camera;
-	Material* material;
+	Mesh* meshes[3] = { NULL,NULL,NULL };
+	Entity* entities[5] = { NULL,NULL,NULL,NULL,NULL };
+	Camera* camera = NULL;
+	Material* material = NULL;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

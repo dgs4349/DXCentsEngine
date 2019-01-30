@@ -7,6 +7,7 @@ class Mesh
 public:
 	Mesh();
 	Mesh(Vertex* const vertices, uint16_t vertexCount, uint16_t* const indices, uint16_t indexCount, ID3D11Device* context);
+	Mesh(char* const filePath, ID3D11Device* context);
 	~Mesh();
 
 	ID3D11Buffer* const* GetVertexBuffer() const;
@@ -18,4 +19,6 @@ private:
 	ID3D11Buffer* VBI = nullptr;
 
 	uint16_t indexCount = 0;
+
+	void CreateBuffers(Vertex* const vertices, uint16_t vertexCount, uint16_t* const indices, uint16_t indexCount, ID3D11Device* const context);
 };
