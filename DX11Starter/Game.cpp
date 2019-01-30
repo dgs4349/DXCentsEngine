@@ -40,7 +40,7 @@ Game::~Game()
 	delete camera;
 	delete material;
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < entities.size(); ++i)
 	{
 		if (entities[i] != nullptr)
 		{
@@ -48,7 +48,7 @@ Game::~Game()
 		}
 	}
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < meshes.size(); ++i)
 	{
 		if (meshes[i] != nullptr)
 		{
@@ -98,10 +98,12 @@ void Game::LoadShaders()
 
 void Game::LoadModels()
 {
-	char* path = "../Assets/Models/";
-	char* coneName = "cone";
-
-	meshes[0] = new Mesh("../Assets/Models/cone.obj", device);
+	meshes.push_back(new Mesh("Assets/Models/cone.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/cube.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/cylinder.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/helix.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/sphere.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/torus.obj", device));
 }
 
 // --------------------------------------------------------
@@ -109,69 +111,19 @@ void Game::LoadModels()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	// Create some temporary variables to represent colors
-	// - Not necessary, just makes things more readable
-	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	XMFLOAT4 white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	XMFLOAT4 pink = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
 
-	// Set up the vertices of the triangle we would like to draw
-	// - We're going to copy this array, exactly as it exists in memory
-	//    over to a DirectX-controlled data structure (the vertex buffer)
-	Vertex vertices[] =
-	{
-		{ XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0)},
-		{ XMFLOAT3(1.5f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(-1.5f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-	};
+	entities.push_back(new Entity(meshes[0], material));
+	entities.push_back(new Entity(meshes[1], material));
+	entities.push_back(new Entity(meshes[2], material));
+	entities.push_back(new Entity(meshes[3], material));
+	entities.push_back(new Entity(meshes[4], material));
+	entities.push_back(new Entity(meshes[5], material));
 
-	Vertex vertices2[] =
-	{
-		{ XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-	};
-
-	Vertex vertices3[] =
-	{
-		{ XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-		{ XMFLOAT3(0.0f, -2.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0, 0) },
-	};
-
-	// Set up the indices, which tell us which vertices to use and in which order
-	// - This is somewhat redundant for just 3 vertices (it's a simple example)
-	// - Indices are technically not required if the vertices are in the buffer 
-	//    in the correct order and each one will be used exactly once
-	// - But just to see how it's done...
-	uint16_t indices[] = { 0, 1, 2 };
-	uint16_t indices2[] = { 1, 0, 2, 0, 3, 2 };
-	uint16_t indices3[] = { 1, 0, 2, 0, 3, 2, 2, 3, 4 };
-
-	meshes[1] = new Mesh(vertices2, 4, indices2, 6, device);
-	meshes[2] = new Mesh(vertices3, 5, indices3, 9, device);
-
-	entities[0] = new Entity(meshes[0], material);
-	entities[1] = new Entity(meshes[0], material);
-	entities[2] = new Entity(meshes[1], material);
-	entities[3] = new Entity(meshes[1], material);
-	entities[4] = new Entity(meshes[2], material);
-
-	entities[0]->transform.Position(-2.0f, -1.0f, 0.01f);
-	entities[1]->transform.Position(2.0f, -1.0f, 0.0f);
-
-	entities[2]->transform.Position(-2.5f, 1.0f, 0.0f);
-	entities[2]->transform.Scale(0.5f, 0.5f, 1);
-	entities[3]->transform.Position(2.5f, 1.0f, 0.0f);
-	entities[3]->transform.Scale(0.5f, 0.5f, 1);
-
-	entities[4]->transform.Position(0.0f, 0.11f, 0.0f);
-	entities[4]->transform.Scale(0.1f, .75f, 1);
+	entities[1]->transform.Position(2.0f, 0.0f, 0.0f);
+	entities[2]->transform.Position(4.0f, 0.0f, 0.0f);
+	entities[3]->transform.Position(6.0f, 0.0f, 0.0f);
+	entities[4]->transform.Position(8.0f, 0.0f, 0.0f);
+	entities[5]->transform.Position(10.0f, 0.0f, 0.0f);
 }
 
 
@@ -186,23 +138,11 @@ void Game::OnResize()
 	camera->OnResize();
 }
 
-float i = 0;
-
 // --------------------------------------------------------
 // Update your game here - user input, move objects, AI, etc.
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
-	entities[0]->transform.Position(sin(i) * 3, entities[0]->transform.Position().y, entities[0]->transform.Position().z);
-	entities[1]->transform.Position(cos(i) * 3, entities[1]->transform.Position().y, entities[1]->transform.Position().z);
-	entities[2]->transform.Rotate(0.0f, 0.0f, 0.001f);
-	entities[3]->transform.Rotate(0.0f, 0.0f, -0.001f);
-	entities[4]->transform.Rotate(0.0f, 0.0f, 0.001f);
-
-	i += deltaTime;
-
-	DirectX::XMFLOAT3 pos = entities[4]->transform.Up();
-
 	camera->Update(deltaTime);
 
 	// Quit if the escape key is pressed
@@ -234,7 +174,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < entities.size(); ++i)
 	{
 		entities[i]->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
 

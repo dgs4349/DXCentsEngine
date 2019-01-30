@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "DXCore.h"
 #include "SimpleShader.h"
 #include <DirectXMath.h>
@@ -35,10 +36,10 @@ private:
 	void LoadModels();
 	void CreateBasicGeometry();
 
-	Mesh* meshes[3] = { NULL,NULL,NULL };
-	Entity* entities[5] = { NULL,NULL,NULL,NULL,NULL };
-	Camera* camera = NULL;
-	Material* material = NULL;
+	std::vector<Mesh*> meshes;
+	std::vector<Entity*> entities;
+	Camera* camera;
+	Material* material;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

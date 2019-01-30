@@ -82,15 +82,4 @@
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Assets\Models\cone.obj" />
-    <Object Include="Assets\Models\cube.obj" />
-    <Object Include="Assets\Models\cylinder.obj" />
-    <Object Include="Assets\Models\helix.obj" />
-    <Object Include="Assets\Models\sphere.obj" />
-    <Object Include="Assets\Models\torus.obj" />
-  </ItemGroup>
 </Project>
