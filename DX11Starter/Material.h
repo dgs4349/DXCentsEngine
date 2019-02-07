@@ -8,8 +8,8 @@ public:
 	Material(SimpleVertexShader* const vertexShader, SimplePixelShader* const pixelShader);
 	~Material();
 
-	SimpleVertexShader* const VertexShader() const;
-	SimplePixelShader* const PixelShader() const;
+	SimpleVertexShader* VertexShader() const;
+	SimplePixelShader* PixelShader() const;
 
 	void SetMaterial() const;
 

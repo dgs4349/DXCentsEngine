@@ -22,12 +22,12 @@ void Material::SetMaterial() const
 	pixelShader->SetShader();
 }
 
-SimpleVertexShader* const Material::VertexShader() const
+SimpleVertexShader* Material::VertexShader() const
 {
 	return vertexShader;
 }
 
-SimplePixelShader* const Material::PixelShader() const
+SimplePixelShader* Material::PixelShader() const
 {
 	return pixelShader;
 }

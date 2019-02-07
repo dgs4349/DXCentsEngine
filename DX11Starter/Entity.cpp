@@ -35,4 +35,5 @@ void Entity::PrepareMaterial(DirectX::XMFLOAT4X4 viewMatrix, DirectX::XMFLOAT4X4
 	material->PixelShader()->SetShader();
 
 	material->VertexShader()->CopyAllBufferData();
+	material->PixelShader()->CopyAllBufferData();
 }

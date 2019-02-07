@@ -21,6 +21,7 @@ Game::Game(HINSTANCE hInstance)
 		true)			// Show extra stats (fps) in title bar?
 {
 	camera = new Camera();
+	directionalLight = DirectionalLight(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f));
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -72,6 +73,8 @@ void Game::Init()
 
 	camera->transform.Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
+	
+	directionalLight = DirectionalLight(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(0.5f, -0.5f, 0.5f));
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -111,7 +114,6 @@ void Game::LoadModels()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-
 	entities.push_back(new Entity(meshes[0], material));
 	entities.push_back(new Entity(meshes[1], material));
 	entities.push_back(new Entity(meshes[2], material));
@@ -176,6 +178,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	for (int i = 0; i < entities.size(); ++i)
 	{
+		entities[i]->material->PixelShader()->SetData("light", &directionalLight, sizeof(DirectionalLight));
 		entities[i]->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
 
 		context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer(), &stride, &offset);

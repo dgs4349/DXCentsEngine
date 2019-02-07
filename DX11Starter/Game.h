@@ -8,6 +8,7 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Light.h"
 
 class Game
 	: public DXCore
@@ -29,7 +30,10 @@ public:
 	void OnMouseUp(WPARAM buttonState, int x, int y);
 	void OnMouseMove(WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta, int x, int y);
+
 private:
+
+	DirectionalLight directionalLight;
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders();
