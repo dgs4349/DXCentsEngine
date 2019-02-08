@@ -174,7 +174,7 @@ Mesh::Mesh(char* const filePath, ID3D11Device* context)
 	// Close the file and create the actual buffers
 	obj.close();
 
-	CreateBuffers(&verts[0], verts.size(), &indices[0], indices.size(), context);
+	CreateBuffers(&verts[0], static_cast<uint16_t>(verts.size()), &indices[0], static_cast<uint16_t>(indices.size()), context);
 }
 
 ID3D11Buffer* const* Mesh::GetVertexBuffer() const

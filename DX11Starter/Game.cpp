@@ -21,7 +21,7 @@ Game::Game(HINSTANCE hInstance)
 		true)			// Show extra stats (fps) in title bar?
 {
 	camera = new Camera();
-	directionalLight = DirectionalLight(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0.0f));
+	directionalLight = DirectionalLight();
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -74,7 +74,7 @@ void Game::Init()
 	camera->transform.Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
 	
-	directionalLight = DirectionalLight(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(0.5f, -0.5f, 0.5f));
+	directionalLight = DirectionalLight(XMFLOAT4(0.1f, 0.1f, 0.3f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(0.5f, -0.5f, 0.5f));
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  

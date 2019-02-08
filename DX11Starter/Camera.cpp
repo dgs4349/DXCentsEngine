@@ -82,8 +82,8 @@ void Camera::SetScreenSize(int width, int height)
 
 void Camera::SetScreenSize(XMFLOAT2 size)
 {
-	screenWidth = size.x;
-	screenHeight = size.y;
+	screenWidth = static_cast<uint16_t>(size.x);
+	screenHeight = static_cast<uint16_t>(size.y);
 	UpdateProjectionMatrix();
 }
 

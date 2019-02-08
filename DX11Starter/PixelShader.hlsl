@@ -41,8 +41,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	float3 normal = normalize(input.normal);
 
-	float3 lightDirection = normalize(light.direction) * -1.0f;
-	float lightAmount = saturate(dot(normal, lightDirection));
+	float lightAmount = saturate(dot(normal, normalize(-light.direction)));
 
-	return light.diffuseColor * lightAmount + light.ambientColor;
+	return light.ambientColor + (light.diffuseColor * lightAmount);
 }
