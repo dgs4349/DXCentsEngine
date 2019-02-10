@@ -22,6 +22,7 @@ Game::Game(HINSTANCE hInstance)
 {
 	camera = new Camera();
 	directionalLight = DirectionalLight();
+	directionalLight2 = DirectionalLight();
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -39,22 +40,27 @@ Game::Game(HINSTANCE hInstance)
 Game::~Game()
 {
 	delete camera;
-	delete material;
+	delete vertexShader;
+	delete pixelShader;
+
+	for (int i = 0; i < materials.size(); ++i)
+	{
+		delete materials[i];
+	}
+
+	for (int i = 0; i < textureViews.size(); ++i)
+	{
+		textureViews[i]->Release();
+	}
 
 	for (int i = 0; i < entities.size(); ++i)
 	{
-		if (entities[i] != nullptr)
-		{
-			delete entities[i];
-		}
+		delete entities[i];
 	}
 
 	for (int i = 0; i < meshes.size(); ++i)
 	{
-		if (meshes[i] != nullptr)
-		{
-			delete meshes[i];
-		}
+		delete meshes[i];
 	}
 }
 
@@ -68,13 +74,16 @@ void Game::Init()
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
+	LoadTextures();
+	CreateMaterials();
 	LoadModels();
 	CreateBasicGeometry();
 
 	camera->transform.Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
-	
-	directionalLight = DirectionalLight(XMFLOAT4(0.1f, 0.1f, 0.3f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(0.5f, -0.5f, 0.5f));
+
+	directionalLight = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, -1.0f, -1.0f));
+	directionalLight2 = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -90,13 +99,11 @@ void Game::Init()
 // --------------------------------------------------------
 void Game::LoadShaders()
 {
-	SimpleVertexShader* vertexShader = new SimpleVertexShader(device, context);
+	vertexShader = new SimpleVertexShader(device, context);
 	vertexShader->LoadShaderFile(L"VertexShader.cso");
 
-	SimplePixelShader* pixelShader = new SimplePixelShader(device, context);
+	pixelShader = new SimplePixelShader(device, context);
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
-
-	material = new Material(vertexShader, pixelShader);
 }
 
 void Game::LoadModels()
@@ -109,17 +116,56 @@ void Game::LoadModels()
 	meshes.push_back(new Mesh("Assets/Models/torus.obj", device));
 }
 
+void Game::LoadTextures()
+{
+	ID3D11ShaderResourceView* texView;
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Cobblestone.jpg", 0, &texView);
+	textureViews.push_back(texView);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Dirt.jpg", 0, &texView);
+	textureViews.push_back(texView);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/StonePath.jpg", 0, &texView);
+	textureViews.push_back(texView);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/WoodCrate.jpg", 0, &texView);
+	textureViews.push_back(texView);
+}
+
+void Game::CreateMaterials()
+{
+	ID3D11SamplerState* samplerState;
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+
+	//materials.push_back(new Material(vertexShader, pixelShader));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[0], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[1], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[2], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], samplerState));
+}
+
 // --------------------------------------------------------
 // Creates the geometry we're going to draw - a single triangle for now
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	entities.push_back(new Entity(meshes[0], material));
-	entities.push_back(new Entity(meshes[1], material));
-	entities.push_back(new Entity(meshes[2], material));
-	entities.push_back(new Entity(meshes[3], material));
-	entities.push_back(new Entity(meshes[4], material));
-	entities.push_back(new Entity(meshes[5], material));
+	entities.push_back(new Entity(meshes[0], materials[0]));
+	entities.push_back(new Entity(meshes[1], materials[0]));
+	entities.push_back(new Entity(meshes[2], materials[0]));
+	entities.push_back(new Entity(meshes[3], materials[0]));
+	entities.push_back(new Entity(meshes[4], materials[0]));
+	entities.push_back(new Entity(meshes[5], materials[0]));
 
 	entities[1]->transform.Position(2.0f, 0.0f, 0.0f);
 	entities[2]->transform.Position(4.0f, 0.0f, 0.0f);
@@ -179,6 +225,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	for (int i = 0; i < entities.size(); ++i)
 	{
 		entities[i]->material->PixelShader()->SetData("light", &directionalLight, sizeof(DirectionalLight));
+		entities[i]->material->PixelShader()->SetData("light2", &directionalLight2, sizeof(DirectionalLight));
 		entities[i]->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
 
 		context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer(), &stride, &offset);

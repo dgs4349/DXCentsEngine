@@ -14,6 +14,7 @@ struct VertexToPixel
 	float4 position		: SV_POSITION;
 	float4 color		: COLOR;
 	float3 normal		: NORMAL;
+	float2 uv			: UV;
 };
 
 struct DirectionalLight
@@ -26,7 +27,11 @@ struct DirectionalLight
 cbuffer externalData : register(b0)
 {
 	DirectionalLight light;
+	DirectionalLight light2;
 };
+
+Texture2D diffuseTexture : register(t0);
+SamplerState basicSampler : register(s0);
 
 // --------------------------------------------------------
 // The entry point (main method) for our pixel shader
@@ -39,9 +44,12 @@ cbuffer externalData : register(b0)
 // --------------------------------------------------------
 float4 main(VertexToPixel input) : SV_TARGET
 {
+	float4 surfaceColor = diffuseTexture.Sample(basicSampler, input.uv);
+
 	float3 normal = normalize(input.normal);
 
 	float lightAmount = saturate(dot(normal, normalize(-light.direction)));
+	float lightAmount2 = saturate(dot(normal, normalize(-light2.direction)));
 
-	return light.ambientColor + (light.diffuseColor * lightAmount);
+	return (light.ambientColor + light2.ambientColor + (light.diffuseColor * lightAmount) + (light2.diffuseColor * lightAmount2)) * surfaceColor;
 }

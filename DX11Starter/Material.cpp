@@ -4,16 +4,26 @@ Material::Material()
 {
 }
 
-Material::Material(SimpleVertexShader * const vertexShader, SimplePixelShader * const pixelShader)
+Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelShader)
 {
 	this->vertexShader = vertexShader;
 	this->pixelShader = pixelShader;
 }
 
+Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelShader, ID3D11ShaderResourceView* shaderResourceView, ID3D11SamplerState* samplerState)
+{
+	this->vertexShader = vertexShader;
+	this->pixelShader = pixelShader;
+	this->shaderResourceView = shaderResourceView;
+	this->samplerState = samplerState;
+}
+
 Material::~Material()
 {
-	delete vertexShader;
-	delete pixelShader;
+	vertexShader = nullptr;
+	pixelShader = nullptr;
+	shaderResourceView = nullptr;
+	samplerState->Release();
 }
 
 void Material::SetMaterial() const
@@ -30,4 +40,14 @@ SimpleVertexShader* Material::VertexShader() const
 SimplePixelShader* Material::PixelShader() const
 {
 	return pixelShader;
+}
+
+ID3D11ShaderResourceView* Material::ShaderResourceView() const
+{
+	return shaderResourceView;
+}
+
+ID3D11SamplerState * Material::SamplerState() const
+{
+	return samplerState;
 }

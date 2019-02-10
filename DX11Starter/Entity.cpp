@@ -27,6 +27,9 @@ void Entity::SetMesh(Mesh* const mesh)
 
 void Entity::PrepareMaterial(DirectX::XMFLOAT4X4 viewMatrix, DirectX::XMFLOAT4X4 projectionMatrix)
 {
+	material->PixelShader()->SetSamplerState("basicSampler", material->SamplerState());
+	material->PixelShader()->SetShaderResourceView("diffuseTexture", material->ShaderResourceView());
+
 	material->VertexShader()->SetMatrix4x4("view", viewMatrix);
 	material->VertexShader()->SetMatrix4x4("projection", projectionMatrix);
 	material->VertexShader()->SetMatrix4x4("world", transform.WorldMatrix());
