@@ -82,8 +82,8 @@ void Game::Init()
 	camera->transform.Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
 
-	directionalLight = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, -1.0f, -1.0f));
-	directionalLight2 = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
+	directionalLight = DirectionalLight(XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 1.0f));
+	//directionalLight2 = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -161,11 +161,11 @@ void Game::CreateMaterials()
 void Game::CreateBasicGeometry()
 {
 	entities.push_back(new Entity(meshes[0], materials[0]));
-	entities.push_back(new Entity(meshes[1], materials[0]));
-	entities.push_back(new Entity(meshes[2], materials[0]));
-	entities.push_back(new Entity(meshes[3], materials[0]));
-	entities.push_back(new Entity(meshes[4], materials[0]));
-	entities.push_back(new Entity(meshes[5], materials[0]));
+	entities.push_back(new Entity(meshes[1], materials[3]));
+	entities.push_back(new Entity(meshes[2], materials[2]));
+	entities.push_back(new Entity(meshes[3], materials[1]));
+	entities.push_back(new Entity(meshes[4], materials[2]));
+	entities.push_back(new Entity(meshes[5], materials[3]));
 
 	entities[1]->transform.Position(2.0f, 0.0f, 0.0f);
 	entities[2]->transform.Position(4.0f, 0.0f, 0.0f);
