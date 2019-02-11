@@ -12,16 +12,8 @@ class Logger
 {
 public:
 
-	static Logger* GetInstance(void)
-	{
-		static Logger* instance = nullptr;
-		if (instance == nullptr)
-		{
-			instance = new Logger();
-			printf("Creating Singleton for '%s'\n", typeid(Logger).name());
-		}
-		return instance;
-	}
+	static Logger* GetInstance(void);
+	static void ReleaseInstance(void);
 
 	static std::shared_ptr<spdlog::logger> GetCurrentConsole();
 

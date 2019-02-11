@@ -12,7 +12,6 @@ public:
 		static T* instance = nullptr;
 		if (instance == nullptr)
 		{
-			LOG_TRACE( "Creating Singleton for '{}'", typeid(T).name());
 			instance = new T();
 		}
 		return instance;
@@ -20,12 +19,19 @@ public:
 
 	static void ReleaseInstance(void)
 	{
+		delete GetInstance();
 	}
 
 	Singleton(Singleton const&) = delete;
 	void operator=(Singleton const&) = delete;
 
 protected:
-	Singleton() {}
-	~Singleton() {}
+	Singleton()
+	{
+		LOG_TRACE("Created '{}' Singleton", typeid(T).name());
+	}
+	~Singleton()
+	{
+		LOG_TRACE("Released '{}' Singleton", typeid(T).name());
+	}
 };

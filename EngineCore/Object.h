@@ -1,26 +1,37 @@
 #pragma once
+
 #include <stdint.h>
 #include <string>
 #include <vector>
 
+#include "ObjectManager.h"
+
 class Object
 {
+	friend class ObjectManager;
 public:
 
-	std::string name;
+	std::string name = "Object";
 
 	Object();
-	~Object();
+	Object(const Object& object);
 
 	inline uint64_t GetInstanceID();
+	inline std::string ToString();
 
-	static void Destroy(Object obj);
-	static Object FindObjectOfType();
-	static std::vector<Object> FindObjectsOfType();
-	static Object Instantiate(Object obj);
+	static void Destroy(Object* const obj);
 
-	inline operator bool();
-	inline int operator !=(Object rh);
-	inline int operator ==(Object rh);
+	inline static Object* Instantiate(Object obj);
+
+	inline virtual operator bool();
+	inline virtual int operator !=(Object rh);
+	inline virtual int operator ==(Object rh);
+
+protected:
+
+	~Object();
+
+private:
+
+	uint64_t ID;
 };
-

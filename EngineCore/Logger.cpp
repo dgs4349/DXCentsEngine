@@ -1,6 +1,20 @@
 #include "Logger.h"
 
+Logger* Logger::GetInstance(void)
+{
+	static Logger* instance = nullptr;
+	if (instance == nullptr)
+	{
+		instance = new Logger();
+		LOG_TRACE("Created Logger Singleton");
+	}
+	return instance;
+}
 
+void Logger::ReleaseInstance(void)
+{
+	delete GetInstance();
+}
 
 std::shared_ptr<spdlog::logger> Logger::GetCurrentConsole()
 {
@@ -16,4 +30,5 @@ Logger::Logger()
 
 Logger::~Logger()
 {
+	LOG_TRACE("Released Logger Singleton");
 }
