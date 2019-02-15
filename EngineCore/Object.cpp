@@ -27,6 +27,11 @@ inline std::string Object::ToString()
 	return name;
 }
 
+void Object::Destroy()
+{
+	ObjectManager::GetInstance()->DeleteObject(this);
+}
+
 void Object::Destroy(Object* const obj)
 {
 	ObjectManager::GetInstance()->DeleteObject(obj);

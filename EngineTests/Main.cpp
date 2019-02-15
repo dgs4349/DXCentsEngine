@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 
-#include "Logger.h"
-#include "ObjectManager.h"
+#include "EngineCore.h"
 
 int main(void)
 {
@@ -14,12 +13,7 @@ int main(void)
 	Logger::GetInstance();
 	ObjectManager::GetInstance();
 
-	Object* test = new Object();
 	new Object();
-	new Object();
-	new Object();
-
-	Object::Destroy(test);
 
 	getchar();
 	ObjectManager::ReleaseInstance();
