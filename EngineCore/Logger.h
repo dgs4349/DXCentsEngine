@@ -39,7 +39,7 @@ private:
 #else
 
 #define  LOG_TRACE( ... ) 
-#define  LOG_WARN( ... )  
+#define  LOG_WARNING( ... )  
 #define  LOG_ERROR( ... ) 
 
 #endif

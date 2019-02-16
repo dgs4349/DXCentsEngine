@@ -7,7 +7,7 @@ class Camera
 {
 public:
 
-	Component::Transform transform;
+	Component::TransformTMP transform;
 
 	Camera();
 	~Camera();

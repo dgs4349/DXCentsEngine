@@ -13,7 +13,15 @@ class ObjectManager : public Singleton<ObjectManager>
 {
 	friend class Singleton<ObjectManager>;
 	friend class Object;
+
 public:
+
+	/// <summary>
+	/// Unregister an object from the manager
+	/// </summary>
+	/// <param name="object">The object to unregister</param>
+	void DestroyObject(Object* const object);
+
 
 protected:
 
@@ -25,27 +33,26 @@ protected:
 	/// <summary>
 	/// Unregister an object from the manager
 	/// </summary>
-	/// <param name="object">The object to unregister</param>
-	void DeleteObject(Object* const object);
-	/// <summary>
-	/// Unregister an object from the manager
-	/// </summary>
 	/// <param name="objectID">The unique object ID to unregister</param>
-	void DeleteObject(uint64_t objectID);
+	void DestroyObject(uint64_t objectID);
+
 
 protected:
-	ObjectManager();
-	~ObjectManager();
-
-private:
 
 	/// <summary>
 	/// The amount of objects that the manager handles
 	/// </summary>
 	uint64_t objectCount = 0;
 
+	ObjectManager();
+	~ObjectManager();
+
+private:
+
 	/// <summary>
 	/// All of the objects that have been registered
 	/// </summary>
 	std::unordered_map<uint64_t, Object*> activeObjects;
 };
+
+#define Destroy ObjectManager::GetInstance()->DestroyObject

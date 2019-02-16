@@ -209,7 +209,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
-    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="TransformTMP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -220,7 +220,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="SimpleShader.h" />
-    <ClInclude Include="Transform.h" />
+    <ClInclude Include="TransformTMP.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

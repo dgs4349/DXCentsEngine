@@ -3,14 +3,14 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "Mesh.h"
-#include "Transform.h"
+#include "TransformTMP.h"
 #include "Material.h"
 
 class Entity
 {
 public:
 
-	Component::Transform transform;
+	Component::TransformTMP transform;
 	Material* material;
 
 	Entity(Mesh* const mesh, Material* const material);

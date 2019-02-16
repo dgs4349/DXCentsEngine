@@ -17,7 +17,7 @@ struct Light
 {
 public:
 
-	Component::Transform transform;
+	Component::TransformTMP transform;
 
 	Light();
 	~Light();

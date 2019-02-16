@@ -39,6 +39,7 @@ public:
 	/// </summary>
 	void operator=(Singleton const&) = delete;
 
+
 protected:
 
 	Singleton()

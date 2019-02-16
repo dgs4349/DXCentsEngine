@@ -1,10 +1,11 @@
-#include "Transform.h"
+#include "..\EngineCore\Transform.h"
+#include "TransformTMP.h"
 
 using namespace DirectX;
 
 namespace Component
 {
-	Transform::Transform()
+	TransformTMP::TransformTMP()
 	{
 		position = { 0.0f, 0.0f, 0.0f };
 		eulerAngle = { 0.0f, 0.0f, 0.0f };
@@ -23,18 +24,18 @@ namespace Component
 
 #pragma region Position Getter/Setter Functions
 
-	XMFLOAT3 Transform::Position() const
+	XMFLOAT3 TransformTMP::Position() const
 	{
 		return position;
 	}
 
-	void Transform::Position(float x, float y, float z)
+	void TransformTMP::Position(float x, float y, float z)
 	{
 		position = XMFLOAT3(x, y, z);
 		dirty = true;
 	}
 
-	void Transform::Position(XMFLOAT3 position)
+	void TransformTMP::Position(XMFLOAT3 position)
 	{
 		this->position = position;
 		dirty = true;
@@ -44,29 +45,29 @@ namespace Component
 
 #pragma region Rotation Getter/Setter Functions
 
-	XMFLOAT4 Transform::Rotation() const
+	XMFLOAT4 TransformTMP::Rotation() const
 	{
 		return rotation;
 	}
 
-	XMFLOAT3 Transform::EulerAngles() const
+	XMFLOAT3 TransformTMP::EulerAngles() const
 	{
 		return eulerAngle;
 	}
 
-	void Transform::Rotation(float x, float y, float z, float w)
+	void TransformTMP::Rotation(float x, float y, float z, float w)
 	{
 		rotation = XMFLOAT4(x, y, z, w);
 		dirty = true;
 	}
 
-	void Transform::Rotation(XMFLOAT4 rotation)
+	void TransformTMP::Rotation(XMFLOAT4 rotation)
 	{
 		this->rotation = rotation;
 		dirty = true;
 	}
 
-	void Transform::Rotate(float x, float y, float z)
+	void TransformTMP::Rotate(float x, float y, float z)
 	{
 		XMVECTOR newRot = XMVectorAdd(XMLoadFloat3(&eulerAngle), { x, y, z });
 		XMVECTOR quat = XMQuaternionRotationRollPitchYawFromVector(newRot);
@@ -76,7 +77,7 @@ namespace Component
 		dirty = true;
 	}
 
-	void Transform::Rotate(XMFLOAT3 rotate)
+	void TransformTMP::Rotate(XMFLOAT3 rotate)
 	{
 		XMVECTOR newRot = XMVectorAdd(XMLoadFloat3(&eulerAngle), XMLoadFloat3(&rotate));
 		XMVECTOR quat = XMQuaternionRotationRollPitchYawFromVector(newRot);
@@ -90,18 +91,18 @@ namespace Component
 
 #pragma region Scale Getter/Setter Functions
 
-	XMFLOAT3 Transform::Scale() const
+	XMFLOAT3 TransformTMP::Scale() const
 	{
 		return scale;
 	}
 
-	void Transform::Scale(float x, float y, float z)
+	void TransformTMP::Scale(float x, float y, float z)
 	{
 		scale = XMFLOAT3(x, y, z);
 		dirty = true;
 	}
 
-	void Transform::Scale(XMFLOAT3 scale)
+	void TransformTMP::Scale(XMFLOAT3 scale)
 	{
 		this->scale = scale;
 		dirty = true;
@@ -111,43 +112,43 @@ namespace Component
 
 #pragma region Directional Getter/Update Functions
 
-	XMFLOAT3 Transform::Forward()
+	XMFLOAT3 TransformTMP::Forward()
 	{
 		UpdateTransform();
 		return forward;
 	}
 
-	XMFLOAT3 Transform::Backward()
+	XMFLOAT3 TransformTMP::Backward()
 	{
 		UpdateTransform();
 		return backward;
 	}
 
-	XMFLOAT3 Transform::Up()
+	XMFLOAT3 TransformTMP::Up()
 	{
 		UpdateTransform();
 		return up;
 	}
 
-	XMFLOAT3 Transform::Down()
+	XMFLOAT3 TransformTMP::Down()
 	{
 		UpdateTransform();
 		return down;
 	}
 
-	XMFLOAT3 Transform::Left()
+	XMFLOAT3 TransformTMP::Left()
 	{
 		UpdateTransform();
 		return left;
 	}
 
-	XMFLOAT3 Transform::Right()
+	XMFLOAT3 TransformTMP::Right()
 	{
 		UpdateTransform();
 		return right;
 	}
 
-	void Transform::UpdateDirectionalVectors()
+	void TransformTMP::UpdateDirectionalVectors()
 	{
 		XMMATRIX mat = XMLoadFloat4x4(&worldMatrix);
 		XMMATRIX rotationMat = XMMatrixRotationQuaternion(XMLoadFloat4(&rotation));
@@ -172,13 +173,13 @@ namespace Component
 
 #pragma region World Matrix Getter/Updater Functions
 
-	XMFLOAT4X4 Transform::WorldMatrix()
+	XMFLOAT4X4 TransformTMP::WorldMatrix()
 	{
 		UpdateTransform();
 		return worldMatrix;
 	}
 
-	void Transform::UpdateWorldMatrix()
+	void TransformTMP::UpdateWorldMatrix()
 	{
 		XMMATRIX scaleMat = XMMatrixScalingFromVector(XMLoadFloat3(&scale));
 		XMMATRIX rotationMat = XMMatrixRotationQuaternion(XMLoadFloat4(&rotation));
@@ -190,12 +191,12 @@ namespace Component
 
 #pragma endregion
 
-	void Transform::SetDirty()
+	void TransformTMP::SetDirty()
 	{
 		dirty = true;
 	}
 
-	void Transform::UpdateTransform()
+	void TransformTMP::UpdateTransform()
 	{
 		if (dirty)
 		{

@@ -13,7 +13,19 @@ int main(void)
 	Logger::GetInstance();
 	ObjectManager::GetInstance();
 
-	new Object();
+	GameObject* gameObjects[1000];
+
+	for (int i = 0; i < 1000; i++)
+	{
+		gameObjects[i] = new GameObject("Test Object");
+	}
+
+
+	std::string name;
+	for (int i = 0; i < 1000; i++)
+	{
+		name = gameObjects[i]->name;
+	}
 
 	getchar();
 	ObjectManager::ReleaseInstance();

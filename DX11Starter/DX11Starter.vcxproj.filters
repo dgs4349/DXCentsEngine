@@ -41,10 +41,10 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
+    <ClCompile Include="Light.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
+    <ClCompile Include="TransformTMP.cpp">
       <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -73,10 +73,10 @@
     <ClInclude Include="Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
+    <ClInclude Include="Light.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
+    <ClInclude Include="TransformTMP.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

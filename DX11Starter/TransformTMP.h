@@ -5,18 +5,18 @@
 
 namespace Component
 {
-	struct Transform
+	struct TransformTMP
 	{
 	public:
 
-		Transform();
+		TransformTMP();
 
 		DirectX::XMFLOAT3 Position() const;
 		void Position(float x, float y, float z);
 		void Position(DirectX::XMFLOAT3 position);
 
 		DirectX::XMFLOAT4 Rotation() const;
-		DirectX::XMFLOAT3 Transform::EulerAngles() const;
+		DirectX::XMFLOAT3 TransformTMP::EulerAngles() const;
 		void Rotation(float x, float y, float z, float w);
 		void Rotation(DirectX::XMFLOAT4 rotation);
 		void Rotate(float x, float y, float z);

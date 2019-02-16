@@ -12,6 +12,12 @@ Object::Object(const Object& object)
 	ObjectManager::GetInstance()->RegisterObject(this);
 }
 
+Object::Object(std::string name)
+{
+	this->name = name;
+	ObjectManager::GetInstance()->RegisterObject(this);
+}
+
 Object::~Object()
 {
 	LOG_TRACE("Destroying {}:{}", name, ID);
@@ -25,16 +31,6 @@ uint64_t Object::GetInstanceID()
 inline std::string Object::ToString()
 {
 	return name;
-}
-
-void Object::Destroy()
-{
-	ObjectManager::GetInstance()->DeleteObject(this);
-}
-
-void Object::Destroy(Object* const obj)
-{
-	ObjectManager::GetInstance()->DeleteObject(obj);
 }
 
 Object* Object::Instantiate(Object obj)

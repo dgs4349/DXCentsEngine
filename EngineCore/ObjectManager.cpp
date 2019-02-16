@@ -27,7 +27,7 @@ void ObjectManager::RegisterObject(Object* const object)
 	objectCount++;
 }
 
-void ObjectManager::DeleteObject(Object* const object)
+void ObjectManager::DestroyObject(Object* const object)
 {
 	if (object->ID >= objectCount)
 	{
@@ -37,10 +37,9 @@ void ObjectManager::DeleteObject(Object* const object)
 
 	activeObjects.erase(activeObjects.find(object->ID));
 	delete object;
-	--objectCount;
 }
 
-void ObjectManager::DeleteObject(uint64_t objectID)
+void ObjectManager::DestroyObject(uint64_t objectID)
 {
 	if (objectID >= objectCount)
 	{
@@ -50,5 +49,4 @@ void ObjectManager::DeleteObject(uint64_t objectID)
 
 	activeObjects.erase(activeObjects.find(objectID));
 	delete activeObjects[objectID];
-	--objectCount;
 }

@@ -22,6 +22,7 @@ namespace HideFlags
 class Object
 {
 	friend class ObjectManager;
+
 public:
 
 	/// <summary>
@@ -49,16 +50,6 @@ public:
 	/// </summary>
 	inline std::string ToString();
 
-	/// <summary>
-	/// Unregisters and frees the memory of this object
-	/// </summary>
-	void Destroy();
-	/// <summary>
-	/// Unregisters and frees the memory of an object
-	/// </summary>
-	/// <param name="obj">The object to delete</param>
-	static void Destroy(Object* const obj);
-
 	inline static Object* Instantiate(Object obj);
 
 	/// <summary>
@@ -74,17 +65,17 @@ public:
 	/// </summary>
 	inline virtual int operator ==(Object rh);
 
+
 protected:
-
-	/// <summary>
-	/// Private delete that should only be called by ObjectManager
-	/// </summary>
-	~Object();
-
-private:
 
 	/// <summary>
 	/// The unique ID of the object
 	/// </summary>
 	uint64_t ID;
+
+	Object(std::string name);
+	/// <summary>
+	/// Private delete that should only be called by ObjectManager
+	/// </summary>
+	virtual ~Object();
 };
