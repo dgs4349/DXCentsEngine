@@ -6,11 +6,9 @@ int main(void)
 {
 	ObjectManager::GetInstance();
 	
-	GameObject* obj = new GameObject(); 
+	GameObject* obj = new GameObject("Test Object");
 
-	obj->AddComponent<Object>();
-	obj->AddComponent<Transform>();
-	obj->AddComponent<Transform>();
+	LOG_TRACE("{}, {}", obj->ToString(), obj->transform->ToString());
 
 	getchar();
 	ObjectManager::ReleaseInstance();

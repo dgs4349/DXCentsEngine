@@ -12,7 +12,7 @@
 
 # Build results
 *.zip
-[_]*/
+[_][BbDd]*/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

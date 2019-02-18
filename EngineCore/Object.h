@@ -52,7 +52,7 @@ public:
 	/// <summary>
 	/// Returns the name of the object
 	/// </summary>
-	inline std::string ToString();
+	std::string ToString();
 
 	inline static Object* Instantiate(Object obj);
 

@@ -33,7 +33,7 @@ uint64_t Object::GetInstanceID()
 }
 
 
-inline std::string Object::ToString()
+std::string Object::ToString()
 {
 	return name;
 }
