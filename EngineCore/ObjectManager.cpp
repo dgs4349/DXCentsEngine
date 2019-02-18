@@ -6,6 +6,7 @@ ObjectManager::ObjectManager()
 {
 }
 
+
 ObjectManager::~ObjectManager()
 {
 	std::unordered_map<uint64_t, Object*>::iterator it = activeObjects.begin();
@@ -18,6 +19,7 @@ ObjectManager::~ObjectManager()
 	activeObjects.clear();
 }
 
+
 void ObjectManager::RegisterObject(Object* const object)
 {
 	object->ID = objectCount;
@@ -26,6 +28,7 @@ void ObjectManager::RegisterObject(Object* const object)
 	activeObjects.insert({ objectCount, object });
 	objectCount++;
 }
+
 
 void ObjectManager::DestroyObject(Object* const object)
 {
@@ -38,6 +41,7 @@ void ObjectManager::DestroyObject(Object* const object)
 	activeObjects.erase(activeObjects.find(object->ID));
 	delete object;
 }
+
 
 void ObjectManager::DestroyObject(uint64_t objectID)
 {

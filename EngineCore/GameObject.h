@@ -1,53 +1,67 @@
 #pragma once
-
 #include <string>
+
 #include "Object.h"
 #include "Transform.h"
+#include "stdHelper.h"
 
 class GameObject : public Object
 {
-	friend class Transform;
+	friend class Component;
 
 public:
 
-	/// <summary>
-	/// The tag of this game object
-	/// </summary>
-	std::string tag;
-	/// <summary>
-	/// The transform attached to this game object
-	/// </summary>
-	Transform* transform = NULL;
+	Transform* transform;
 
-	/// <summary>
-	/// Default constructor
-	/// </summary>
 	GameObject();
-	/// <summary>
-	/// Naming constructor
-	/// </summary>
-	/// <param name="name"></param>
 	GameObject(std::string name);
-	//GameObject(std::string name, std::vector<Component> components);
 
-	void AddComponent();
-	//void AddComponent();
+	template <class T, class ...ARGS>
+	T* AddComponent(ARGS&&... args)
+	{
+		if (!std::is_base_of<Component, T>::value)
+		{
+			LOG_TRACE("Tried to add {} which is not a component, returning", GetTypeName<T>());
+			return nullptr;
+		}
 
+		T* component = GetComponent<T>();
+		if (component != nullptr)
+		{
+			LOG_TRACE("Tried to add {} which already is attached to GameObject, returning", GetTypeName<T>());
+			return nullptr;
+		}
+
+		component = new T(std::forward<ARGS>(args)...);
+		attachedComponents.insert({ GetTypeName<T>(), reinterpret_cast<Component*>(component) });
+
+		return component;
+	}
+
+	template <class T>
+	T* GetComponent()
+	{
+		if (!std::is_base_of<Component, T>::value)
+		{
+			LOG_TRACE("Tried to find {} which is not a component, returning", GetTypeName<T>());
+			return nullptr;
+		}
+
+		std::unordered_map<std::string, Component*>::iterator component = attachedComponents.find(GetTypeName<T>());
+
+		if (component == attachedComponents.end())
+		{
+			return nullptr;
+		}
+		else
+		{
+			return reinterpret_cast<T*>(component->second);
+		}
+	}
 
 protected:
+	~GameObject();
 
-	virtual ~GameObject() override;
-
-
-private:
-
-	/// <summary>
-	/// Whether the game object is active in the scene
-	/// </summary>
-	bool activeInHierarchy = true;
-	/// <summary>
-	/// Whether the local state of this game object is active
-	/// </summary>
-	bool activeSelf = true;
+	std::unordered_map<std::string, Component*> attachedComponents;
 };
 

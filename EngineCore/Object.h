@@ -6,6 +6,10 @@
 
 #include "ObjectManager.h"
 
+#ifndef ObjectManager
+class ObjectManager;
+#endif
+
 namespace HideFlags
 {
 	enum HideFlags

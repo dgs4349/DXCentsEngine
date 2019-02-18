@@ -1,29 +1,22 @@
 #pragma once
 
-#include <string>
 #include "Object.h"
-#include "GameObject.h"
 
-template <class T>
+class GameObject;
+class Transform;
+
 class Component : public Object
 {
-	friend class GameObject;
-
 public:
 
-	/// <summary>
-	/// The game object this component is attached to
-	/// </summary>
-	GameObject* gameObject = NULL;
+	GameObject* gameObject;
+	Transform* transform;
 
-	Component() {}
-
+	Component();
 
 protected:
-	/// <summary>
-	/// Naming constructor
-	/// </summary>
-	/// <param name="name">The name of the component</param>
-	Component(std::string name) : Object(name) {}
-	~Component() override {}
+
+	Component(std::string name);
+	~Component() override;
 };
+

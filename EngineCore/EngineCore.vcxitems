@@ -3,7 +3,8 @@
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <ItemsProjectGuid>{baee6c8d-3570-49ab-8a61-3d67296fbe02}</ItemsProjectGuid>
+    <ItemsProjectGuid>{bfbc5d5e-2bcd-4a8e-ad63-29a7267f8d5e}</ItemsProjectGuid>
+    <ItemsProjectName>CentsEngine</ItemsProjectName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -14,20 +15,22 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Component.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCore.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)GameObject.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Logger.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Object.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)ObjectManager.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Singleton.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Transform.h" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Component.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameObject.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Logger.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Object.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ObjectManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CentsEngine.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Component.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)GameObject.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Logger.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Object.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ObjectManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Singleton.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)stdHelper.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Transform.h" />
   </ItemGroup>
 </Project>

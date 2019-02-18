@@ -2,42 +2,54 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Core">
-      <UniqueIdentifier>{de9805a0-6df7-4262-a438-b8972fef1a83}</UniqueIdentifier>
+      <UniqueIdentifier>{78b3cb08-75de-43a1-9739-6b3a3f6caca1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Debug">
-      <UniqueIdentifier>{af71e6c6-4afb-418a-8305-f16d30151ac7}</UniqueIdentifier>
+    <Filter Include="Util">
+      <UniqueIdentifier>{a3751aec-77c9-4979-a8c2-bf610c66bb1b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\ECS">
-      <UniqueIdentifier>{995ec084-da8d-4c3a-b30b-41a306336dee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS\Manager">
-      <UniqueIdentifier>{52e4f548-d4d1-44fe-a338-31e67771eab8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS\Entity">
-      <UniqueIdentifier>{2ace2615-475e-403f-9760-c1feb39af31f}</UniqueIdentifier>
+      <UniqueIdentifier>{19bfa99c-87c7-4b06-a1ec-2943f7079d11}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\ECS\Components">
-      <UniqueIdentifier>{616dd661-189d-47df-9373-0fc8a70c47d5}</UniqueIdentifier>
+      <UniqueIdentifier>{8f44a4d1-e27c-424b-b63a-a0f4f1bb1e3c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)ObjectManager.h">
-      <Filter>Core\ECS\Manager</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Logger.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Object.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ObjectManager.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)GameObject.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Component.cpp">
+      <Filter>Core\ECS\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Transform.cpp">
+      <Filter>Core\ECS\Components</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Logger.h">
+      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Singleton.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Logger.h">
-      <Filter>Core\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCore.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)GameObject.h">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Object.h">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ObjectManager.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CentsEngine.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)GameObject.h">
+      <Filter>Core\ECS</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Component.h">
       <Filter>Core\ECS\Components</Filter>
@@ -45,22 +57,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Transform.h">
       <Filter>Core\ECS\Components</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ObjectManager.cpp">
-      <Filter>Core\ECS\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Logger.cpp">
-      <Filter>Core\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)GameObject.cpp">
-      <Filter>Core\ECS\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Object.cpp">
-      <Filter>Core\ECS\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Transform.cpp">
-      <Filter>Core\ECS\Components</Filter>
-    </ClCompile>
+    <ClInclude Include="$(MSBuildThisFileDirectory)stdHelper.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

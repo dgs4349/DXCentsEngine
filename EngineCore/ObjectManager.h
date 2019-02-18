@@ -1,9 +1,13 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <stdint.h>
 
-#include "Object.h"
 #include "Singleton.h"
+#include "Object.h"
+
+#ifndef Object
+class Object;
+#endif
 
 /// <summary>
 /// Class that manages all of the objects that are created
@@ -12,7 +16,7 @@
 class ObjectManager : public Singleton<ObjectManager>
 {
 	friend class Singleton<ObjectManager>;
-	friend class Object;
+	friend Object;
 
 public:
 
