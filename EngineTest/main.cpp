@@ -3,31 +3,33 @@
 
 #include "CentsEngine.h"
 
+#define SOL_CHECK_ARGUMENTS 1
+#include <sol.hpp>
+
+
+void Print(std::string message)
+{
+	LOG_TRACE("{}", message);
+}
+
+void Print2(std::string message)
+{
+	LOG_TRACE("{}", message);
+}
+
+
 int main()
 {
+	ObjectManager::GetInstance();
+
+	sol::state lua;
+	
+	lua.set_function("Print", Print);
+
+	lua.script_file("script.lua");
 
 	getchar();
+
+	ObjectManager::ReleaseInstance();
 	return 1;
 }
-
-
-/*
-	extern "C" {
-#include "lua\lua.h"
-#include "lua\lauxlib.h"
-#include "lua\lualib.h"
-}
-
-#include <LuaBridge\LuaBridge.h>
-
-	using namespace luabridge;
-	lua_State* L = luaL_newstate();
-	luaL_openlibs(L);
-	getGlobalNamespace(L).addFunction("printMessage", printMessage);
-	luaL_dofile(L, "script.lua");
-	lua_pcall(L, 0, 0, 0);
-	LuaRef sumNumbers = getGlobal(L, "sumNumbers");
-	int result = sumNumbers(5, 4);
-	std::cout << "Result:" << result << std::endl;
-	system("pause");
-	*/

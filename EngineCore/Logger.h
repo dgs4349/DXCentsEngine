@@ -5,8 +5,8 @@
 #define SPDLOG_TRACE_ON
 #define SPDLOG_DEBUG_ON
 
-#include "spdlog\spdlog.h"
-#include "spdlog\sinks\stdout_sinks.h"
+#include "spdlog.h"
+#include "sinks\stdout_sinks.h"
 
 class Logger
 {

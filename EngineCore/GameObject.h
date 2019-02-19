@@ -16,6 +16,11 @@ public:
 	GameObject();
 	GameObject(std::string name);
 
+	static GameObject* newGameObject()
+	{
+		return new GameObject();
+	}
+
 	template <class T, class ...ARGS>
 	T* AddComponent(ARGS&&... args)
 	{
