@@ -4,7 +4,7 @@
 
 Object::Object()
 {
-	LOG_TRACE("Creating {}:{}", name, ID);
+	LOG_TRACE("Creating {}", name);
 
 	ObjectManager::GetInstance()->RegisterObject(this);
 }
@@ -12,6 +12,10 @@ Object::Object()
 
 Object::Object(const Object& object)
 {
+	name = object.name;
+
+	LOG_TRACE("Copying {}", name);
+
 	ObjectManager::GetInstance()->RegisterObject(this);
 }
 
@@ -19,7 +23,7 @@ Object::Object(const Object& object)
 Object::Object(std::string name)
 {
 	this->name = name;
-	LOG_TRACE("Creating {}:{}", name, ID);
+	LOG_TRACE("Creating {}", name);
 	ObjectManager::GetInstance()->RegisterObject(this);
 }
 

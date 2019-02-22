@@ -13,5 +13,4 @@ Component::Component(std::string name) : Object(name)
 
 Component::~Component()
 {
-	LOG_TRACE("Component Deletion");
 }

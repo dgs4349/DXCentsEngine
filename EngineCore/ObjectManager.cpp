@@ -1,4 +1,6 @@
 #include "ObjectManager.h"
+#include "Component.h"
+#include "GameObject.h"
 
 using namespace std;
 
@@ -80,6 +82,12 @@ void ObjectManager::DestroyObject(uint64_t objectID)
 
 	Object* object = activeObjects[objectID];
 
+	if (typeid(object) == typeid(Component))
+	{
+		Component* component = dynamic_cast<Component*>(object);
+		component->gameObject->RemoveComponent(component);
+	}
+
 	LOG_TRACE("Destroying: {}", object->name);
 	UnregisterObject(object);
 	delete object;
@@ -91,6 +99,13 @@ void ObjectManager::DestroyObject(Object* object)
 	if (object->ID >= objectCount)
 	{
 		LOG_WARNING("Tried to delete object with ID:{} that isn't registered", object->ID);
+		return;
+	}
+
+	if (dynamic_cast<Component*>(object))
+	{
+		Component* component = dynamic_cast<Component*>(object);
+		component->gameObject->RemoveComponent(component);
 		return;
 	}
 

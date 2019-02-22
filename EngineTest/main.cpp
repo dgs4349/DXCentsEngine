@@ -7,16 +7,6 @@
 #include <sol.hpp>
 
 
-void Print(std::string message)
-{
-	LOG_TRACE("{}", message);
-}
-
-void Print2(std::string message)
-{
-	LOG_TRACE("{}", message);
-}
-
 int main()
 {
 	ObjectManager::GetInstance();
@@ -24,6 +14,7 @@ int main()
 	GameObject* obj = new GameObject("Test");
 
 	Destroy(obj->transform);
+	obj->AddComponent<Transform>();
 
 	getchar();
 	ObjectManager::ReleaseInstance();

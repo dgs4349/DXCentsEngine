@@ -63,25 +63,18 @@ public:
 		}
 	}
 
-protected:
-
-	template <class T>
-	void RemoveComponent()
+	void RemoveComponent(Component* component)
 	{
-		if (!std::is_base_of<Component, T>::value)
+		if (static_cast<Transform*>(component) == transform)
 		{
-			LOG_TRACE("Tried to remove {} which is attached to the GameObject, returning", GetTypeName<T>());
+			LOG_TRACE("Tried to remove {} which cannot be removed from a GameObject, returning", component->name);
 			return;
 		}
 
-		if (attachedComponents.find(GetTypeName<T>()) == transform)
-		{
-			LOG_TRACE("Tried to remove {} which cannot be removed from a GameObject, returning", GetTypeName<T>());
-			return;
-		}
-
-		attachedComponents.erase(attachedComponents.find(GetTypeName<T>()));
+		attachedComponents.erase(attachedComponents.find(component->name));
 	}
+
+protected:
 
 	~GameObject();
 
