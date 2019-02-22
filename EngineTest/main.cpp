@@ -17,19 +17,16 @@ void Print2(std::string message)
 	LOG_TRACE("{}", message);
 }
 
-
 int main()
 {
 	ObjectManager::GetInstance();
 
-	sol::state lua;
-	
-	lua.set_function("Print", Print);
+	GameObject* obj = new GameObject("Test");
 
-	lua.script_file("script.lua");
+	Destroy(obj->transform);
 
 	getchar();
-
 	ObjectManager::ReleaseInstance();
+	getchar();
 	return 1;
 }

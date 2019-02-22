@@ -43,6 +43,3 @@ private:
 #define  LOG_ERROR( ... ) 
 
 #endif
-
-#define printf "Use 'LOG_TRACE'";
-#define cout "Use 'LOG_TRACE'";

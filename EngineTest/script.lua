@@ -1,4 +1,10 @@
-testString = "Lua Works!"
-number = 42
+obj = Object.new()
+obj2 = Object.new()
+obj.name = "Testing";
 
-Print("Hello");
+function start()
+	-- body
+
+	obj = Object.new()
+	obj2 = Object.new("Testing")
+end

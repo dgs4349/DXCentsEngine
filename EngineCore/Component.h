@@ -7,6 +7,7 @@ class Transform;
 
 class Component : public Object
 {
+	friend class GameObject;
 public:
 
 	GameObject* gameObject;
@@ -17,6 +18,14 @@ public:
 protected:
 
 	Component(std::string name);
-	~Component() override;
+	virtual ~Component() override;
+
+	template <class T>
+	void DestroyComponent();
 };
 
+template<class T>
+inline void Component::DestroyComponent()
+{
+	gameObject->RemoveComponent<T>();
+}

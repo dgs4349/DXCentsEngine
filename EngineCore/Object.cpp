@@ -4,6 +4,8 @@
 
 Object::Object()
 {
+	LOG_TRACE("Creating {}:{}", name, ID);
+
 	ObjectManager::GetInstance()->RegisterObject(this);
 }
 
@@ -17,6 +19,7 @@ Object::Object(const Object& object)
 Object::Object(std::string name)
 {
 	this->name = name;
+	LOG_TRACE("Creating {}:{}", name, ID);
 	ObjectManager::GetInstance()->RegisterObject(this);
 }
 
@@ -24,6 +27,7 @@ Object::Object(std::string name)
 Object::~Object()
 {
 	LOG_TRACE("Destroying {}:{}", name, ID);
+	ObjectManager::GetInstance()->UnregisterObject(this);
 }
 
 

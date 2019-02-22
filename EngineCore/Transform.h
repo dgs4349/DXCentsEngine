@@ -10,6 +10,6 @@ public:
 	Transform();
 
 protected:
-	~Transform();
+	~Transform() override;
 };
 

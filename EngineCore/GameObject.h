@@ -7,8 +7,6 @@
 
 class GameObject : public Object
 {
-	friend class Component;
-
 public:
 
 	Transform* transform;
@@ -38,6 +36,7 @@ public:
 		}
 
 		component = new T(std::forward<ARGS>(args)...);
+		reinterpret_cast<Component*>(component)->gameObject = this;
 		attachedComponents.insert({ GetTypeName<T>(), reinterpret_cast<Component*>(component) });
 
 		return component;
@@ -65,8 +64,26 @@ public:
 	}
 
 protected:
+
+	template <class T>
+	void RemoveComponent()
+	{
+		if (!std::is_base_of<Component, T>::value)
+		{
+			LOG_TRACE("Tried to remove {} which is attached to the GameObject, returning", GetTypeName<T>());
+			return;
+		}
+
+		if (attachedComponents.find(GetTypeName<T>()) == transform)
+		{
+			LOG_TRACE("Tried to remove {} which cannot be removed from a GameObject, returning", GetTypeName<T>());
+			return;
+		}
+
+		attachedComponents.erase(attachedComponents.find(GetTypeName<T>()));
+	}
+
 	~GameObject();
 
 	std::unordered_map<std::string, Component*> attachedComponents;
 };
-

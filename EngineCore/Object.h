@@ -43,6 +43,10 @@ public:
 	/// </summary>
 	Object();
 	/// <summary>
+	/// Naming constructor
+	/// </summary>
+	Object(std::string name);
+	/// <summary>
 	/// Create a copy of an object
 	/// </summary>
 	/// <param name="object">The object being copied</param>
@@ -73,13 +77,12 @@ public:
 protected:
 
 	/// <summary>
-	/// The unique ID of the object
-	/// </summary>
-	uint64_t ID;
-
-	Object(std::string name);
-	/// <summary>
 	/// Private delete that should only be called by ObjectManager
 	/// </summary>
 	virtual ~Object();
+
+	/// <summary>
+	/// The unique ID of the object
+	/// </summary>
+	uint64_t ID;
 };

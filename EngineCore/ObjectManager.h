@@ -5,9 +5,7 @@
 #include "Singleton.h"
 #include "Object.h"
 
-#ifndef Object
 class Object;
-#endif
 
 /// <summary>
 /// Class that manages all of the objects that are created
@@ -16,30 +14,20 @@ class Object;
 class ObjectManager : public Singleton<ObjectManager>
 {
 	friend class Singleton<ObjectManager>;
-	friend Object;
+	friend class Object;
 
 public:
 
 	/// <summary>
-	/// Unregister an object from the manager
+	/// Unregister and destroy an object from the manager
 	/// </summary>
-	/// <param name="object">The object to unregister</param>
-	void DestroyObject(Object* const object);
-
-
-protected:
-
-	/// <summary>
-	/// Register an object to the manager
-	/// </summary>
-	/// <param name="object">The object to register</param>
-	void RegisterObject(Object* const object);
-	/// <summary>
-	/// Unregister an object from the manager
-	/// </summary>
-	/// <param name="objectID">The unique object ID to unregister</param>
+	/// <param name="objectID">The unique object ID to destroy</param>
 	void DestroyObject(uint64_t objectID);
-
+	/// <summary>
+	/// Unregister and destroy an object from the manager
+	/// </summary>
+	/// <param name="object">The object to destroy</param>
+	void DestroyObject(Object* object);
 
 protected:
 
@@ -50,6 +38,22 @@ protected:
 
 	ObjectManager();
 	~ObjectManager();
+
+	/// <summary>
+	/// Register an object to the manager
+	/// </summary>
+	/// <param name="object">The object to register</param>
+	void RegisterObject(Object* const object);
+	/// <summary>
+	/// Unregister an object from the manager
+	/// </summary>
+	/// <param name="objectID">The object to unregister</param>
+	void UnregisterObject(Object* const object);
+	/// <summary>
+	/// Unregister an object from the manager
+	/// </summary>
+	/// <param name="objectID">The unique object ID to unregister</param>
+	void UnregisterObject(uint64_t objectID);
 
 private:
 
