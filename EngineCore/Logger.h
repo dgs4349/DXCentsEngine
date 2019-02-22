@@ -12,9 +12,19 @@ class Logger
 {
 public:
 
+	/// <summary>
+	/// Get the Singleton instance of the Logger
+	/// </summary>
 	static Logger* GetInstance(void);
+	/// <summary>
+	/// Release the only instance of the Logger
+	/// </summary>
 	static void ReleaseInstance(void);
 
+	/// <summary>
+	/// Get the console the Logger is outputting to
+	/// </summary>
+	/// <returns></returns>
 	static std::shared_ptr<spdlog::logger> GetCurrentConsole();
 
 	Logger(Logger const&) = delete;
@@ -27,13 +37,25 @@ protected:
 
 private:
 
+	/// <summary>
+	/// Shared pointer to the output conole 
+	/// </summary>
 	std::shared_ptr<spdlog::logger> console;
 };
 
 #if defined( DEBUG ) || defined ( _DEBUG )
 
+/// <summary>
+/// Log a regular type message
+/// </summary>
 #define  LOG_TRACE( ... )    Logger::GetCurrentConsole()->info( __VA_ARGS__ )
+/// <summary>
+/// Log a warning type message
+/// </summary>
 #define  LOG_WARNING( ... )     Logger::GetCurrentConsole()->warn( __VA_ARGS__ )
+/// <summary>
+/// Log an error type message
+/// </summary>
 #define  LOG_ERROR( ... )    Logger::GetCurrentConsole()->error( __VA_ARGS__ )
 
 #else

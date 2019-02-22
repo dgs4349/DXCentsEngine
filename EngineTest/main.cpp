@@ -13,6 +13,9 @@ int main()
 
 	GameObject* obj = new GameObject("Test");
 
+	Component* component = obj->AddComponent<Component>();
+	Destroy(component);
+
 	Destroy(obj->transform);
 	obj->AddComponent<Transform>();
 

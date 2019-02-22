@@ -14,6 +14,7 @@ class Object;
 class ObjectManager : public Singleton<ObjectManager>
 {
 	friend class Singleton<ObjectManager>;
+	friend class GameObject;
 	friend class Object;
 
 public:
@@ -63,4 +64,7 @@ private:
 	std::unordered_map<uint64_t, Object*> activeObjects;
 };
 
+/// <summary>
+/// Calls destroy object in the object manager
+/// </summary>
 #define Destroy ObjectManager::GetInstance()->DestroyObject

@@ -82,10 +82,13 @@ void ObjectManager::DestroyObject(uint64_t objectID)
 
 	Object* object = activeObjects[objectID];
 
-	if (typeid(object) == typeid(Component))
+	if (dynamic_cast<Component*>(object))
 	{
 		Component* component = dynamic_cast<Component*>(object);
-		component->gameObject->RemoveComponent(component);
+		if (!component->gameObject->RemoveComponent(component))
+		{
+			return;
+		}
 	}
 
 	LOG_TRACE("Destroying: {}", object->name);
