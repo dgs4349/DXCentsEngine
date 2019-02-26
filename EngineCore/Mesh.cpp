@@ -1,20 +1,27 @@
 #include "Mesh.h"
-#include <iostream>
+
 #include <fstream>
-#include <vector>
 
 using namespace DirectX;
 
-Mesh::Mesh()
+Mesh::Mesh() : Object("Mesh")
 {
 }
 
-Mesh::Mesh(Vertex* const vertices, uint16_t vertexCount, uint16_t* const indices, uint16_t indexCount, ID3D11Device* const context)
+
+Mesh::~Mesh()
 {
-	CreateBuffers(vertices, vertexCount, indices, indexCount, context);
+	if (vertexBuffer)
+	{
+		vertexBuffer->Release();
+	}
+	if (indexBuffer)
+	{
+		indexBuffer->Release();
+	}
 }
 
-Mesh::Mesh(char* const filePath, ID3D11Device* context)
+Mesh::Mesh(const char* filePath, ID3D11Device* context)
 {
 	printf("Creating mesh: %s\n", filePath);
 
@@ -94,19 +101,19 @@ Mesh::Mesh(char* const filePath, ID3D11Device* context)
 			// - OBJ File indices are 1-based, so
 			//    they need to be adusted
 			Vertex v1;
-			v1.Position = positions[i[0] - 1];
-			v1.UV = uvs[i[1] - 1];
-			v1.Normal = normals[i[2] - 1];
+			v1.position = positions[i[0] - 1];
+			v1.uv = uvs[i[1] - 1];
+			v1.normal = normals[i[2] - 1];
 
 			Vertex v2;
-			v2.Position = positions[i[3] - 1];
-			v2.UV = uvs[i[4] - 1];
-			v2.Normal = normals[i[5] - 1];
+			v2.position = positions[i[3] - 1];
+			v2.uv = uvs[i[4] - 1];
+			v2.normal = normals[i[5] - 1];
 
 			Vertex v3;
-			v3.Position = positions[i[6] - 1];
-			v3.UV = uvs[i[7] - 1];
-			v3.Normal = normals[i[8] - 1];
+			v3.position = positions[i[6] - 1];
+			v3.uv = uvs[i[7] - 1];
+			v3.normal = normals[i[8] - 1];
 
 			// The model is most likely in a right-handed space,
 			// especially if it came from Maya.  We want to convert
@@ -120,19 +127,19 @@ Mesh::Mesh(char* const filePath, ID3D11Device* context)
 			// 3D modeling packages use the bottom left as (0,0)
 
 			// Flip the UV's since they're probably "upside down"
-			v1.UV.y = 1.0f - v1.UV.y;
-			v2.UV.y = 1.0f - v2.UV.y;
-			v3.UV.y = 1.0f - v3.UV.y;
+			v1.uv.y = 1.0f - v1.uv.y;
+			v2.uv.y = 1.0f - v2.uv.y;
+			v3.uv.y = 1.0f - v3.uv.y;
 
 			// Flip Z (LH vs. RH)
-			v1.Position.z *= -1.0f;
-			v2.Position.z *= -1.0f;
-			v3.Position.z *= -1.0f;
+			v1.position.z *= -1.0f;
+			v2.position.z *= -1.0f;
+			v3.position.z *= -1.0f;
 
 			// Flip normal Z
-			v1.Normal.z *= -1.0f;
-			v2.Normal.z *= -1.0f;
-			v3.Normal.z *= -1.0f;
+			v1.normal.z *= -1.0f;
+			v2.normal.z *= -1.0f;
+			v3.normal.z *= -1.0f;
 
 			// Add the verts to the vector (flipping the winding order)
 			verts.push_back(v1);
@@ -149,14 +156,14 @@ Mesh::Mesh(char* const filePath, ID3D11Device* context)
 			{
 				// Make the last vertex
 				Vertex v4;
-				v4.Position = positions[i[9] - 1];
-				v4.UV = uvs[i[10] - 1];
-				v4.Normal = normals[i[11] - 1];
+				v4.position = positions[i[9] - 1];
+				v4.uv = uvs[i[10] - 1];
+				v4.normal = normals[i[11] - 1];
 
 				// Flip the UV, Z pos and normal
-				v4.UV.y = 1.0f - v4.UV.y;
-				v4.Position.z *= -1.0f;
-				v4.Normal.z *= -1.0f;
+				v4.uv.y = 1.0f - v4.uv.y;
+				v4.position.z *= -1.0f;
+				v4.normal.z *= -1.0f;
 
 				// Add a whole triangle (flipping the winding order)
 				verts.push_back(v1);
@@ -177,33 +184,45 @@ Mesh::Mesh(char* const filePath, ID3D11Device* context)
 	CreateBuffers(&verts[0], static_cast<uint16_t>(verts.size()), &indices[0], static_cast<uint16_t>(indices.size()), context);
 }
 
-ID3D11Buffer* const* Mesh::GetVertexBuffer() const
+void Mesh::Clear()
 {
-	return &VBO;
+	vertices.clear();
+	triangles.clear();
 }
 
-ID3D11Buffer* const Mesh::GetIndexBuffer() const
+std::string Mesh::GetMeshName() const
 {
-	return VBI;
+	return meshName;
 }
 
-uint16_t Mesh::GetIndexCount() const
+std::vector<uint16_t> Mesh::GetTriangles() const
+{
+	return triangles;
+}
+
+std::vector<Vertex> Mesh::GetVertices() const
+{
+	return vertices;
+}
+
+uint16_t Mesh::GetVertexCount() const
+{
+	return vertexCount;
+}
+
+uint32_t Mesh::GetIndexCount() const
 {
 	return indexCount;
 }
 
-Mesh::~Mesh()
+ID3D11Buffer* const* Mesh::GetVertexBuffer() const
 {
-	if (VBO != nullptr)
-	{
-		VBO->Release();
-		VBO = nullptr;
-	}
-	if (VBI != nullptr)
-	{
-		VBI->Release();
-		VBI = nullptr;
-	}
+	return &vertexBuffer;
+}
+
+ID3D11Buffer* const Mesh::GetIndexBuffer() const
+{
+	return indexBuffer;
 }
 
 void Mesh::CreateBuffers(Vertex* const vertices, uint16_t vertexCount, uint16_t* const indices, uint16_t indexCount, ID3D11Device* const context)
@@ -232,6 +251,6 @@ void Mesh::CreateBuffers(Vertex* const vertices, uint16_t vertexCount, uint16_t*
 	IBD.MiscFlags = 0;
 	IBD.StructureByteStride = 0;
 
-	context->CreateBuffer(&VBD, &vertexData, &VBO);
-	context->CreateBuffer(&IBD, &indexData, &VBI);
+	context->CreateBuffer(&VBD, &vertexData, &vertexBuffer);
+	context->CreateBuffer(&IBD, &indexData, &indexBuffer);
 }

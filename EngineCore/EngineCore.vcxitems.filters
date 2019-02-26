@@ -13,6 +13,18 @@
     <Filter Include="Core\ECS\Components">
       <UniqueIdentifier>{8f44a4d1-e27c-424b-b63a-a0f4f1bb1e3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\ECS\Components\Render">
+      <UniqueIdentifier>{6592a8d3-cc3a-455a-9c00-c3eade755b20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Render">
+      <UniqueIdentifier>{56697e5f-809d-45ae-9357-3de31cf88253}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Render\Light">
+      <UniqueIdentifier>{16193549-710f-4d45-b18b-c4e2ae3318c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Render\Mesh">
+      <UniqueIdentifier>{5160caa1-0dd9-4011-9454-0eb281a2d18d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Logger.cpp">
@@ -33,6 +45,29 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Transform.cpp">
       <Filter>Core\ECS\Components</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer.cpp">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Mesh.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Material.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)SimpleShader.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Camera.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MeshRenderer.cpp">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MeshFilter.cpp">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)RenderManager.cpp">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)DXCore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Logger.h">
@@ -60,5 +95,31 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)stdHelper.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer.h">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Mesh.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Vertex.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Material.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)SimpleShader.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Camera.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MeshRenderer.h">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MeshFilter.h">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)RenderManager.h">
+      <Filter>Core\ECS\Components\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)DXCore.h" />
   </ItemGroup>
 </Project>

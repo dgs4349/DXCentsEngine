@@ -7,3 +7,7 @@
 // ECS
 #include "ObjectManager.h"
 #include "GameObject.h"
+
+#include "MeshRenderer.h"
+#include "MeshFilter.h"
+#include "RenderManager.h"

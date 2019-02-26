@@ -4,6 +4,8 @@
 #include "Object.h"
 #include "Transform.h"
 #include "stdHelper.h"
+#include "Mesh.h"
+#include "Material.h"
 
 class GameObject : public Object
 {
@@ -20,6 +22,8 @@ public:
 	/// </summary>
 	/// <param name="name">The name of the GameObject</param>
 	GameObject(std::string name);
+
+	GameObject(std::string name, Mesh* mesh, Material* material);
 
 	template <class T, class ...ARGS>
 	/// <summary>
@@ -44,35 +48,16 @@ public:
 		}
 
 		component = new T(std::forward<ARGS>(args)...);
+		if (transform == nullptr && GetTypeName<T>() == GetTypeName<Transform>())
+		{
+			transform = reinterpret_cast<Transform*>(component);
+		}
+
 		reinterpret_cast<Component*>(component)->gameObject = this;
+		reinterpret_cast<Component*>(component)->transform = transform;
 		attachedComponents.insert({ GetTypeName<T>(), reinterpret_cast<Component*>(component) });
 
 		return component;
-	}
-
-	template <class T>
-	/// <summary>
-	/// Attach a Component type that has already been created to this GameObject
-	/// </summary>
-	/// <param name="component">The Component to attach</param>
-	/// <returns>Whether the Component was attached or not</returns>
-	bool AddComponent(T* component)
-	{
-		if (!std::is_base_of<Component, T>::value)
-		{
-			LOG_TRACE("Tried to add {} which is not a component, returning", GetTypeName<T>());
-			return false;
-		}
-
-		if (!std::is_base_of<Component, T>::value)
-		{
-			LOG_TRACE("Tried to add {} which is not a component, returning", GetTypeName<T>());
-			return false;
-		}
-
-		reinterpret_cast<Component*>(component)->gameObject = this;
-		attachedComponents.insert({ GetTypeName<T>(), reinterpret_cast<Component*>(component) })
-		return true;
 	}
 
 	template <class T>
