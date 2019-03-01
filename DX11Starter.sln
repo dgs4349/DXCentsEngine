@@ -7,8 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CentsEngine", "EngineCore\E
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EngineTest", "EngineTest\EngineTest.vcxproj", "{F23AC2E8-2031-43D5-98F1-AD3B9C8CB526}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Jump The Rope", "Jump The Rope\Jump The Rope.vcxproj", "{06D8A0BB-4721-44E0-A08F-EBFA26453A08}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		EngineCore\EngineCore.vcxitems*{06d8a0bb-4721-44e0-a08f-ebfa26453a08}*SharedItemsImports = 4
 		EngineCore\EngineCore.vcxitems*{bfbc5d5e-2bcd-4a8e-ad63-29a7267f8d5e}*SharedItemsImports = 9
 		EngineCore\EngineCore.vcxitems*{f23ac2e8-2031-43d5-98f1-ad3b9c8cb526}*SharedItemsImports = 4
 	EndGlobalSection
@@ -27,6 +30,14 @@ Global
 		{F23AC2E8-2031-43D5-98F1-AD3B9C8CB526}.Release|x64.Build.0 = Release|x64
 		{F23AC2E8-2031-43D5-98F1-AD3B9C8CB526}.Release|x86.ActiveCfg = Release|Win32
 		{F23AC2E8-2031-43D5-98F1-AD3B9C8CB526}.Release|x86.Build.0 = Release|Win32
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Debug|x64.ActiveCfg = Debug|x64
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Debug|x64.Build.0 = Debug|x64
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Debug|x86.ActiveCfg = Debug|Win32
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Debug|x86.Build.0 = Debug|Win32
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Release|x64.ActiveCfg = Release|x64
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Release|x64.Build.0 = Release|x64
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Release|x86.ActiveCfg = Release|Win32
+		{06D8A0BB-4721-44E0-A08F-EBFA26453A08}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
