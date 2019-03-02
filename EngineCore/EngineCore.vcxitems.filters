@@ -22,6 +22,12 @@
     <Filter Include="Core\Render\Mesh">
       <UniqueIdentifier>{5160caa1-0dd9-4011-9454-0eb281a2d18d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\ECS\Components\Behavior">
+      <UniqueIdentifier>{5fb60efa-f0e8-4d3d-8c32-7a539e12547b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ECS\Components\Behavior\Lights">
+      <UniqueIdentifier>{d8906315-e722-4fd9-98cd-fb04a66c0d17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Logger.cpp">
@@ -55,15 +61,15 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MeshFilter.cpp">
       <Filter>Core\ECS\Components\Render</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)RenderManager.cpp">
-      <Filter>Core\ECS\Components\Render</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)DXCore.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Material.cpp">
       <Filter>Core\Render\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Mesh.cpp">
       <Filter>Core\Render\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)RenderManager.cpp">
+      <Filter>Core\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -108,9 +114,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MeshFilter.h">
       <Filter>Core\ECS\Components\Render</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)RenderManager.h">
-      <Filter>Core\ECS\Components\Render</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)DXCore.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Material.h">
       <Filter>Core\Render\Mesh</Filter>
@@ -120,6 +123,12 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Color.h">
       <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)RenderManager.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)LightTypes.h">
+      <Filter>Core\ECS\Components\Behavior\Lights</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

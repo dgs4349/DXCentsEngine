@@ -1,15 +1,6 @@
 #pragma once
 
 #include <vector>
-#include "DXCore.h"
-#include "SimpleShader.h"
-#include <DirectXMath.h>
-#include "Mesh.h"
-#include "GameObject.h"
-#include "Camera.h"
-#include "Material.h"
-#include "Light.h"
-#include "WICTextureLoader.h"
 
 #include "CentsEngine.h"
 
@@ -36,6 +27,7 @@ public:
 
 private:
 
+	AmbientLight ambientLight;
 	DirectionalLight directionalLight;
 	DirectionalLight directionalLight2;
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <DirectXMath.h>
 #include "Singleton.h"
 #include "Renderer.h"
 #include "Camera.h"
