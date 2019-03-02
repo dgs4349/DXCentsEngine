@@ -32,7 +32,7 @@ ObjectManager::~ObjectManager()
 void ObjectManager::RegisterObject(Object* const object)
 {
 	object->ID = objectCount;
-	LOG_TRACE("Adding '{}:{}' to object manager", object->name, object->ID);
+	LOG_TRACE("Adding to object manager\t\t'{}'", object->name, object->ID);
 
 	activeObjects.insert({ objectCount, object });
 	objectCount++;
@@ -43,7 +43,7 @@ void ObjectManager::UnregisterObject(Object* const object)
 {
 	if (object->ID >= objectCount)
 	{
-		LOG_WARNING("Tried to unregister object with ID:{} that isn't registered", object->ID);
+		LOG_WARNING("Can't unregister object that isn't registered\t\t ID: {}", object->ID);
 		return;
 	}
 
@@ -59,7 +59,7 @@ void ObjectManager::UnregisterObject(uint64_t objectID)
 {
 	if (objectID >= objectCount)
 	{
-		LOG_WARNING("Tried to unregister object with ID:{} that isn't registered", objectID);
+		LOG_WARNING("Can't unregister object that isn't registered\t\t ID: {}", objectID);
 		return;
 	}
 
@@ -76,7 +76,7 @@ void ObjectManager::DestroyObject(uint64_t objectID)
 {
 	if (objectID >= objectCount)
 	{
-		LOG_WARNING("Tried to delete object with ID:{} that isn't registered", objectID);
+		LOG_WARNING("Can't delete object that isn't registered\t\t ID: {}", objectID);
 		return;
 	}
 
@@ -101,7 +101,7 @@ void ObjectManager::DestroyObject(Object* object)
 {
 	if (object->ID >= objectCount)
 	{
-		LOG_WARNING("Tried to delete object with ID:{} that isn't registered", object->ID);
+		LOG_WARNING("Can't delete object that isn't registered\t\t ID: {}", object->ID);
 		return;
 	}
 

@@ -4,13 +4,6 @@
 // For the DirectX Math library
 using namespace DirectX;
 
-/*
-#if defined(DEBUG) || defined(_DEBUG)
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
-*/
-
 // --------------------------------------------------------
 // Constructor
 //
@@ -21,6 +14,13 @@ using namespace DirectX;
 // --------------------------------------------------------
 Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX Game"), 1280, 720, true)
 {
+#if defined(DEBUG) || defined(_DEBUG)
+	// Do we want a console window?  Probably only in debug mode
+	CreateConsoleWindow(500, 120, 32, 120);
+	printf("Console window created successfully.  Feel free to printf() here.\n");
+	LOG_TRACE("Test");
+#endif
+
 	Logger::GetInstance();
 	ObjectManager::GetInstance();
 	RenderManager::GetInstance();
@@ -30,12 +30,6 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camera = camObject->AddComponent<Camera>();
 	directionalLight = DirectionalLight();
 	directionalLight2 = DirectionalLight();
-
-#if defined(DEBUG) || defined(_DEBUG)
-	// Do we want a console window?  Probably only in debug mode
-	CreateConsoleWindow(500, 120, 32, 120);
-	printf("Console window created successfully.  Feel free to printf() here.\n");
-#endif
 
 }
 
@@ -83,8 +77,8 @@ void Game::Init()
 	camera->transform->Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
 
-	directionalLight = DirectionalLight(XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 1.0f));
-	directionalLight2 = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
+	directionalLight = DirectionalLight(Color(0.3f, 0.3f, 0.3f, 1.0f), Color(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 1.0f));
+	directionalLight2 = DirectionalLight(Color(0.2f, 0.2f, 0.2f, 1.0f), Color(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  

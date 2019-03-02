@@ -11,3 +11,7 @@
 #include "MeshRenderer.h"
 #include "MeshFilter.h"
 #include "RenderManager.h"
+
+// Util
+#include "Color.h"
+#include "Vertex.h"
