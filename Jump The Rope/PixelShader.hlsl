@@ -16,35 +16,84 @@ struct VertexToPixel
 	float4 color		: COLOR;
 	float3 normal		: NORMAL;
 	float2 uv			: UV;
+	float3 worldPos		: POSITION;
 };
 
 cbuffer externalData : register(b0)
 {
-	AmbientLight ambientLight;
-	DirectionalLight light;
-	DirectionalLight light2;
+	Lights lights;
+	float3 cameraPos;
 };
 
 Texture2D diffuseTexture : register(t0);
 SamplerState basicSampler : register(s0);
 
-// --------------------------------------------------------
-// The entry point (main method) for our pixel shader
-// 
-// - Input is the data coming down the pipeline (defined by the struct)
-// - Output is a single color (float4)
-// - Has a special semantic (SV_TARGET), which means 
-//    "put the output of this into the current render target"
-// - Named "main" because that's the default the shader compiler looks for
-// --------------------------------------------------------
+float Attenuate(PointLight light, float3 worldPos)
+{
+	float dist = distance(light.position, worldPos);
+
+	// Ranged-based attenuation
+	float att = saturate(1.0f - (dist * dist / (light.range * light.range)));
+
+	// Soft falloff
+	return att * att;
+}
+
+float3 CalcDirLight(DirectionalLight aLight, float3 norm)
+{
+	float3 lightNormDir = normalize(-aLight.direction.rgb);
+
+	float NdotL = saturate(dot(norm, lightNormDir));
+
+	return float3(aLight.color.rgb * NdotL);
+}
+
+float3 CalcPointLight(PointLight light, float3 normal, float3 worldPos, float3 camPos, float3 surfaceColor)
+{
+	// Calc light direction
+	float3 toLight = normalize(light.position - worldPos);
+	float3 toCam = normalize(camPos - worldPos);
+
+	// Calculate the light amounts
+	float atten = Attenuate(light, worldPos);
+	float diff = saturate(dot(normal, toLight));
+
+	// Calculate diffuse with energy conservation
+	// (Reflected light doesn't diffuse)
+	float3 balancedDiff = diff;
+
+	// Combine
+	return (balancedDiff * surfaceColor) * atten * light.intensity * light.color;
+}
+
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	float4 surfaceColor = diffuseTexture.Sample(basicSampler, input.uv);
-
 	float3 normal = normalize(input.normal);
 
-	float lightAmount = saturate(dot(normal, normalize(-light.direction)));
-	float lightAmount2 = saturate(dot(normal, normalize(-light2.direction)));
+	// AmbientColor Calculation
+	float3 ambientColor = float3(0, 0, 0);
+	for (int a = 0; a < lights.ambientLightCount; ++a)
+	{
+		ambientColor += float3(lights.ambientLights[a].color.rgb * lights.ambientLights[a].intensity);
+	}
 
-	return (ambientLight.color + (light.color * lightAmount) + (light2.color * lightAmount2)) * surfaceColor;
+	// Dir Light Calculation
+	float3 dirColor = float3(0, 0, 0);
+	for (int d = 0; d < lights.dirLightCount; ++d)
+	{
+		dirColor += CalcDirLight(lights.dirLights[d], normal);
+	}
+
+	// Point Light Calculation
+	float3 pointColor = float3(0, 0, 0);
+	for (int p = 0; p < lights.pointLightCount; ++p)
+	{
+		pointColor += CalcPointLight(lights.pointLights[p], normal, input.worldPos, cameraPos, surfaceColor.rgb);
+	}
+
+	float3 finalLightColor = ambientColor + dirColor + pointColor;
+	float3 gamma = float3(pow(abs(finalLightColor.rgb * surfaceColor.rgb), (1.0 / 2.2)));
+
+	return float4(gamma, 1);
 }

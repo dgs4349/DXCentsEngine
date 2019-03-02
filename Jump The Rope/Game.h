@@ -27,9 +27,12 @@ public:
 
 private:
 
-	AmbientLight ambientLight;
+	Lights lights;
+
+
+	/*AmbientLight ambientLight;
 	DirectionalLight directionalLight;
-	DirectionalLight directionalLight2;
+	DirectionalLight directionalLight2;*/
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders();

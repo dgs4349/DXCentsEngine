@@ -21,6 +21,12 @@ using namespace DirectX;
 // --------------------------------------------------------
 Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX Game"), 1280, 720, true)
 {
+#if defined(DEBUG) || defined(_DEBUG)
+	// Do we want a console window?  Probably only in debug mode
+	CreateConsoleWindow(500, 120, 32, 120);
+	printf("Console window created successfully.  Feel free to printf() here.\n");
+#endif
+
 	Logger::GetInstance();
 	ObjectManager::GetInstance();
 	RenderManager::GetInstance();
@@ -28,15 +34,7 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camObject = new GameObject("Camera");
 
 	camera = camObject->AddComponent<Camera>();
-	directionalLight = DirectionalLight();
-	directionalLight2 = DirectionalLight();
-
-#if defined(DEBUG) || defined(_DEBUG)
-	// Do we want a console window?  Probably only in debug mode
-	CreateConsoleWindow(500, 120, 32, 120);
-	printf("Console window created successfully.  Feel free to printf() here.\n");
-#endif
-
+	lights = Lights();
 }
 
 // --------------------------------------------------------
@@ -82,10 +80,13 @@ void Game::Init()
 
 	camera->transform->Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
+	
+	lights.ambientLights[0] = { Color(0.5f), 1 };
+	lights.ambientLightCount = 1;
 
-	ambientLight = { Color(0.5f) };
+	/*ambientLight = { Color(0.5f) };
 	directionalLight = { Color(0.5f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) };
-	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };
+	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };*/
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -228,9 +229,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	for (int i = 0; i < gameObjects.size(); ++i)
 	{
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("ambientLight", &ambientLight, sizeof(AmbientLight));
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light", &directionalLight, sizeof(DirectionalLight));
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light2", &directionalLight2, sizeof(DirectionalLight));
+		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("lights", &lights, sizeof(Lights));
 		gameObjects[i]->GetComponent<MeshRenderer>()->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
 
 		context->IASetVertexBuffers(0, 1, gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetVertexBuffer(), &stride, &offset);
