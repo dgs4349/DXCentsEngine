@@ -78,7 +78,7 @@ void Game::Init()
 	LoadModels();
 	CreateBasicGeometry();
 
-	camera->transform->Position(0.0f, 0.0f, -10.0f);
+	camera->transform->Position(0.0f, 1.0f, -10.0f);
 	camera->SetScreenSize(width, height);
 	
 	lights.ambientLights[0] = { Color(0.5f), 1 };
@@ -117,6 +117,7 @@ void Game::LoadModels()
 	meshes.push_back(new Mesh("Assets/Models/helix.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/sphere.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/torus.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/rope.obj", device));
 }
 
 void Game::LoadTextures()
@@ -165,6 +166,7 @@ void Game::CreateMaterials()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
+	/* Commenting out original mesh display for scene setup
 	gameObjects.push_back(new GameObject("Test", meshes[0], materials[0]));
 	gameObjects.push_back(new GameObject("Test", meshes[1], materials[3]));
 	gameObjects.push_back(new GameObject("Test", meshes[2], materials[2]));
@@ -177,6 +179,33 @@ void Game::CreateBasicGeometry()
 	gameObjects[3]->transform->Position(6.0f, 0.0f, 0.0f);
 	gameObjects[4]->transform->Position(8.0f, 0.0f, 0.0f);
 	gameObjects[5]->transform->Position(10.0f, 0.0f, 0.0f);
+	*/
+
+	// Left Player
+	gameObjects.push_back(new GameObject("Test", meshes[1], materials[0]));
+	// Right Player
+	gameObjects.push_back(new GameObject("Test", meshes[1], materials[0]));
+	// Rope
+	gameObjects.push_back(new GameObject("Test", meshes[6], materials[3]));
+	// Ground
+	gameObjects.push_back(new GameObject("Test", meshes[1], materials[1]));
+
+	// Left Player
+	gameObjects[0]->transform->Position(1.0f, 0.0f, 0.0f);
+	gameObjects[0]->transform->Scale(1.0f, 2.0f, 1.0f);
+
+	// Right Player
+	gameObjects[1]->transform->Position(-1.0f, 0.0f, 0.0f);
+	gameObjects[1]->transform->Scale(1.0f, 2.0f, 1.0f);
+
+	// Rope
+	gameObjects[2]->transform->Position(0.0f, 1.0f, 0.0f);
+	gameObjects[2]->transform->Scale(2.0f, 2.0f, 2.0f);
+	gameObjects[2]->transform->Rotate(1 * 3.141592, 0, 0);
+	// Ground
+	gameObjects[3]->transform->Position(0.0f, -1.0f, 0.0f);
+	gameObjects[3]->transform->Scale(10.0f, 1.0f, 10.0f);
+
 }
 
 
