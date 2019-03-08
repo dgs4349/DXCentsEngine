@@ -64,7 +64,7 @@ public:
 	/// <summary>
 	/// Get the Component attached to this GameObject based on the the Component type
 	/// </summary>
-	T* GetComponent()
+	T* GetComponent() const
 	{
 		if (!std::is_base_of<Component, T>::value)
 		{
@@ -72,7 +72,7 @@ public:
 			return nullptr;
 		}
 
-		std::unordered_map<std::string, Component*>::iterator component = attachedComponents.find(GetTypeName<T>());
+		std::unordered_map<std::string, Component*>::const_iterator component = attachedComponents.find(GetTypeName<T>());
 
 		if (component == attachedComponents.end())
 		{

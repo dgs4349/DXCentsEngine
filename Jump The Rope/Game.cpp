@@ -80,7 +80,7 @@ void Game::Init()
 
 	camera->transform->Position(0.0f, 1.0f, -10.0f);
 	camera->SetScreenSize(width, height);
-	
+
 	lights.ambientLights[0] = { Color(0.5f), 1 };
 	lights.ambientLightCount = 1;
 
@@ -150,7 +150,7 @@ void Game::CreateMaterials()
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	
+
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[0], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
@@ -166,46 +166,34 @@ void Game::CreateMaterials()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	/* Commenting out original mesh display for scene setup
-	gameObjects.push_back(new GameObject("Test", meshes[0], materials[0]));
-	gameObjects.push_back(new GameObject("Test", meshes[1], materials[3]));
-	gameObjects.push_back(new GameObject("Test", meshes[2], materials[2]));
-	gameObjects.push_back(new GameObject("Test", meshes[3], materials[1]));
-	gameObjects.push_back(new GameObject("Test", meshes[4], materials[2]));
-	gameObjects.push_back(new GameObject("Test", meshes[5], materials[3]));
-
-	gameObjects[1]->transform->Position(2.0f, 0.0f, 0.0f);
-	gameObjects[2]->transform->Position(4.0f, 0.0f, 0.0f);
-	gameObjects[3]->transform->Position(6.0f, 0.0f, 0.0f);
-	gameObjects[4]->transform->Position(8.0f, 0.0f, 0.0f);
-	gameObjects[5]->transform->Position(10.0f, 0.0f, 0.0f);
-	*/
+	// Rope
+	rope = new GameObject("Rope", meshes[6], materials[3]);
 
 	// Left Player
-	gameObjects.push_back(new GameObject("Test", meshes[1], materials[0]));
+	GameObject* player1 = new GameObject("Player 1", meshes[1], materials[0]);
+	players.push_back(player1->AddComponent<Player>());
 	// Right Player
-	gameObjects.push_back(new GameObject("Test", meshes[1], materials[0]));
-	// Rope
-	gameObjects.push_back(new GameObject("Test", meshes[6], materials[3]));
+	GameObject* player2 = new GameObject("Player 2", meshes[1], materials[0]);
+	players.push_back(player2->AddComponent<Player>());
+
 	// Ground
-	gameObjects.push_back(new GameObject("Test", meshes[1], materials[1]));
+	ground = new GameObject("Ground", meshes[1], materials[1]);
 
 	// Left Player
-	gameObjects[0]->transform->Position(1.0f, 0.0f, 0.0f);
-	gameObjects[0]->transform->Scale(1.0f, 2.0f, 1.0f);
+	player1->transform->Position(1.0f, 0.0f, 0.0f);
+	player1->transform->Scale(1.0f, 2.0f, 1.0f);
 
 	// Right Player
-	gameObjects[1]->transform->Position(-1.0f, 0.0f, 0.0f);
-	gameObjects[1]->transform->Scale(1.0f, 2.0f, 1.0f);
+	player2->transform->Position(-1.0f, 0.0f, 0.0f);
+	player2->transform->Scale(1.0f, 2.0f, 1.0f);
 
 	// Rope
-	gameObjects[2]->transform->Position(0.0f, 1.0f, 0.0f);
-	gameObjects[2]->transform->Scale(2.0f, 2.0f, 2.0f);
-	gameObjects[2]->transform->Rotate(1 * 3.141592, 0, 0);
+	rope->transform->Position(0.0f, 0.5f, 0.0f);
+	rope->transform->Scale(2.0f, 2.0f, 2.0f);
+	rope->transform->EulerRotation(0, 0, 0);
 	// Ground
-	gameObjects[3]->transform->Position(0.0f, -1.0f, 0.0f);
-	gameObjects[3]->transform->Scale(10.0f, 1.0f, 10.0f);
-
+	ground->transform->Position(0.0f, -1.5f, 0.0f);
+	ground->transform->Scale(10.0f, 1.0f, 10.0f);
 }
 
 
@@ -225,6 +213,110 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	bool p1Input = GetAsyncKeyState(*"Q");
+	bool p2Input = GetAsyncKeyState(*"P");
+
+	if (gameState == GameState::PreStart)
+	{
+		if (p1Input)
+		{
+			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[1]);
+		}
+		else
+		{
+			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+		}
+
+		if (p2Input)
+		{
+			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[1]);
+		}
+		else
+		{
+			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+		}
+
+		if (p1Input && p2Input)
+		{
+			timer += deltaTime;
+
+			if (timer >= readyLength)
+			{
+				gameState = GameState::Playing;
+
+				timer = 0;
+				ropeSpeed = startRopeSpeed;
+
+				players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+				players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+			}
+		}
+		else
+		{
+			timer = 0;
+		}
+	}
+	if (gameState == GameState::Playing)
+	{
+		ropeSpeed += speedIncrease * deltaTime;
+
+		if (p1Input)
+		{
+			players[0]->Jump(jumpHeight);
+		}
+		if (p2Input)
+		{
+			players[1]->Jump(jumpHeight);
+		}
+
+		if (rope->transform->EulerAngles().x > 180 - ropeWidth && rope->transform->EulerAngles().x < 180 + ropeWidth)
+		{
+			for (int i = 0; i < players.size(); ++i)
+			{
+				if (players[i]->transform->Position().y < ropeHeight)
+				{
+					players[i]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[2]);
+					gameState = GameState::End;
+				}
+			}
+		}
+	}
+	if (gameState == GameState::End)
+	{
+
+		timer += deltaTime;
+
+		if (timer > endScreenLength && rope->transform->EulerAngles().x == 0)
+		{
+			gameState = GameState::PreStart;
+			timer = 0;
+		}
+
+		if (rope->transform->EulerAngles().x < 5 || rope->transform->EulerAngles().x > 355)
+		{
+			rope->transform->EulerRotation(0, 0, 0);
+			ropeSpeed = 0;
+		}
+	}
+
+	rope->transform->Rotate({ ropeSpeed * deltaTime, 0, 0 });
+
+	for (int i = 0; i < players.size(); ++i)
+	{
+		players[i]->accelleration -= gravity * deltaTime;
+		players[i]->Update(deltaTime);
+
+		XMFLOAT3 pos = players[i]->transform->Position();
+
+		if (pos.y < floorHeight)
+		{
+			pos.y = floorHeight;
+			players[i]->transform->Position(pos);
+			players[i]->onGround = true;
+			players[i]->accelleration = 0;
+		}
+	}
+
 	camera->Update(deltaTime);
 
 	// Quit if the escape key is pressed
@@ -250,21 +342,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-	// Set buffers in the input assembler
-	//  - Do this ONCE PER OBJECT you're drawing, since each object might
-	//    have different geometry.
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-
-	for (int i = 0; i < gameObjects.size(); ++i)
-	{
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("lights", &lights, sizeof(Lights));
-		gameObjects[i]->GetComponent<MeshRenderer>()->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
-
-		context->IASetVertexBuffers(0, 1, gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetVertexBuffer(), &stride, &offset);
-		context->IASetIndexBuffer(gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
-		context->DrawIndexed(gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetIndexCount(), 0, 0);
-	}
+	RenderManager::GetInstance()->Render(camera, context, lights);
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
@@ -317,7 +395,7 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	// Add any custom code here...
 	if (buttonState & 0x0001)
 	{
-		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.001f, (float)(x - prevMousePos.x) * 0.001f, 0.0f);
+		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.1f, (float)(x - prevMousePos.x) * 0.1f, 0.0f);
 	}
 
 	// Save the previous mouse position, so we have it for the future

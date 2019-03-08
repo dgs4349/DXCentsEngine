@@ -3,6 +3,7 @@
 #include "Singleton.h"
 #include "Renderer.h"
 #include "Camera.h"
+#include "LightTypes.h"
 
 class Renderer;
 
@@ -17,7 +18,7 @@ public:
 	void UnregisterRenderer(Renderer* const renderer);
 	void UnregisterRenderer(uint64_t const rendererID);
 
-	void Render(Camera* camera) const;
+	void Render(Camera* camera, ID3D11DeviceContext* context, Lights& lights) const;
 
 protected:
 

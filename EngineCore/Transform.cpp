@@ -51,44 +51,67 @@ XMFLOAT4 Transform::Rotation() const
 }
 
 
-XMFLOAT3 Transform::EulerAngles() const
+XMFLOAT3 Transform::EulerAngles()
 {
+	eulerAngle = { fmodf(eulerAngle.x, 360.0f), fmodf(eulerAngle.y, 360.0f), fmodf(eulerAngle.z, 360.0f) };
+
 	return eulerAngle;
 }
 
 
 void Transform::Rotation(float x, float y, float z, float w)
 {
-	rotation = XMFLOAT4(x, y, z, w);
-	dirty = true;
+	Rotation({ x, y, z, w });
 }
 
 
 void Transform::Rotation(XMFLOAT4 rotation)
 {
 	this->rotation = rotation;
+
+	XMVECTOR quat = XMLoadFloat4(&rotation);
+	XMVECTOR angleAxis;
+	float angle;
+	XMQuaternionToAxisAngle(&angleAxis, &angle, quat);
+	XMStoreFloat3(&eulerAngle, XMVectorScale(angleAxis, angle));
+
 	dirty = true;
 }
 
 
 void Transform::Rotate(float x, float y, float z)
 {
-	XMVECTOR newRot = XMVectorAdd(XMLoadFloat3(&eulerAngle), { x, y, z });
-	XMVECTOR quat = XMQuaternionRotationRollPitchYawFromVector(newRot);
-
-	XMStoreFloat4(&rotation, quat);
-	XMStoreFloat3(&eulerAngle, newRot);
-	dirty = true;
+	Rotate({ x, y, z });
 }
 
 
 void Transform::Rotate(XMFLOAT3 rotate)
 {
 	XMVECTOR newRot = XMVectorAdd(XMLoadFloat3(&eulerAngle), XMLoadFloat3(&rotate));
+	XMStoreFloat3(&eulerAngle, newRot);
+
+	newRot = XMVectorScale(newRot, XM_PI / 180);
 	XMVECTOR quat = XMQuaternionRotationRollPitchYawFromVector(newRot);
 
 	XMStoreFloat4(&rotation, quat);
-	XMStoreFloat3(&eulerAngle, newRot);
+	dirty = true;
+}
+
+
+void Transform::EulerRotation(float x, float y, float z)
+{
+	EulerRotation({ x, y, z });
+}
+
+
+void Transform::EulerRotation(XMFLOAT3 eulerRotation)
+{
+	XMVECTOR rot = { XMConvertToRadians(eulerRotation.x), XMConvertToRadians(eulerRotation.y) , XMConvertToRadians(eulerRotation.z) };
+	XMVECTOR quat = XMQuaternionRotationRollPitchYawFromVector(rot);
+
+	XMStoreFloat4(&rotation, quat);
+	eulerAngle = eulerRotation;
+
 	dirty = true;
 }
 

@@ -14,11 +14,13 @@ public:
 	void Position(DirectX::XMFLOAT3 position);
 
 	DirectX::XMFLOAT4 Rotation() const;
-	DirectX::XMFLOAT3 EulerAngles() const;
+	DirectX::XMFLOAT3 EulerAngles();
 	void Rotation(float x, float y, float z, float w);
 	void Rotation(DirectX::XMFLOAT4 rotation);
 	void Rotate(float x, float y, float z);
 	void Rotate(DirectX::XMFLOAT3 rotation);
+	void EulerRotation(float x, float y, float z);
+	void EulerRotation(DirectX::XMFLOAT3 eulerRotation);
 
 	DirectX::XMFLOAT3 Scale() const;
 	void Scale(float x, float y, float z);

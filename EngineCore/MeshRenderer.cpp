@@ -25,6 +25,11 @@ Material* const MeshRenderer::GetMaterial() const
 	return material;
 }
 
+void MeshRenderer::SetMaterial(Material* const material)
+{
+	this->material = material;
+}
+
 
 void MeshRenderer::PrepareMaterial(XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix) const
 {
