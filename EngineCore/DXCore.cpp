@@ -86,7 +86,7 @@ HRESULT DXCore::InitWindow()
 	// appropriate window class struct
 	WNDCLASS wndClass		= {}; // Zero out the memory
 	wndClass.style			= CS_HREDRAW | CS_VREDRAW;	// Redraw on horizontal or vertical movement/adjustment
-	wndClass.lpfnWndProc	= DXCore::WindowProc;
+	wndClass.lpfnWndProc	= InputManager::WindowProc;
 	wndClass.cbClsExtra		= 0;
 	wndClass.cbWndExtra		= 0;
 	wndClass.hInstance		= hInstance;						// Our app's handle

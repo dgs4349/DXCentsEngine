@@ -68,6 +68,7 @@
       <Filter>Core\ECS\Components\Render</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)DXCore.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)InputManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Logger.h">
@@ -121,5 +122,6 @@
       <Filter>Core\ECS\Components\Render</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)DXCore.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)InputManager.h" />
   </ItemGroup>
 </Project>

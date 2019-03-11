@@ -48,6 +48,7 @@ Game::~Game()
 {
 	ObjectManager::ReleaseInstance();
 	RenderManager::ReleaseInstance();
+	InputManager::ReleaseInstance();
 
 	delete vertexShader;
 	delete pixelShader;
