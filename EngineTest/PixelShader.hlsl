@@ -1,3 +1,5 @@
+#include "../EngineCore/LightTypes.h"
+
 // Struct representing the data we expect to receive from earlier pipeline stages
 // - Should match the output of our corresponding vertex shader
 // - The name of the struct itself is unimportant
@@ -16,15 +18,9 @@ struct VertexToPixel
 	float2 uv			: UV;
 };
 
-struct DirectionalLight
-{
-	float4 ambientColor;
-	float4 diffuseColor;
-	float3 direction;
-};
-
 cbuffer externalData : register(b0)
 {
+	AmbientLight ambientLight;
 	DirectionalLight light;
 	DirectionalLight light2;
 };
@@ -50,5 +46,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float lightAmount = saturate(dot(normal, normalize(-light.direction)));
 	float lightAmount2 = saturate(dot(normal, normalize(-light2.direction)));
 
-	return (light.ambientColor + light2.ambientColor + (light.diffuseColor * lightAmount) + (light2.diffuseColor * lightAmount2)) * surfaceColor;
+	return (ambientLight.color + (light.color * lightAmount) + (light2.color * lightAmount2)) * surfaceColor;
 }

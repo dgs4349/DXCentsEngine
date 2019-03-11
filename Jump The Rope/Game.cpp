@@ -21,6 +21,12 @@ using namespace DirectX;
 // --------------------------------------------------------
 Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX Game"), 1280, 720, true)
 {
+#if defined(DEBUG) || defined(_DEBUG)
+	// Do we want a console window?  Probably only in debug mode
+	CreateConsoleWindow(500, 120, 32, 120);
+	printf("Console window created successfully.  Feel free to printf() here.\n");
+#endif
+
 	Logger::GetInstance();
 	ObjectManager::GetInstance();
 	RenderManager::GetInstance();
@@ -28,15 +34,7 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camObject = new GameObject("Camera");
 
 	camera = camObject->AddComponent<Camera>();
-	directionalLight = DirectionalLight();
-	directionalLight2 = DirectionalLight();
-
-#if defined(DEBUG) || defined(_DEBUG)
-	// Do we want a console window?  Probably only in debug mode
-	CreateConsoleWindow(500, 120, 32, 120);
-	printf("Console window created successfully.  Feel free to printf() here.\n");
-#endif
-
+	lights = Lights();
 }
 
 // --------------------------------------------------------
@@ -81,11 +79,15 @@ void Game::Init()
 	LoadModels();
 	CreateBasicGeometry();
 
-	camera->transform->Position(0.0f, 0.0f, -10.0f);
+	camera->transform->Position(0.0f, 1.0f, -10.0f);
 	camera->SetScreenSize(width, height);
 
-	directionalLight = DirectionalLight(XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 1.0f));
-	directionalLight2 = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
+	lights.ambientLights[0] = { Color(0.5f), 1 };
+	lights.ambientLightCount = 1;
+
+	/*ambientLight = { Color(0.5f) };
+	directionalLight = { Color(0.5f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) };
+	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };*/
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -116,6 +118,7 @@ void Game::LoadModels()
 	meshes.push_back(new Mesh("Assets/Models/helix.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/sphere.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/torus.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/rope.obj", device));
 }
 
 void Game::LoadTextures()
@@ -148,7 +151,7 @@ void Game::CreateMaterials()
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	
+
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[0], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
@@ -164,18 +167,34 @@ void Game::CreateMaterials()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	gameObjects.push_back(new GameObject("Test", meshes[0], materials[0]));
-	gameObjects.push_back(new GameObject("Test", meshes[1], materials[3]));
-	gameObjects.push_back(new GameObject("Test", meshes[2], materials[2]));
-	gameObjects.push_back(new GameObject("Test", meshes[3], materials[1]));
-	gameObjects.push_back(new GameObject("Test", meshes[4], materials[2]));
-	gameObjects.push_back(new GameObject("Test", meshes[5], materials[3]));
+	// Rope
+	rope = new GameObject("Rope", meshes[6], materials[3]);
 
-	gameObjects[1]->transform->Position(2.0f, 0.0f, 0.0f);
-	gameObjects[2]->transform->Position(4.0f, 0.0f, 0.0f);
-	gameObjects[3]->transform->Position(6.0f, 0.0f, 0.0f);
-	gameObjects[4]->transform->Position(8.0f, 0.0f, 0.0f);
-	gameObjects[5]->transform->Position(10.0f, 0.0f, 0.0f);
+	// Left Player
+	GameObject* player1 = new GameObject("Player 1", meshes[1], materials[0]);
+	players.push_back(player1->AddComponent<Player>());
+	// Right Player
+	GameObject* player2 = new GameObject("Player 2", meshes[1], materials[0]);
+	players.push_back(player2->AddComponent<Player>());
+
+	// Ground
+	ground = new GameObject("Ground", meshes[1], materials[1]);
+
+	// Left Player
+	player1->transform->Position(1.0f, 0.0f, 0.0f);
+	player1->transform->Scale(1.0f, 2.0f, 1.0f);
+
+	// Right Player
+	player2->transform->Position(-1.0f, 0.0f, 0.0f);
+	player2->transform->Scale(1.0f, 2.0f, 1.0f);
+
+	// Rope
+	rope->transform->Position(0.0f, 0.5f, 0.0f);
+	rope->transform->Scale(2.0f, 2.0f, 2.0f);
+	rope->transform->EulerRotation(0, 0, 0);
+	// Ground
+	ground->transform->Position(0.0f, -1.5f, 0.0f);
+	ground->transform->Scale(10.0f, 1.0f, 10.0f);
 }
 
 
@@ -195,6 +214,110 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	bool p1Input = GetAsyncKeyState(*"Q");
+	bool p2Input = GetAsyncKeyState(*"P");
+
+	if (gameState == GameState::PreStart)
+	{
+		if (p1Input)
+		{
+			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[1]);
+		}
+		else
+		{
+			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+		}
+
+		if (p2Input)
+		{
+			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[1]);
+		}
+		else
+		{
+			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+		}
+
+		if (p1Input && p2Input)
+		{
+			timer += deltaTime;
+
+			if (timer >= readyLength)
+			{
+				gameState = GameState::Playing;
+
+				timer = 0;
+				ropeSpeed = startRopeSpeed;
+
+				players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+				players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+			}
+		}
+		else
+		{
+			timer = 0;
+		}
+	}
+	if (gameState == GameState::Playing)
+	{
+		ropeSpeed += speedIncrease * deltaTime;
+
+		if (p1Input)
+		{
+			players[0]->Jump(jumpHeight);
+		}
+		if (p2Input)
+		{
+			players[1]->Jump(jumpHeight);
+		}
+
+		if (rope->transform->EulerAngles().x > 180 - ropeWidth && rope->transform->EulerAngles().x < 180 + ropeWidth)
+		{
+			for (int i = 0; i < players.size(); ++i)
+			{
+				if (players[i]->transform->Position().y < ropeHeight)
+				{
+					players[i]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[2]);
+					gameState = GameState::End;
+				}
+			}
+		}
+	}
+	if (gameState == GameState::End)
+	{
+
+		timer += deltaTime;
+
+		if (timer > endScreenLength && rope->transform->EulerAngles().x == 0)
+		{
+			gameState = GameState::PreStart;
+			timer = 0;
+		}
+
+		if (rope->transform->EulerAngles().x < 5 || rope->transform->EulerAngles().x > 355)
+		{
+			rope->transform->EulerRotation(0, 0, 0);
+			ropeSpeed = 0;
+		}
+	}
+
+	rope->transform->Rotate({ ropeSpeed * deltaTime, 0, 0 });
+
+	for (int i = 0; i < players.size(); ++i)
+	{
+		players[i]->accelleration -= gravity * deltaTime;
+		players[i]->Update(deltaTime);
+
+		XMFLOAT3 pos = players[i]->transform->Position();
+
+		if (pos.y < floorHeight)
+		{
+			pos.y = floorHeight;
+			players[i]->transform->Position(pos);
+			players[i]->onGround = true;
+			players[i]->accelleration = 0;
+		}
+	}
+
 	camera->Update(deltaTime);
 
 	// Quit if the escape key is pressed
@@ -220,22 +343,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-	// Set buffers in the input assembler
-	//  - Do this ONCE PER OBJECT you're drawing, since each object might
-	//    have different geometry.
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-
-	for (int i = 0; i < gameObjects.size(); ++i)
-	{
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light", &directionalLight, sizeof(DirectionalLight));
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light2", &directionalLight2, sizeof(DirectionalLight));
-		gameObjects[i]->GetComponent<MeshRenderer>()->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
-
-		context->IASetVertexBuffers(0, 1, gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetVertexBuffer(), &stride, &offset);
-		context->IASetIndexBuffer(gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
-		context->DrawIndexed(gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetIndexCount(), 0, 0);
-	}
+	RenderManager::GetInstance()->Render(camera, context, lights);
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
@@ -288,7 +396,7 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	// Add any custom code here...
 	if (buttonState & 0x0001)
 	{
-		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.001f, (float)(x - prevMousePos.x) * 0.001f, 0.0f);
+		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.1f, (float)(x - prevMousePos.x) * 0.1f, 0.0f);
 	}
 
 	// Save the previous mouse position, so we have it for the future

@@ -1,16 +1,16 @@
 #include "Material.h"
 
-Material::Material()
+Material::Material() : Object("Material")
 {
 }
 
-Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelShader)
+Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelShader) : Object("Material")
 {
 	this->vertexShader = vertexShader;
 	this->pixelShader = pixelShader;
 }
 
-Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelShader, ID3D11ShaderResourceView* shaderResourceView, ID3D11SamplerState* samplerState)
+Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelShader, ID3D11ShaderResourceView* shaderResourceView, ID3D11SamplerState* samplerState) : Object("Material")
 {
 	this->vertexShader = vertexShader;
 	this->pixelShader = pixelShader;

@@ -8,9 +8,9 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Material.h"
-#include "Light.h"
 #include "WICTextureLoader.h"
 
+#include "LightTypes.h"
 #include "CentsEngine.h"
 
 class Game
@@ -36,6 +36,7 @@ public:
 
 private:
 
+	AmbientLight ambientLight;
 	DirectionalLight directionalLight;
 	DirectionalLight directionalLight2;
 

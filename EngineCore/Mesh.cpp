@@ -8,22 +8,13 @@ Mesh::Mesh() : Object("Mesh")
 {
 }
 
-
-Mesh::~Mesh()
+Mesh::Mesh(const char* filePath, ID3D11Device* context) : Object("Mesh")
 {
-	if (vertexBuffer)
-	{
-		vertexBuffer->Release();
-	}
-	if (indexBuffer)
-	{
-		indexBuffer->Release();
-	}
-}
-
-Mesh::Mesh(const char* filePath, ID3D11Device* context)
-{
-	printf("Creating mesh: %s\n", filePath);
+	LOG_TRACE("Loading mesh:\t\t\t{}", filePath);
+	meshName = std::string(filePath);
+	size_t fileName = meshName.find_last_of('/') + 1;
+	size_t fileExtension = meshName.find('.');
+	meshName = meshName.substr(fileName, fileExtension - fileName);
 
 	// File input object
 	std::ifstream obj(filePath);
@@ -182,6 +173,18 @@ Mesh::Mesh(const char* filePath, ID3D11Device* context)
 	obj.close();
 
 	CreateBuffers(&verts[0], static_cast<uint16_t>(verts.size()), &indices[0], static_cast<uint16_t>(indices.size()), context);
+}
+
+Mesh::~Mesh()
+{
+	if (vertexBuffer)
+	{
+		vertexBuffer->Release();
+	}
+	if (indexBuffer)
+	{
+		indexBuffer->Release();
+	}
 }
 
 void Mesh::Clear()

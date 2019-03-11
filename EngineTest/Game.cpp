@@ -4,13 +4,6 @@
 // For the DirectX Math library
 using namespace DirectX;
 
-/*
-#if defined(DEBUG) || defined(_DEBUG)
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
-*/
-
 // --------------------------------------------------------
 // Constructor
 //
@@ -21,21 +14,24 @@ using namespace DirectX;
 // --------------------------------------------------------
 Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX Game"), 1280, 720, true)
 {
-	Logger::GetInstance();
-	ObjectManager::GetInstance();
-	RenderManager::GetInstance();
-
-	camObject = new GameObject("Camera");
-
-	camera = camObject->AddComponent<Camera>();
-	directionalLight = DirectionalLight();
-	directionalLight2 = DirectionalLight();
-
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
 	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
 #endif
+
+	LOG_TRACE("{}", sizeof(DirectionalLight));
+
+	Logger::GetInstance();
+	ObjectManager::GetInstance();
+	RenderManager::GetInstance();
+
+	camObject = new GameObject("Camera");
+	camera = camObject->AddComponent<Camera>();
+
+	ambientLight = { Color(0.5f) };
+	directionalLight = { Color(0.5f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) };
+	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };
 
 }
 
@@ -82,9 +78,6 @@ void Game::Init()
 
 	camera->transform->Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
-
-	directionalLight = DirectionalLight(XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 1.0f));
-	directionalLight2 = DirectionalLight(XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -227,6 +220,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	for (int i = 0; i < gameObjects.size(); ++i)
 	{
+		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("ambientLight", &ambientLight, sizeof(AmbientLight));
 		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light", &directionalLight, sizeof(DirectionalLight));
 		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light2", &directionalLight2, sizeof(DirectionalLight));
 		gameObjects[i]->GetComponent<MeshRenderer>()->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());

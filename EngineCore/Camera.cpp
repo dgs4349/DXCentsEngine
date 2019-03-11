@@ -16,8 +16,6 @@ Camera::~Camera()
 
 void Camera::Update(float deltaTime)
 {
-	LOG_TRACE("Update Camera");
-
 	XMVECTOR move = { 0.0f, 0.0f, 0.0f };
 	XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
 

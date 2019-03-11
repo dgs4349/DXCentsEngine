@@ -1,17 +1,21 @@
 #pragma once
 
 #include <vector>
-#include "DXCore.h"
-#include "SimpleShader.h"
-#include <DirectXMath.h>
-#include "Mesh.h"
-#include "GameObject.h"
-#include "Camera.h"
-#include "Material.h"
-#include "Light.h"
-#include "WICTextureLoader.h"
 
 #include "CentsEngine.h"
+#include "Player.h"
+
+namespace GameState
+{
+	enum GameState
+	{
+		PreStart,
+		Playing,
+		End
+	};
+
+#define GameState GameState::GameState
+}
 
 class Game
 	: public DXCore
@@ -36,8 +40,20 @@ public:
 
 private:
 
-	DirectionalLight directionalLight;
-	DirectionalLight directionalLight2;
+	Lights lights;
+
+	float startRopeSpeed = 100.0f;
+	float ropeSpeed;
+	float speedIncrease = 15.0f;
+	float floorHeight = 0.0;
+	float gravity = 6.5f;
+	float jumpHeight = 4.0f;
+	float ropeWidth = 10.0f;
+	float ropeHeight = 0.5f;
+	float timer;
+	float readyLength = 1.0f;
+	float endScreenLength = 1.0f;
+	GameState gameState;
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders();
@@ -45,6 +61,10 @@ private:
 	void LoadTextures();
 	void CreateMaterials();
 	void CreateBasicGeometry();
+
+	GameObject* rope;
+	std::vector<Player*> players;
+	GameObject* ground;
 
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;
