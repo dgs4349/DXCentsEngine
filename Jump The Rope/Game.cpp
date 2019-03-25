@@ -118,6 +118,10 @@ void Game::LoadModels()
 	meshes.push_back(new Mesh("Assets/Models/sphere.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/torus.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/rope.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/skeleboy_body.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/skeleboy_arm1.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/ghostulon.obj", device));
+
 }
 
 void Game::LoadTextures()
@@ -126,6 +130,12 @@ void Game::LoadTextures()
 	ID3D11ShaderResourceView* texView2;
 	ID3D11ShaderResourceView* texView3;
 	ID3D11ShaderResourceView* texView4;
+	ID3D11ShaderResourceView* texView5;
+	ID3D11ShaderResourceView* texView6;
+	ID3D11ShaderResourceView* texView7;
+	ID3D11ShaderResourceView* texView8;
+	ID3D11ShaderResourceView* texView9;
+	ID3D11ShaderResourceView* texView10;
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Cobblestone.jpg", 0, &texView1);
 	textureViews.push_back(texView1);
@@ -138,6 +148,24 @@ void Game::LoadTextures()
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/WoodCrate.jpg", 0, &texView4);
 	textureViews.push_back(texView4);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/skelebonesTex.png", 0, &texView5);
+	textureViews.push_back(texView5);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/ghostoTex1.png", 0, &texView6);
+	textureViews.push_back(texView6);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/ghostoTex2.png", 0, &texView7);
+	textureViews.push_back(texView7);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/ghostoTex3.png", 0, &texView8);
+	textureViews.push_back(texView8);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/ghostoTex4.png", 0, &texView9);
+	textureViews.push_back(texView9);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/ghostoTex5.png", 0, &texView10);
+	textureViews.push_back(texView10);
 }
 
 void Game::CreateMaterials()
@@ -159,6 +187,18 @@ void Game::CreateMaterials()
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[2], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[5], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[6], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[7], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], samplerState));
 }
 
 // --------------------------------------------------------
@@ -170,22 +210,28 @@ void Game::CreateBasicGeometry()
 	rope = new GameObject("Rope", meshes[6], materials[3]);
 
 	// Left Player
-	GameObject* player1 = new GameObject("Player 1", meshes[1], materials[0]);
+	GameObject* player1 = new GameObject("Player 1", meshes[9], materials[5]);
 	players.push_back(player1->AddComponent<Player>());
 	// Right Player
-	GameObject* player2 = new GameObject("Player 2", meshes[1], materials[0]);
+	GameObject* player2 = new GameObject("Player 2", meshes[9], materials[6]);
 	players.push_back(player2->AddComponent<Player>());
 
 	// Ground
 	ground = new GameObject("Ground", meshes[1], materials[1]);
 
+	// Skeletons
+	skel1 = new GameObject("Skeleton1", meshes[7], materials[4]);
+	skel2 = new GameObject("Skeleton2", meshes[7], materials[4]);
+	skel1Arm = new GameObject("Skeleton1Arm", meshes[8], materials[4]);
+	skel2Arm = new GameObject("Skeleton2Arm", meshes[8], materials[4]);
+
 	// Left Player
-	player1->transform->Position(1.0f, 0.0f, 0.0f);
-	player1->transform->Scale(1.0f, 2.0f, 1.0f);
+	player1->transform->Position(-1.0f, 0.0f, 0.0f);
+	player1->transform->Scale(1.0f, 1.0f, 1.0f);
 
 	// Right Player
-	player2->transform->Position(-1.0f, 0.0f, 0.0f);
-	player2->transform->Scale(1.0f, 2.0f, 1.0f);
+	player2->transform->Position(1.0f, 0.0f, 0.0f);
+	player2->transform->Scale(1.0f, 1.0f, 1.0f);
 
 	// Rope
 	rope->transform->Position(0.0f, 0.5f, 0.0f);
@@ -193,7 +239,20 @@ void Game::CreateBasicGeometry()
 	rope->transform->EulerRotation(0, 0, 0);
 	// Ground
 	ground->transform->Position(0.0f, -1.5f, 0.0f);
-	ground->transform->Scale(10.0f, 1.0f, 10.0f);
+	ground->transform->Scale(20.0f, 1.0f, 20.0f);
+
+	// Skeletons
+	skel1->transform->Position(5.6f, -1.0f, 0.0f);
+	skel1->transform->EulerRotation(0, 90.0f, 0);
+
+	skel2->transform->Position(-5.6f, -1.0f, 0.0f);
+	skel2->transform->EulerRotation(0, -90.0f, 0);
+
+	skel1Arm->transform->Position(5.6f, 0.54f, 0.0f);
+	skel1Arm->transform->EulerRotation(0, 90.0f, 0);
+
+	skel2Arm->transform->Position(-5.6f, 0.54f, 0.0f);
+	skel2Arm->transform->EulerRotation(0, -90.0f, 0);
 }
 
 
@@ -220,20 +279,20 @@ void Game::Update(float deltaTime, float totalTime)
 	{
 		if (p1Input)
 		{
-			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[1]);
+			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[8]);
 		}
 		else
 		{
-			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+			players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[5]);
 		}
 
 		if (p2Input)
 		{
-			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[1]);
+			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[9]);
 		}
 		else
 		{
-			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+			players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[6]);
 		}
 
 		if (p1Input && p2Input)
@@ -247,8 +306,8 @@ void Game::Update(float deltaTime, float totalTime)
 				timer = 0;
 				ropeSpeed = startRopeSpeed;
 
-				players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
-				players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[0]);
+				players[0]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[5]);
+				players[1]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[6]);
 			}
 		}
 		else
@@ -275,7 +334,7 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				if (players[i]->transform->Position().y < ropeHeight)
 				{
-					players[i]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[2]);
+					players[i]->gameObject->GetComponent<MeshRenderer>()->SetMaterial(materials[7]);
 					gameState = GameState::End;
 				}
 			}
@@ -299,7 +358,10 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 
+	//rotates rope and arms
 	rope->transform->Rotate({ ropeSpeed * deltaTime, 0, 0 });
+	skel1Arm->transform->Rotate({ 0, 0, ropeSpeed * deltaTime});
+	skel2Arm->transform->Rotate({ 0, 0, -ropeSpeed * deltaTime});
 
 	for (int i = 0; i < players.size(); ++i)
 	{

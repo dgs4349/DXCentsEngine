@@ -65,6 +65,10 @@ private:
 	GameObject* rope;
 	std::vector<Player*> players;
 	GameObject* ground;
+	GameObject* skel1;
+	GameObject* skel2;
+	GameObject* skel1Arm;
+	GameObject* skel2Arm;
 
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;
