@@ -4,6 +4,7 @@
 
 #include "CentsEngine.h"
 #include "Player.h"
+#include "AudioHandler.h";
 
 namespace GameState
 {
@@ -38,9 +39,14 @@ public:
 	void OnMouseMove(WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta, int x, int y);
 
+	void OnSuspending();
+	void OnResuming();
+
 private:
 
 	Lights lights;
+
+	AudioHandler* audioHandler;
 
 	float startRopeSpeed = 100.0f;
 	float ropeSpeed;

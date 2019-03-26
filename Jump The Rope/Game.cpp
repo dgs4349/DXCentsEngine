@@ -474,4 +474,12 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 {
 	// Add any custom code here...
 }
+void Game::OnSuspending()
+{
+	audioHandler->Suspend();
+}
+void Game::OnResuming()
+{
+	audioHandler->Resume();
+}
 #pragma endregion
