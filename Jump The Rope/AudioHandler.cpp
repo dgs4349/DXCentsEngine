@@ -47,11 +47,6 @@ void AudioHandler::Resume()
 	audEngine->Resume();
 }
 
-std::unique_ptr<DirectX::SoundEffect> AudioHandler::MakeSound(char * location)
-{
-	return std::make_unique<SoundEffect>(audEngine.get(), location);
-}
-
 void AudioHandler::PlayOnce(SoundEffect* sfx, float volume)
 {
 	// TODO get and set the time on audio effect, add callbacks

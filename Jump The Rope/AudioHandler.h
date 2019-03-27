@@ -14,8 +14,6 @@ public:
 	void Suspend();
 	void Resume();
 
-	std::unique_ptr<DirectX::SoundEffect> MakeSound(char* location);
-
 	void PlayOnce(DirectX::SoundEffect* sfx, float volume);
 	void PlayLoop(DirectX::SoundEffect* sfx, float volume);
 
