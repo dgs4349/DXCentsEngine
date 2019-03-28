@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{041f7dfb-c3d2-4c58-acf3-c6c839c59d16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{4a0baf77-5d32-4633-909f-7f3c79e2c8ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -27,8 +30,11 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AudioHandler.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="CentsAudioHandler.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="CentsSoundEffect.cpp">
+      <Filter>Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -38,7 +44,10 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AudioHandler.h">
+    <ClInclude Include="CentsAudioHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CentsSoundEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

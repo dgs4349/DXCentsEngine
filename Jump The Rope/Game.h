@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "CentsEngine.h"
-#include "Player.h"
-#include "AudioHandler.h";
+#include "CentsEngine.h";
+#include "Player.h";
+#include "CentsAudioHandler.h";
 
 namespace GameState
 {
@@ -46,7 +46,7 @@ private:
 
 	Lights lights;
 
-	AudioHandler* audioHandler;
+	CentsAudioHandler* audioHandler;
 
 	float startRopeSpeed = 100.0f;
 	float ropeSpeed;
