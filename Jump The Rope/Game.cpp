@@ -78,7 +78,8 @@ void Game::Init()
 	LoadModels();
 	CreateBasicGeometry();
 
-	camera->transform->Position(0.0f, 1.0f, -10.0f);
+	camera->transform->Position(7.0f, 2.0f, -13.0f);
+	camera->transform->Rotate(0.0f, -30.0f, 0.0f);
 	camera->SetScreenSize(width, height);
 
 	lights.ambientLights[0] = { Color(0.5f), 1 };
@@ -121,7 +122,10 @@ void Game::LoadModels()
 	meshes.push_back(new Mesh("Assets/Models/skeleboy_body.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/skeleboy_arm1.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/ghostulon.obj", device));
-
+	meshes.push_back(new Mesh("Assets/Models/Ground.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/Tree.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/Cross.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/Grave.obj", device));
 }
 
 void Game::LoadTextures()
@@ -136,6 +140,7 @@ void Game::LoadTextures()
 	ID3D11ShaderResourceView* texView8;
 	ID3D11ShaderResourceView* texView9;
 	ID3D11ShaderResourceView* texView10;
+	ID3D11ShaderResourceView* texView11;
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Cobblestone.jpg", 0, &texView1);
 	textureViews.push_back(texView1);
@@ -166,6 +171,9 @@ void Game::LoadTextures()
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/ghostoTex5.png", 0, &texView10);
 	textureViews.push_back(texView10);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Ground.png", 0, &texView11);
+	textureViews.push_back(texView11);
 }
 
 void Game::CreateMaterials()
@@ -199,6 +207,8 @@ void Game::CreateMaterials()
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], samplerState));
 }
 
 // --------------------------------------------------------
@@ -217,7 +227,23 @@ void Game::CreateBasicGeometry()
 	players.push_back(player2->AddComponent<Player>());
 
 	// Ground
-	ground = new GameObject("Ground", meshes[1], materials[1]);
+	ground = new GameObject("Ground", meshes[10], materials[10]);
+
+	// Props
+	tree1 = new GameObject("Tree1", meshes[11], materials[1]);
+	tree2 = new GameObject("Tree2", meshes[11], materials[1]);
+	tree3 = new GameObject("Tree3", meshes[11], materials[1]);
+	tree4 = new GameObject("Tree4", meshes[11], materials[1]);
+	tree5 = new GameObject("Tree5", meshes[11], materials[1]);
+	tree6 = new GameObject("Tree3", meshes[11], materials[1]);
+	tree7 = new GameObject("Tree4", meshes[11], materials[1]);
+	tree8 = new GameObject("Tree5", meshes[11], materials[1]);
+	cross = new GameObject("Cross", meshes[12], materials[0]);
+	grave1 = new GameObject("Grave1", meshes[13], materials[0]);
+	grave2 = new GameObject("Grave2", meshes[13], materials[0]);
+	grave3 = new GameObject("Grave3", meshes[13], materials[0]);
+	grave4 = new GameObject("Grave4", meshes[13], materials[0]);
+	grave5 = new GameObject("Grave5", meshes[13], materials[0]);
 
 	// Skeletons
 	skel1 = new GameObject("Skeleton1", meshes[7], materials[4]);
@@ -238,8 +264,57 @@ void Game::CreateBasicGeometry()
 	rope->transform->Scale(2.0f, 2.0f, 2.0f);
 	rope->transform->EulerRotation(0, 0, 0);
 	// Ground
-	ground->transform->Position(0.0f, -1.5f, 0.0f);
-	ground->transform->Scale(20.0f, 1.0f, 20.0f);
+	ground->transform->Position(0.0f, -1.0f, 0.0f);
+	ground->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	// Props
+	tree1->transform->Position(-11.67f, -1.0f, 12.8f);
+	tree1->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	tree2->transform->Position(-14.14f, -1.0f, 5.9f);
+	tree2->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	tree3->transform->Position(-13.47f, -1.0f, -2.5f);
+	tree3->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	tree4->transform->Position(-4.2f, -1.0f, 13.0f);
+	tree4->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	tree5->transform->Position(-9.5f, -1.0f, 20.76f);
+	tree5->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	tree6->transform->Position(-20.5f, -1.0f, -9.4f);
+	tree6->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	tree7->transform->Position(-12.82f, -1.0f, -13.430f);
+	tree7->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	tree8->transform->Position(5.0f, -1.0f, 15.0f);
+	tree8->transform->Scale(1.0f, 1.0f, 1.0f);
+
+	cross->transform->Position(-10.54f, -1.0f, 9.48f);
+	cross->transform->Scale(1.0f, 1.0f, 1.0f);
+	cross->transform->Rotate(0.0, -24.5, 0.0);
+
+	grave1->transform->Position(-7.0f, -1.0f, 10.50f);
+	grave1->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave1->transform->Rotate(0.0, -5.0, 0.0);
+
+	grave2->transform->Position(-3.0f, -1.0f, 10.50f);
+	grave2->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave2->transform->Rotate(0.0, 5.0, 0.0);
+
+	grave3->transform->Position(1.0f, -1.0f, 10.50f);
+	grave3->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave3->transform->Rotate(0.0, 5.0, 0.0);
+
+	grave4->transform->Position(-10.0f, -1.0f, 4.00f);
+	grave4->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave4->transform->Rotate(0.0, -95.0, 0.0);
+
+	grave5->transform->Position(-10.0f, -1.0f, 0.00f);
+	grave5->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave5->transform->Rotate(0.0, -85.0, 0.0);
 
 	// Skeletons
 	skel1->transform->Position(5.6f, -1.0f, 0.0f);

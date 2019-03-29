@@ -65,6 +65,21 @@ private:
 	GameObject* rope;
 	std::vector<Player*> players;
 	GameObject* ground;
+	GameObject* tree1;
+	GameObject* tree2;
+	GameObject* tree3;
+	GameObject* tree4;
+	GameObject* tree5;
+	GameObject* tree6;
+	GameObject* tree7;
+	GameObject* tree8;
+
+	GameObject* cross;
+	GameObject* grave1;
+	GameObject* grave2;
+	GameObject* grave3;
+	GameObject* grave4;
+	GameObject* grave5;
 	GameObject* skel1;
 	GameObject* skel2;
 	GameObject* skel1Arm;
