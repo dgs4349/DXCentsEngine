@@ -15,8 +15,8 @@ class CentsSoundEffect
 {
 public:
 	CentsSoundEffect();
-	CentsSoundEffect(AudioEngine* audEngine, const wchar_t location);
-	CentsSoundEffect(AudioEngine* audEngine, const wchar_t location, bool loop);
+	CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location);
+	CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location, bool loop);
 	~CentsSoundEffect();
 
 	enum SoundEffectState { DelayStart = 0, Starting = 1, Playing = 2, Completed = 3 };

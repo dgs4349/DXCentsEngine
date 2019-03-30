@@ -6,15 +6,15 @@ CentsSoundEffect::CentsSoundEffect()
 {
 }
 
-CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t location)
+CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location)
 {
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, &location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 }
 
-CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t location, bool loop)
+CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t* location, bool loop)
 {
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, &location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 	Loop = loop;
 }
@@ -26,18 +26,19 @@ CentsSoundEffect::~CentsSoundEffect()
 
 void CentsSoundEffect::Update(float deltaTime, float totalTime)
 {
-	if (state = DelayStart) {
+	if (state == DelayStart) {
 		Play(totalTime);
 		state = Playing;
-		endTime = startTime + soundEffect->GetSampleDurationMS();
+		endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
 	}
-	if (state = Starting) {
+	if (state == Starting) {
 		startTime = totalTime;
 		state = Playing;
-		endTime = startTime + soundEffect->GetSampleDurationMS();
+		endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
 	}
+	printf("%f total, %f end\n", totalTime, endTime);
 	if (state == Playing && !Loop) {
-		if (totalTime >= endTime) {
+		if (totalTime > endTime) {
 			state = Completed;
 			if (SetLoopDelayed) {
 				Loop = true;

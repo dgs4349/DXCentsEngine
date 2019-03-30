@@ -98,6 +98,11 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	audioHandler->Init();
+	// loading audio here for now
+	bgIntro = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_intro.wav");
+	bgLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_loop.wav", true);
+	bgIntro->Link(bgLoop);
+	bgIntro->PlayOnUpdate();
 }
 
 // --------------------------------------------------------

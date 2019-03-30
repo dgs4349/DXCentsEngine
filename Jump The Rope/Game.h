@@ -76,6 +76,9 @@ private:
 	GameObject* skel1Arm;
 	GameObject* skel2Arm;
 
+	CentsSoundEffect* bgIntro;
+	CentsSoundEffect* bgLoop;
+
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;
 	std::vector<ID3D11ShaderResourceView*> textureViews;
