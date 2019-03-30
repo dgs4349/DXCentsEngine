@@ -6,21 +6,17 @@ CentsSoundEffect::CentsSoundEffect()
 {
 }
 
-CentsSoundEffect::CentsSoundEffect(CentsAudioHandler* AudioHandler, const wchar_t location)
+CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t location)
 {
-	audioHandler = AudioHandler;
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audioHandler->GetAudioEngine(), location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, &location);
 	soundEffectInstance = soundEffect->CreateInstance();
-	audioHandler->Add(this);
 }
 
-CentsSoundEffect::CentsSoundEffect(CentsAudioHandler * AudioHandler, const wchar_t location, bool loop)
+CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t location, bool loop)
 {
-	audioHandler = AudioHandler;
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audioHandler->GetAudioEngine, location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, &location);
 	soundEffectInstance = soundEffect->CreateInstance();
 	Loop = loop;
-	audioHandler->Add(this);
 }
 
 
@@ -63,11 +59,6 @@ void CentsSoundEffect::Link(CentsSoundEffect * linkee, bool loop)
 {
 	linked = linkee;
 	linked->SetLoop(loop);
-}
-
-void CentsSoundEffect::Play()
-{
-	soundEffectInstance->Play();
 }
 
 void CentsSoundEffect::Play(float volume, float pitch, float pan)

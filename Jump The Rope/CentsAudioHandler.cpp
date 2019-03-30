@@ -5,6 +5,7 @@ using namespace DirectX;
 CentsAudioHandler::CentsAudioHandler()
 {
 	effects = std::vector<CentsSoundEffect*>();
+	managedEffects = std::vector<CentsSoundEffect*>();
 }
 
 
@@ -14,6 +15,7 @@ CentsAudioHandler::~CentsAudioHandler()
 	{
 		audEngine->Suspend();
 	}
+	for (int i = 0; i < managedEffects.size(); i++) delete managedEffects[i];
 }
 
 void CentsAudioHandler::Update(float deltaTime, float totalTime)
@@ -53,7 +55,20 @@ void CentsAudioHandler::Resume()
 	audEngine->Resume();
 }
 
+CentsSoundEffect * CentsAudioHandler::CreateSoundEffect(wchar_t location)
+{
+	CentsSoundEffect* effect = new CentsSoundEffect(audEngine.get(), location);
+	Add(effect);
+	Manage(effect);
+	return effect;
+}
+
 void CentsAudioHandler::Add(CentsSoundEffect * effect)
 {
 	effects.push_back(effect);
+}
+
+void CentsAudioHandler::Manage(CentsSoundEffect * effect)
+{
+	managedEffects.push_back(effect);
 }

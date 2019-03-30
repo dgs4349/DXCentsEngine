@@ -1,18 +1,25 @@
 #pragma once
 
-#include "CentsAudioHandler.h"
+#include <Audio.h>
 
 using namespace DirectX;
 
-enum SoundEffectState { DelayStart = 0, Starting = 1, Playing = 2, Completed = 3 };
+/*
+	@author Davis Smith
+	- Wraps SoundEffect and SoundEffectInstance from DirectXTK Audio
+	- Allows chaining soundeffects to play in sequence
+	- Adds playback status
+*/
 
 class CentsSoundEffect
 {
 public:
 	CentsSoundEffect();
-	CentsSoundEffect(CentsAudioHandler* AudioHandler, const wchar_t location);
-	CentsSoundEffect(CentsAudioHandler* AudioHandler, const wchar_t location, bool loop);
+	CentsSoundEffect(AudioEngine* audEngine, const wchar_t location);
+	CentsSoundEffect(AudioEngine* audEngine, const wchar_t location, bool loop);
 	~CentsSoundEffect();
+
+	enum SoundEffectState { DelayStart = 0, Starting = 1, Playing = 2, Completed = 3 };
 
 	void Update(float deltaTime, float totaltime);
 
@@ -34,10 +41,9 @@ public:
 	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f);
 
 	bool IsComplete();
+	SoundEffectState GetPlaybackStatus() { return state; }
 
 private:
-	CentsAudioHandler * audioHandler;
-
 	CentsSoundEffect * linked = nullptr;
 	
 	SoundEffectState state = Completed;
