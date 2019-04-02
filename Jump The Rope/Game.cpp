@@ -177,6 +177,10 @@ void Game::LoadTextures()
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/ghostoTex5.png", 0, &texView10);
 	textureViews.push_back(texView10);
+
+	ID3D11ShaderResourceView * testNormalMap;
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/normal.tif", 0, &testNormalMap);
+	textureViews.push_back(testNormalMap);
 }
 
 void Game::CreateMaterials()
@@ -191,25 +195,25 @@ void Game::CreateMaterials()
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[0], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[0], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[1], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[1], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[2], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[2], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[5], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[5], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[6], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[6], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[7], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[7], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], textureViews[10], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], textureViews[10], samplerState));
 }
 
 // --------------------------------------------------------

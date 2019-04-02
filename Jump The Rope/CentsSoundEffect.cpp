@@ -36,7 +36,6 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 		state = Playing;
 		endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
 	}
-	printf("%f total, %f end\n", totalTime, endTime);
 	if (state == Playing && !Loop) {
 		if (totalTime > endTime) {
 			state = Completed;
