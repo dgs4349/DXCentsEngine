@@ -28,16 +28,17 @@ cbuffer externalData : register(b0)
 Texture2D diffuseTexture : register(t0);
 SamplerState basicSampler : register(s0);
 
-float Attenuate(PointLight light, float3 worldPos)
+float Attenuate(float3 position, float range, float3 worldPos)
 {
-	float dist = distance(light.position, worldPos);
+	float dist = distance(position, worldPos);
 
 	// Ranged-based attenuation
-	float att = saturate(1.0f - (dist * dist / (light.range * light.range)));
+	float att = saturate(1.0f - (dist * dist / (range * range)));
 
 	// Soft falloff
 	return att * att;
 }
+
 
 float3 CalcDirLight(DirectionalLight aLight, float3 norm)
 {
@@ -55,7 +56,7 @@ float3 CalcPointLight(PointLight light, float3 normal, float3 worldPos, float3 c
 	float3 toCam = normalize(camPos - worldPos);
 
 	// Calculate the light amounts
-	float atten = Attenuate(light, worldPos);
+	float atten = Attenuate(light.position, light.range, worldPos);
 	float diff = saturate(dot(normal, toLight));
 
 	// Calculate diffuse with energy conservation
@@ -64,6 +65,22 @@ float3 CalcPointLight(PointLight light, float3 normal, float3 worldPos, float3 c
 
 	// Combine
 	return (balancedDiff * surfaceColor) * atten * light.intensity * light.color;
+}
+
+float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 camPos, float3 surfaceColor)
+{
+	float3 toLight = normalize(light.position - worldPos);
+	float3 toCam = normalize(camPos - worldPos);
+
+	float centerAngle = max(dot(toLight, light.direction), 0.0f);
+	float spotAmount = pow(centerAngle, light.angle);
+
+	float atten = Attenuate(light.position, light.range, worldPos);
+	float diff = saturate(dot(normal, toLight));
+
+	float3 balancedDiff = diff;
+
+	return (balancedDiff * surfaceColor) * spotAmount * light.intensity * light.color;
 }
 
 float4 main(VertexToPixel input) : SV_TARGET
@@ -92,7 +109,14 @@ float4 main(VertexToPixel input) : SV_TARGET
 		pointColor += CalcPointLight(lights.pointLights[p], normal, input.worldPos, cameraPos, surfaceColor.rgb);
 	}
 
-	float3 finalLightColor = ambientColor + dirColor + pointColor;
+	// Spot Light Calculation
+	float3 spotColor = float3(0, 0, 0);
+	for (int s = 0; s < lights.spotLightCount; ++s)
+	{
+		spotColor += CalcSpotLight(lights.spotLights[s], normal, input.worldPos, cameraPos, surfaceColor.rgb);
+	}
+
+	float3 finalLightColor = ambientColor + dirColor + pointColor + spotColor;
 	float3 gamma = float3(pow(abs(finalLightColor.rgb * surfaceColor.rgb), (1.0 / 2.2)));
 
 	return float4(gamma, 1);

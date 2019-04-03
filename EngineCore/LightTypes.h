@@ -61,14 +61,14 @@ struct PointLight
 /// </summary>
 struct SpotLight
 {
-	COLOR3 color;
-	INTENSITY;
-
-	FLOAT3 position;
+	FLOAT3 color;
 	float range;
 
-	FLOAT3 direction;
+	FLOAT3 position;
 	float angle;
+
+	FLOAT3 direction;
+	INTENSITY;
 };
 
 

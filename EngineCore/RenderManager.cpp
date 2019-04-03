@@ -2,6 +2,7 @@
 #include "MeshRenderer.h"
 #include "MeshFilter.h"
 #include "GameObject.h"
+#include "Transform.h"
 
 using namespace DirectX;
 
@@ -39,6 +40,7 @@ void RenderManager::Render(Camera* camera, ID3D11DeviceContext* context, Lights&
 		const MeshFilter* meshFilter = gameObject->GetComponent<MeshFilter>();
 
 		meshRenderer->GetMaterial()->PixelShader()->SetData("lights", &lights, sizeof(Lights));
+		meshRenderer->GetMaterial()->PixelShader()->SetData("cameraPos", &camera->transform->Position(), sizeof(XMFLOAT3));
 		meshRenderer->PrepareMaterial(view, projection);
 
 		context->IASetVertexBuffers(0, 1, meshFilter->GetMesh()->GetVertexBuffer(), &stride, &offset);

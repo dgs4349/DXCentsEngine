@@ -9,9 +9,13 @@
 #include "Camera.h"
 #include "Material.h"
 #include "WICTextureLoader.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
 
 #include "LightTypes.h"
 #include "CentsEngine.h"
+#include "RenderManager.h"
 
 class Game
 	: public DXCore
@@ -36,9 +40,7 @@ public:
 
 private:
 
-	AmbientLight ambientLight;
-	DirectionalLight directionalLight;
-	DirectionalLight directionalLight2;
+	Lights lights;
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders();

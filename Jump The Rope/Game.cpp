@@ -81,8 +81,17 @@ void Game::Init()
 	camera->transform->Position(0.0f, 1.0f, -10.0f);
 	camera->SetScreenSize(width, height);
 
-	lights.ambientLights[0] = { Color(0.5f), 1 };
+	lights.ambientLights[0] = { Color(0.2f), 1 };
 	lights.ambientLightCount = 1;
+
+	lights.dirLights[0] = { Color(1, 0, 0, 1), XMFLOAT3(1, 0, 0) };
+	lights.dirLightCount = 1;
+
+	lights.pointLights[0] = { XMFLOAT3(1, 1, 1), 2, XMFLOAT3(3.5f, 0.5f, 0), 10 };
+	lights.pointLightCount = 1;
+	
+	lights.spotLights[0] = { XMFLOAT3(1, 1, 1), 10, XMFLOAT3(0, 3, 0), 10, XMFLOAT3(0, -1, 0), 10 };
+	lights.spotLightCount = 1;
 
 	/*ambientLight = { Color(0.5f) };
 	directionalLight = { Color(0.5f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) };

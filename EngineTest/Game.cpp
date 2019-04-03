@@ -29,10 +29,7 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camObject = new GameObject("Camera");
 	camera = camObject->AddComponent<Camera>();
 
-	ambientLight = { Color(0.5f) };
-	directionalLight = { Color(0.5f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) };
-	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };
-
+	lights = Lights();
 }
 
 // --------------------------------------------------------
@@ -58,6 +55,10 @@ Game::~Game()
 	gameObjects.clear();
 	meshes.clear();
 
+	ImGui_ImplWin32_Shutdown();
+	ImGui_ImplDX11_Shutdown();
+	ImGui::DestroyContext();
+
 	Logger::ReleaseInstance();
 }
 
@@ -79,10 +80,19 @@ void Game::Init()
 	camera->transform->Position(0.0f, 0.0f, -10.0f);
 	camera->SetScreenSize(width, height);
 
+	lights.ambientLights[0] = { Color(0.5f), 1 };
+	lights.ambientLightCount = 1;
+
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+	ImGui::CreateContext();
+	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplDX11_Init(device, context);
+	ImGui::StyleColorsDark();
 }
 
 // --------------------------------------------------------
@@ -196,7 +206,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 // --------------------------------------------------------
 // Clear the screen, redraw everything, present to the user
-// --------------------------------------------------------
+// -----------------------D---------------------------------
 void Game::Draw(float deltaTime, float totalTime)
 {
 	// Background color (Cornflower Blue in this case) for clearing
@@ -218,17 +228,22 @@ void Game::Draw(float deltaTime, float totalTime)
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
-	for (int i = 0; i < gameObjects.size(); ++i)
-	{
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("ambientLight", &ambientLight, sizeof(AmbientLight));
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light", &directionalLight, sizeof(DirectionalLight));
-		gameObjects[i]->GetComponent<MeshRenderer>()->GetMaterial()->PixelShader()->SetData("light2", &directionalLight2, sizeof(DirectionalLight));
-		gameObjects[i]->GetComponent<MeshRenderer>()->PrepareMaterial(camera->ViewMatrix(), camera->ProjectionMatrix());
+	RenderManager::GetInstance()->Render(camera, context, lights);
 
-		context->IASetVertexBuffers(0, 1, gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetVertexBuffer(), &stride, &offset);
-		context->IASetIndexBuffer(gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
-		context->DrawIndexed(gameObjects[i]->GetComponent<MeshFilter>()->GetMesh()->GetIndexCount(), 0, 0);
+
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Testing ImGui");
+		ImGui::End();
+		ImGui::ShowTestWindow();
 	}
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
@@ -281,7 +296,7 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	// Add any custom code here...
 	if (buttonState & 0x0001)
 	{
-		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.001f, (float)(x - prevMousePos.x) * 0.001f, 0.0f);
+		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.1f, (float)(x - prevMousePos.x) * 0.1f, 0.0f);
 	}
 
 	// Save the previous mouse position, so we have it for the future

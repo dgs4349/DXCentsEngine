@@ -27,7 +27,6 @@ struct VertexShaderInput
 	float3 normal		: NORMAL;
 	float3 tangent		: TANGENT;
 	float2 uv			: UV;
-	float3 worldPos		: POSITION;
 };
 
 // Struct representing the data we're sending down the pipeline
@@ -84,7 +83,7 @@ VertexToPixel main(VertexShaderInput input)
 
 	output.normal = mul(input.normal, (float3x3)world);
 	output.uv = input.uv;
-	output.worldPos = input.worldPos;
+	output.worldPos = mul(float4(input.position, 1.0f), world).xyz;
 
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)
