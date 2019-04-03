@@ -91,7 +91,7 @@ void Game::Init()
 	lights.pointLights[0] = { XMFLOAT3(1, 1, 1), 2, XMFLOAT3(3.5f, 0.5f, 0), 10 };
 	lights.pointLightCount = 1;
 	
-	lights.spotLights[0] = { XMFLOAT3(1, 1, 1), 10, XMFLOAT3(0, 3, 0), 10, XMFLOAT3(0, -1, 0), 10 };
+	lights.spotLights[0] = { XMFLOAT3(0, 0, 1), 10, XMFLOAT3(0, 1, 0), 10, XMFLOAT3(-1, 0, 0), 10 };
 	lights.spotLightCount = 1;
 
 	/*ambientLight = { Color(0.5f) };
