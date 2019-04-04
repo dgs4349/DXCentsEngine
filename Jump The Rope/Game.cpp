@@ -35,6 +35,8 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 
 	camera = camObject->AddComponent<Camera>();
 	lights = Lights();
+
+	audioHandler = new CentsAudioHandler();
 }
 
 // --------------------------------------------------------
@@ -59,6 +61,8 @@ Game::~Game()
 	materials.clear();
 	gameObjects.clear();
 	meshes.clear();
+
+	delete audioHandler;
 
 	Logger::ReleaseInstance();
 }
@@ -102,6 +106,8 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	audioHandler->Init();
 }
 
 // --------------------------------------------------------
@@ -465,6 +471,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime);
 
+	audioHandler->Update(deltaTime, totalTime);
+
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
@@ -557,5 +565,13 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 void Game::OnMouseWheel(float wheelDelta, int x, int y)
 {
 	// Add any custom code here...
+}
+void Game::OnSuspending()
+{
+	audioHandler->Suspend();
+}
+void Game::OnResuming()
+{
+	audioHandler->Resume();
 }
 #pragma endregion
