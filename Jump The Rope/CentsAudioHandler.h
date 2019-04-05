@@ -28,7 +28,7 @@ public:
 	void Resume();
 
 	// creates sound effect and passes through Add and Manage
-	CentsSoundEffect* CreateSoundEffect(wchar_t location);
+	CentsSoundEffect* CreateSoundEffect(const wchar_t* location, bool loop=false);
 
 	DirectX::AudioEngine* GetAudioEngine() { return audEngine.get(); }
 

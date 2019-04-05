@@ -55,9 +55,9 @@ void CentsAudioHandler::Resume()
 	audEngine->Resume();
 }
 
-CentsSoundEffect * CentsAudioHandler::CreateSoundEffect(wchar_t location)
+CentsSoundEffect * CentsAudioHandler::CreateSoundEffect(const wchar_t* location, bool loop)
 {
-	CentsSoundEffect* effect = new CentsSoundEffect(audEngine.get(), location);
+	CentsSoundEffect* effect = new CentsSoundEffect(audEngine.get(), location, loop);
 	Add(effect);
 	Manage(effect);
 	return effect;

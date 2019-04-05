@@ -34,7 +34,10 @@ void MeshRenderer::SetMaterial(Material* const material)
 void MeshRenderer::PrepareMaterial(XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix) const
 {
 	material->PixelShader()->SetSamplerState("basicSampler", material->SamplerState());
-	material->PixelShader()->SetShaderResourceView("diffuseTexture", material->ShaderResourceView());
+	material->PixelShader()->SetShaderResourceView("diffuseTexture", material->DiffuseTextureResourceView());
+
+	//if (material->HasNormalTexureResource()) 
+		material->PixelShader()->SetShaderResourceView("normalTexture", material->NormalTextureResourceView());
 
 	material->VertexShader()->SetMatrix4x4("view", viewMatrix);
 	material->VertexShader()->SetMatrix4x4("projection", projectionMatrix);

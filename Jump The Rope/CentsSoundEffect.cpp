@@ -6,15 +6,15 @@ CentsSoundEffect::CentsSoundEffect()
 {
 }
 
-CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t location)
+CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location)
 {
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, &location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 }
 
-CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t location, bool loop)
+CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t* location, bool loop)
 {
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, &location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 	Loop = loop;
 }
@@ -26,18 +26,18 @@ CentsSoundEffect::~CentsSoundEffect()
 
 void CentsSoundEffect::Update(float deltaTime, float totalTime)
 {
-	if (state = DelayStart) {
+	if (state == DelayStart) {
 		Play(totalTime);
 		state = Playing;
-		endTime = startTime + soundEffect->GetSampleDurationMS();
+		endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
 	}
-	if (state = Starting) {
+	if (state == Starting) {
 		startTime = totalTime;
 		state = Playing;
-		endTime = startTime + soundEffect->GetSampleDurationMS();
+		endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
 	}
 	if (state == Playing && !Loop) {
-		if (totalTime >= endTime) {
+		if (totalTime > endTime) {
 			state = Completed;
 			if (SetLoopDelayed) {
 				Loop = true;
@@ -111,11 +111,18 @@ void CentsSoundEffect::Stop(bool immediate)
 	if (linked != nullptr) linked->Stop(immediate);
 }
 
-void CentsSoundEffect::Set(float volume, float pitch, float pan)
+void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
 {
-	soundEffectInstance->SetVolume(volume);
-	soundEffectInstance->SetPitch(pitch);
-	soundEffectInstance->SetPan(pan);
+	if (!paramsSetting) { // prevent recusion loop
+		soundEffectInstance->SetVolume(volume);
+		soundEffectInstance->SetPitch(pitch);
+		soundEffectInstance->SetPan(pan);
+		paramsSetting = true;
+		if (setLinked && linked != nullptr) {
+			linked->Set(volume, pitch, pan, setLinked);
+		}
+		paramsSetting = false;
+	}
 }
 
 bool CentsSoundEffect::IsComplete()

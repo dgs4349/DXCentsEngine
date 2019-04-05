@@ -44,6 +44,7 @@ struct VertexToPixel
 	float4 position		: SV_POSITION;	// XYZW position (System Value Position)
 	float4 color		: COLOR;        // RGBA color
 	float3 normal		: NORMAL;
+	float3 tangent		: TANGENT;
 	float2 uv			: UV;
 	float3 worldPos		: POSITION;
 };
@@ -84,6 +85,8 @@ VertexToPixel main(VertexShaderInput input)
 	output.normal = mul(input.normal, (float3x3)world);
 	output.uv = input.uv;
 	output.worldPos = mul(float4(input.position, 1.0f), world).xyz;
+
+	output.tangent = normalize(mul(input.tangent, (float3x3)world));
 
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)

@@ -15,8 +15,8 @@ class CentsSoundEffect
 {
 public:
 	CentsSoundEffect();
-	CentsSoundEffect(AudioEngine* audEngine, const wchar_t location);
-	CentsSoundEffect(AudioEngine* audEngine, const wchar_t location, bool loop);
+	CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location);
+	CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location, bool loop);
 	~CentsSoundEffect();
 
 	enum SoundEffectState { DelayStart = 0, Starting = 1, Playing = 2, Completed = 3 };
@@ -38,7 +38,7 @@ public:
 	void SetLoop(bool loop);
 
 	void Stop(bool immediate = true);
-	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f);
+	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f, bool setLinked=true);
 
 	bool IsComplete();
 	SoundEffectState GetPlaybackStatus() { return state; }
@@ -47,6 +47,9 @@ private:
 	CentsSoundEffect * linked = nullptr;
 	
 	SoundEffectState state = Completed;
+
+	// used in Set to prevent stack overflow
+	bool paramsSetting = false;
 
 	float length;
 	bool Loop = false;

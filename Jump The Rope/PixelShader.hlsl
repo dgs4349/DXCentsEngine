@@ -15,6 +15,7 @@ struct VertexToPixel
 	float4 position		: SV_POSITION;
 	float4 color		: COLOR;
 	float3 normal		: NORMAL;
+	float3 tangent		: TANGENT;
 	float2 uv			: UV;
 	float3 worldPos		: POSITION;
 };
@@ -29,6 +30,7 @@ cbuffer externalData : register(b0)
 Texture2D diffuseTexture : register(t0);
 SamplerState basicSampler : register(s0);
 
+Texture2D normalTexture : register(t1);
 
 float Attenuate(float3 position, float range, float3 worldPos)
 {
@@ -88,7 +90,16 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	float4 surfaceColor = diffuseTexture.Sample(basicSampler, input.uv + uvOffset);
-	float3 normal = normalize(input.normal);
+	float3 normalFromMap = normalTexture.Sample(basicSampler, input.uv).rgb * 2 - 1;
+
+	// Calculate the matrix we'll use to convert from tangent to world space
+	float3 N = normalize(input.normal);
+	float3 T = normalize(input.tangent - dot(input.tangent, N) * N);
+	float3 B = cross(T, N);
+	float3x3 TBN = float3x3(T, B, N);
+
+	// Use the normal from the map, after we've converted it to world space
+	float3 normal = normalize(mul(normalFromMap, TBN));
 
 	// AmbientColor Calculation
 	float3 ambientColor = float3(0, 0, 0);
