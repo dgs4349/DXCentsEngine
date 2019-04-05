@@ -469,6 +469,10 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 
+	// Animated the uv offset of the materials
+	materials[0]->uvOffset.x = sin(totalTime);
+	materials[0]->uvOffset.y = cos(totalTime);
+
 	camera->Update(deltaTime);
 
 	audioHandler->Update(deltaTime, totalTime);

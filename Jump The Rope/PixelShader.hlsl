@@ -23,10 +23,12 @@ cbuffer externalData : register(b0)
 {
 	Lights lights;
 	float3 cameraPos;
+	float2 uvOffset;
 };
 
 Texture2D diffuseTexture : register(t0);
 SamplerState basicSampler : register(s0);
+
 
 float Attenuate(float3 position, float range, float3 worldPos)
 {
@@ -85,7 +87,7 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	float4 surfaceColor = diffuseTexture.Sample(basicSampler, input.uv);
+	float4 surfaceColor = diffuseTexture.Sample(basicSampler, input.uv + uvOffset);
 	float3 normal = normalize(input.normal);
 
 	// AmbientColor Calculation

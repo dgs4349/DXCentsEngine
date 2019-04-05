@@ -13,7 +13,7 @@ public:
 	SimplePixelShader* PixelShader() const;
 	ID3D11ShaderResourceView* ShaderResourceView() const;
 	ID3D11SamplerState* SamplerState() const;
-
+	DirectX::XMFLOAT2 uvOffset;
 	void SetMaterial() const;
 
 protected:

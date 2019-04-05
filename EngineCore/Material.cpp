@@ -8,6 +8,7 @@ Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelSha
 {
 	this->vertexShader = vertexShader;
 	this->pixelShader = pixelShader;
+	this->uvOffset = DirectX::XMFLOAT2(0, 0);
 }
 
 Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelShader, ID3D11ShaderResourceView* shaderResourceView, ID3D11SamplerState* samplerState) : Object("Material")
@@ -16,6 +17,7 @@ Material::Material(SimpleVertexShader* vertexShader, SimplePixelShader* pixelSha
 	this->pixelShader = pixelShader;
 	this->shaderResourceView = shaderResourceView;
 	this->samplerState = samplerState;
+	this->uvOffset = DirectX::XMFLOAT2(0, 0);
 }
 
 Material::~Material()
