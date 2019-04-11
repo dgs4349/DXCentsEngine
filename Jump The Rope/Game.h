@@ -91,6 +91,8 @@ private:
 	GameObject* skel1Arm;
 	GameObject* skel2Arm;
 
+	GameObject* fog;
+
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;
 	std::vector<ID3D11ShaderResourceView*> textureViews;
@@ -99,6 +101,7 @@ private:
 	SimplePixelShader* pixelShader;
 	Camera* camera;
 	GameObject* camObject;
+	ID3D11BlendState* blendState;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.
