@@ -89,6 +89,8 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
+
+
 	float4 surfaceColor = diffuseTexture.Sample(basicSampler, input.uv + uvOffset);
 	float3 normalFromMap = normalTexture.Sample(basicSampler, input.uv).rgb * 2 - 1;
 
@@ -100,6 +102,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	// Use the normal from the map, after we've converted it to world space
 	float3 normal = normalize(mul(normalFromMap, TBN));
+
 
 	// AmbientColor Calculation
 	float3 ambientColor = float3(0, 0, 0);
@@ -131,6 +134,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	float3 finalLightColor = ambientColor + dirColor + pointColor + spotColor;
 	float3 gamma = float3(pow(abs(finalLightColor.rgb * surfaceColor.rgb), (1.0 / 2.2)));
-
-	return float4(gamma, 1);
+	
+	return float4(gamma, surfaceColor.a);
 }

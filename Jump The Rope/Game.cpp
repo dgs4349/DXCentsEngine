@@ -196,9 +196,13 @@ void Game::LoadTextures()
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Ground.png", 0, &texView11);
 	textureViews.push_back(texView11);
 
+
 	ID3D11ShaderResourceView * testNormalMap;
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/normal.tif", 0, &testNormalMap);
 	textureViews.push_back(testNormalMap);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Fog.png", 0, &texView11);
+	textureViews.push_back(texView11);
 }
 
 void Game::CreateMaterials()
@@ -211,6 +215,27 @@ void Game::CreateMaterials()
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	// Blend state
+	D3D11_BLEND_DESC bd = {};
+	bd.RenderTarget[0].BlendEnable = true;
+
+	// These control how the RGB channels are combined
+	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+	// These control how the alpha channel is combined
+	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	device->CreateBlendState(&bd, &blendState);
+
+	// Set the blend state (using a bit mask of 0xFFFFFFFF for sample mask)
+	context->OMSetBlendState(blendState, 0, 0xFFFFFFFF);
 
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[0], textureViews[11], samplerState));
@@ -231,10 +256,13 @@ void Game::CreateMaterials()
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], textureViews[11], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], textureViews[11], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10],  textureViews[11], samplerState));
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[11], extureViews[11], samplerState));
+	
+
 }
 
 // --------------------------------------------------------
@@ -276,6 +304,9 @@ void Game::CreateBasicGeometry()
 	skel2 = new GameObject("Skeleton2", meshes[7], materials[4]);
 	skel1Arm = new GameObject("Skeleton1Arm", meshes[8], materials[4]);
 	skel2Arm = new GameObject("Skeleton2Arm", meshes[8], materials[4]);
+
+	// Fog
+	fog = new GameObject("Fog", meshes[1], materials[11]);
 
 	// Left Player
 	player1->transform->Position(-1.0f, 0.0f, 0.0f);
@@ -354,6 +385,9 @@ void Game::CreateBasicGeometry()
 
 	skel2Arm->transform->Position(-5.6f, 0.54f, 0.0f);
 	skel2Arm->transform->EulerRotation(0, -90.0f, 0);
+
+	fog->transform->Scale(30.0f, .5f, 30.0f);
+	fog->transform->Position(0.0f, -1.0f, 0.0f);
 }
 
 
@@ -481,8 +515,8 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 
 	// Animated the uv offset of the materials
-	materials[0]->uvOffset.x = sin(totalTime);
-	materials[0]->uvOffset.y = cos(totalTime);
+	materials[11]->uvOffset.x = totalTime * .1f;
+	materials[11]->uvOffset.y = cos(totalTime) / 20.0f;
 
 	camera->Update(deltaTime);
 
