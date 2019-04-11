@@ -86,16 +86,16 @@ void Game::Init()
 	camera->transform->Rotate(0.0f, -30.0f, 0.0f);
 	camera->SetScreenSize(width, height);
 
-	lights.ambientLights[0] = { Color(0.2f), 1 };
+	lights.ambientLights[0] = { Color(0.05f), 1 };
 	lights.ambientLightCount = 1;
 
-	lights.dirLights[0] = { Color(1, 0, 0, 1), XMFLOAT3(1, 0, 0) };
+	lights.dirLights[0] = { Color(.1f, .05f, .05f, 1), XMFLOAT3(1, 1, 0) };
 	lights.dirLightCount = 1;
 
-	lights.pointLights[0] = { XMFLOAT3(1, 1, 1), 2, XMFLOAT3(3.5f, 0.5f, 0), 10 };
+	lights.pointLights[0] = { XMFLOAT3(1, 1, 1), 10, XMFLOAT3(-8.0f, 0.5f,8.0f), 2 };
 	lights.pointLightCount = 1;
 	
-	lights.spotLights[0] = { XMFLOAT3(0, 0, 1), 10, XMFLOAT3(0, 1, 0), 10, XMFLOAT3(-1, 0, 0), 10 };
+	lights.spotLights[0] = { XMFLOAT3(.5f, .25f, 0), 25, XMFLOAT3(0, 10, 1), 10, XMFLOAT3(0, 1,-.1f), 3 };
 	lights.spotLightCount = 1;
 
 	/*ambientLight = { Color(0.5f) };
@@ -249,7 +249,8 @@ void Game::CreateMaterials()
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[2], textureViews[11], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], samplerState));
+
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
@@ -297,12 +298,12 @@ void Game::CreateBasicGeometry()
 	tree6 = new GameObject("Tree3", meshes[11], materials[1]);
 	tree7 = new GameObject("Tree4", meshes[11], materials[1]);
 	tree8 = new GameObject("Tree5", meshes[11], materials[1]);
-	cross = new GameObject("Cross", meshes[12], materials[0]);
-	grave1 = new GameObject("Grave1", meshes[13], materials[0]);
-	grave2 = new GameObject("Grave2", meshes[13], materials[0]);
-	grave3 = new GameObject("Grave3", meshes[13], materials[0]);
-	grave4 = new GameObject("Grave4", meshes[13], materials[0]);
-	grave5 = new GameObject("Grave5", meshes[13], materials[0]);
+	cross = new GameObject("Cross", meshes[12], materials[10]);
+	grave1 = new GameObject("Grave1", meshes[13], materials[10]);
+	grave2 = new GameObject("Grave2", meshes[13], materials[10]);
+	grave3 = new GameObject("Grave3", meshes[13], materials[10]);
+	grave4 = new GameObject("Grave4", meshes[13], materials[10]);
+	grave5 = new GameObject("Grave5", meshes[13], materials[10]);
 
 	// Skeletons
 	skel1 = new GameObject("Skeleton1", meshes[7], materials[4]);
@@ -538,7 +539,7 @@ void Game::Update(float deltaTime, float totalTime)
 void Game::Draw(float deltaTime, float totalTime)
 {
 	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
+	const float color[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
 
 	// Clear the render target and depth buffer (erases what's on the screen)
 	//  - Do this ONCE PER FRAME
