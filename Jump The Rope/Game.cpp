@@ -162,7 +162,9 @@ void Game::LoadTextures()
 	ID3D11ShaderResourceView* texView9;
 	ID3D11ShaderResourceView* texView10;
 	ID3D11ShaderResourceView* texView11;
-
+	ID3D11ShaderResourceView* texView14;
+	ID3D11ShaderResourceView* texView13;
+	ID3D11ShaderResourceView* texView12;
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Cobblestone.jpg", 0, &texView1);
 	textureViews.push_back(texView1);
 
@@ -201,8 +203,11 @@ void Game::LoadTextures()
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/normal.tif", 0, &testNormalMap);
 	textureViews.push_back(testNormalMap);
 
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Fog.png", 0, &texView11);
-	textureViews.push_back(texView11);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Fog.png", 0, &texView12);
+	textureViews.push_back(texView12);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Ground_Normal.png", 0, &texView13);
+	textureViews.push_back(texView13);
 }
 
 void Game::CreateMaterials()
@@ -258,7 +263,7 @@ void Game::CreateMaterials()
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10],  textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], textureViews[13], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], samplerState));
 	
