@@ -246,21 +246,21 @@ void Game::CreateMaterials()
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], textureViews[11], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[5], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[5], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[6], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[6], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[7], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[7], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], textureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10],  textureViews[11], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[11], extureViews[11], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], samplerState));
 	
 
 }
@@ -386,7 +386,7 @@ void Game::CreateBasicGeometry()
 	skel2Arm->transform->Position(-5.6f, 0.54f, 0.0f);
 	skel2Arm->transform->EulerRotation(0, -90.0f, 0);
 
-	fog->transform->Scale(30.0f, .5f, 30.0f);
+	fog->transform->Scale(35.0f, .5f, 35.0f);
 	fog->transform->Position(0.0f, -1.0f, 0.0f);
 }
 
