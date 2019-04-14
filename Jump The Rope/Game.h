@@ -2,9 +2,10 @@
 
 #include <vector>
 
-#include "CentsEngine.h";
-#include "Player.h";
-#include "CentsAudioHandler.h";
+#include "CentsEngine.h"
+#include "Player.h"
+#include "CentsAudioHandler.h"
+#include "Emitter.h"
 
 namespace GameState
 {
@@ -91,12 +92,14 @@ private:
 	GameObject* skel1Arm;
 	GameObject* skel2Arm;
 
+	GameObject* testParticle;
 
 	CentsSoundEffect* bgIntro;
 	CentsSoundEffect* bgLoop;
 
 	GameObject* fog;
 
+	Emitter* emitter;
 
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;
@@ -104,9 +107,13 @@ private:
 	std::vector<Material*> materials;
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
+	SimpleVertexShader* particleVS;
+	SimplePixelShader* particlePS;
 	Camera* camera;
 	GameObject* camObject;
 	ID3D11BlendState* blendState;
+	ID3D11DepthStencilState* particleDepthState;
+	ID3D11BlendState* particleBlendState;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

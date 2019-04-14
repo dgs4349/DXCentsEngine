@@ -12,8 +12,8 @@ struct VertexToPixel
 	//  |   Name          Semantic
 	//  |    |                |
 	//  v    v                v
-	float4 position		: SV_POSITION;
-	float4 color		: COLOR;
+	float4 position		: SV_POSITION;	// XYZW position (System Value Position)
+	float4 color		: COLOR;        // RGBA color
 	float3 normal		: NORMAL;
 	float3 tangent		: TANGENT;
 	float2 uv			: UV;

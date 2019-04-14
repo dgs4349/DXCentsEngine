@@ -51,6 +51,12 @@ Game::~Game()
 
 	delete vertexShader;
 	delete pixelShader;
+	delete particleVS;
+	delete particlePS;
+	delete emitter;
+
+	particleBlendState->Release();
+	particleDepthState->Release();
 
 	for (int i = 0; i < textureViews.size(); ++i)
 	{
@@ -73,6 +79,7 @@ Game::~Game()
 // --------------------------------------------------------
 void Game::Init()
 {
+
 	// Helper methods for loading shaders, creating some basic
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
@@ -129,6 +136,12 @@ void Game::LoadShaders()
 
 	pixelShader = new SimplePixelShader(device, context);
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
+
+	particleVS = new SimpleVertexShader(device, context);
+	particleVS->LoadShaderFile(L"ParticleVS.cso");
+
+	particlePS = new SimplePixelShader(device, context);
+	particlePS->LoadShaderFile(L"ParticlePS.cso");
 }
 
 void Game::LoadModels()
@@ -208,6 +221,9 @@ void Game::LoadTextures()
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Ground_Normal.png", 0, &texView13);
 	textureViews.push_back(texView13);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/fireParticle.jpg", 0, &texView14);
+	textureViews.push_back(texView14);
 }
 
 void Game::CreateMaterials()
@@ -224,6 +240,26 @@ void Game::CreateMaterials()
 	// Blend state
 	D3D11_BLEND_DESC bd = {};
 	bd.RenderTarget[0].BlendEnable = true;
+
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; // Turns off depth writing
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	device->CreateDepthStencilState(&dsDesc, &particleDepthState);
+
+	// Blend for particles (additive)
+	D3D11_BLEND_DESC blend = {};
+	blend.AlphaToCoverageEnable = false;
+	blend.IndependentBlendEnable = false;
+	blend.RenderTarget[0].BlendEnable = true;
+	blend.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Still respect pixel shader output alpha
+	blend.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blend, &particleBlendState);
 
 	// These control how the RGB channels are combined
 	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
@@ -304,6 +340,25 @@ void Game::CreateBasicGeometry()
 	grave3 = new GameObject("Grave3", meshes[13], materials[10]);
 	grave4 = new GameObject("Grave4", meshes[13], materials[10]);
 	grave5 = new GameObject("Grave5", meshes[13], materials[10]);
+	
+	emitter = new Emitter(
+		120,							// Max particles
+		20,								// Particles per second
+		5,								// Particle lifetime
+		0.1f,							// Start size
+		0.3f,							// End size
+		XMFLOAT4(1, 0.1f, 0.1f, 0.7f),	// Start color
+		XMFLOAT4(1, 0.6f, 0.1f, 0),		// End color
+		XMFLOAT3(0, .3f, 0),				// Start velocity
+		XMFLOAT3(0.1f, 0.1f, 0.1f),		// Velocity randomness range
+		XMFLOAT3(-11.67f, -1.0f, 12.8f),				// Emitter position
+		XMFLOAT3(0.2f, 0, 0.2f),		// Position randomness range
+		XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
+		XMFLOAT3(0, -0.01f, 0),				// Constant acceleration
+		device,
+		particleVS,
+		particlePS,
+		textureViews[14]);
 
 	// Skeletons
 	skel1 = new GameObject("Skeleton1", meshes[7], materials[4]);
@@ -504,6 +559,8 @@ void Game::Update(float deltaTime, float totalTime)
 	skel1Arm->transform->Rotate({ 0, 0, ropeSpeed * deltaTime});
 	skel2Arm->transform->Rotate({ 0, 0, -ropeSpeed * deltaTime});
 
+	emitter->Update(deltaTime);
+
 	for (int i = 0; i < players.size(); ++i)
 	{
 		players[i]->accelleration -= gravity * deltaTime;
@@ -552,6 +609,16 @@ void Game::Draw(float deltaTime, float totalTime)
 		0);
 
 	RenderManager::GetInstance()->Render(camera, context, lights);
+
+	float blend[4] = { 1,1,1,1 };
+	context->OMSetBlendState(particleBlendState, blend, 0xffffffff);	// Additive blending
+	context->OMSetDepthStencilState(particleDepthState, 0);
+
+	emitter->Draw(context, camera);
+
+	context->OMSetBlendState(blendState, blend, 0xffffffff);
+	context->OMSetDepthStencilState(0, 0);
+	context->RSSetState(0);
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
