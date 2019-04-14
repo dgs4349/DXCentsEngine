@@ -83,10 +83,9 @@ VertexToPixel main(VertexShaderInput input)
 	output.color = float4(1.0f, 0.0f, 0.0f, 1.0f);
 
 	output.normal = mul(input.normal, (float3x3)world);
+	output.tangent = normalize(mul(input.tangent, (float3x3)world));
 	output.uv = input.uv;
 	output.worldPos = mul(float4(input.position, 1.0f), world).xyz;
-
-	output.tangent = normalize(mul(input.tangent, (float3x3)world));
 
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)
