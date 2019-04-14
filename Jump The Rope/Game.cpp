@@ -55,6 +55,7 @@ Game::~Game()
 	delete particlePS;
 	delete emitter;
 
+	blendState->Release();
 	particleBlendState->Release();
 	particleDepthState->Release();
 
