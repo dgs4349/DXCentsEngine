@@ -100,9 +100,9 @@ void Game::Init()
 	lights.dirLights[0] = { Color(.1f, .05f, .05f, 1), XMFLOAT3(1, 1, 0) };
 	lights.dirLightCount = 1;
 
-	lights.pointLights[0] = { XMFLOAT3(1, 1, 1), 10, XMFLOAT3(-8.0f, 0.5f,8.0f), 2 };
+	lights.pointLights[0] = { XMFLOAT3(0.960f, 0.3f, 0.2f), 10, XMFLOAT3(-8.0f, 0.45f, 8.0f), 2 };
 	lights.pointLightCount = 1;
-	
+
 	lights.spotLights[0] = { XMFLOAT3(.5f, .25f, 0), 25, XMFLOAT3(0, 10, 1), 10, XMFLOAT3(0, 1,-.1f), 3 };
 	lights.spotLightCount = 1;
 
@@ -161,6 +161,7 @@ void Game::LoadModels()
 	meshes.push_back(new Mesh("Assets/Models/Tree.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/Cross.obj", device));
 	meshes.push_back(new Mesh("Assets/Models/Grave.obj", device));
+	meshes.push_back(new Mesh("Assets/Models/Torch.obj", device));
 }
 
 void Game::LoadTextures()
@@ -238,6 +239,10 @@ void Game::LoadTextures()
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/smoke.png", 0, &texView17);
 	textureViews.push_back(texView17);
+
+	ID3D11ShaderResourceView * blankNormal;
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/normal.png", 0, &blankNormal);
+	textureViews.push_back(blankNormal);
 }
 
 void Game::CreateMaterials()
@@ -302,22 +307,22 @@ void Game::CreateMaterials()
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[3], samplerState));
 
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[4], textureViews[18], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[5], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[5], textureViews[18], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[6], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[6], textureViews[18], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[7], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[7], textureViews[18], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[8], textureViews[18], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[9], textureViews[18], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], textureViews[13], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], samplerState));
-	
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], textureViews[18], samplerState));
+
 
 }
 
@@ -354,8 +359,8 @@ void Game::CreateBasicGeometry()
 	grave3 = new GameObject("Grave3", meshes[13], materials[10]);
 	grave4 = new GameObject("Grave4", meshes[13], materials[10]);
 	grave5 = new GameObject("Grave5", meshes[13], materials[10]);
-	
-	flame1 = new Flame(XMFLOAT3(6.0f, -1.0f, -8.0f), textureViews[17], textureViews[15], textureViews[16], device, particleVS, particlePS);
+
+	flame1 = new Flame(XMFLOAT3(-8.0f, 0.45f, 8.0f), textureViews[17], textureViews[15], textureViews[16], device, particleVS, particlePS);
 
 	// Skeletons
 	skel1 = new GameObject("Skeleton1", meshes[7], materials[4]);
@@ -365,6 +370,10 @@ void Game::CreateBasicGeometry()
 
 	// Fog
 	fog = new GameObject("Fog", meshes[1], materials[11]);
+
+	torch = new GameObject("Torch", meshes[14], materials[10]);
+
+	torch->transform->Position(-8.0f, 0.3f, 8.0f);
 
 	// Left Player
 	player1->transform->Position(-1.0f, 0.0f, 0.0f);
@@ -553,8 +562,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 	//rotates rope and arms
 	rope->transform->Rotate({ ropeSpeed * deltaTime, 0, 0 });
-	skel1Arm->transform->Rotate({ 0, 0, ropeSpeed * deltaTime});
-	skel2Arm->transform->Rotate({ 0, 0, -ropeSpeed * deltaTime});
+	skel1Arm->transform->Rotate({ 0, 0, ropeSpeed * deltaTime });
+	skel2Arm->transform->Rotate({ 0, 0, -ropeSpeed * deltaTime });
 
 	flame1->Update(deltaTime);
 
@@ -581,6 +590,12 @@ void Game::Update(float deltaTime, float totalTime)
 	camera->Update(deltaTime);
 
 	audioHandler->Update(deltaTime, totalTime);
+
+
+	// animate the torches light
+	lights.pointLights[0].color = XMFLOAT3(1.0f, 0.3f, 0.1f);
+	lights.pointLights[0].intensity = sin(totalTime * 10.54f) * sin(totalTime * 3.78f) * sin(totalTime * 2.487f) * sin(totalTime * 0.879f) * 3 +4;
+
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))

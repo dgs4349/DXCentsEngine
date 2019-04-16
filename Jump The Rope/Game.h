@@ -93,6 +93,8 @@ private:
 	GameObject* skel1Arm;
 	GameObject* skel2Arm;
 
+	GameObject* torch;
+
 	GameObject* testParticle;
 
 	CentsSoundEffect* bgIntro;
