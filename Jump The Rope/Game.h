@@ -67,6 +67,7 @@ private:
 	void LoadShaders();
 	void LoadModels();
 	void LoadTextures();
+	void SetShaderHashTextures();
 	void CreateMaterials();
 	void CreateBasicGeometry();
 
@@ -101,6 +102,9 @@ private:
 	GameObject* fog;
 
 	Flame* flame1;
+
+	ID3D11ShaderResourceView* hashTexture1;
+	ID3D11ShaderResourceView* hashTexture2;
 
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;

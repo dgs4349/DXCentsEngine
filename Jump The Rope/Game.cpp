@@ -90,6 +90,8 @@ void Game::Init()
 	LoadModels();
 	CreateBasicGeometry();
 
+	SetShaderHashTextures();
+
 	camera->transform->Position(7.0f, 2.0f, -13.0f);
 	camera->transform->Rotate(0.0f, -30.0f, 0.0f);
 	camera->SetScreenSize(width, height);
@@ -136,7 +138,7 @@ void Game::LoadShaders()
 	vertexShader->LoadShaderFile(L"VertexShader.cso");
 
 	pixelShader = new SimplePixelShader(device, context);
-	pixelShader->LoadShaderFile(L"PixelShader.cso");
+	pixelShader->LoadShaderFile(L"PixelShaderHash.cso");
 
 	particleVS = new SimpleVertexShader(device, context);
 	particleVS->LoadShaderFile(L"ParticleVS.cso");
@@ -165,6 +167,11 @@ void Game::LoadModels()
 
 void Game::LoadTextures()
 {
+	//does hashmark shading
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light.png", 0, &hashTexture1);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark.png", 0, &hashTexture2);
+
+	//all other textures
 	ID3D11ShaderResourceView* texView1;		// Cobblestone
 	ID3D11ShaderResourceView* texView2;		// Dirt
 	ID3D11ShaderResourceView* texView3;		// StonePath
@@ -238,6 +245,12 @@ void Game::LoadTextures()
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/smoke.png", 0, &texView17);
 	textureViews.push_back(texView17);
+}
+
+void Game::SetShaderHashTextures()
+{
+	pixelShader->SetShaderResourceView("hashTexture1", hashTexture1);
+	pixelShader->SetShaderResourceView("hashTexture2", hashTexture2);
 }
 
 void Game::CreateMaterials()
@@ -611,7 +624,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->OMSetBlendState(particleBlendState, blend, 0xffffffff);	// Additive blending
 	context->OMSetDepthStencilState(particleDepthState, 0);
 
-	flame1->Draw(context, camera);
+	//flame1->Draw(context, camera);
 
 	context->OMSetBlendState(blendState, blend, 0xffffffff);
 	context->OMSetDepthStencilState(0, 0);
