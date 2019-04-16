@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "CentsAudioHandler.h"
 #include "Emitter.h"
+#include "Flame.h"
 
 namespace GameState
 {
@@ -99,7 +100,7 @@ private:
 
 	GameObject* fog;
 
-	Emitter* emitter;
+	Flame* flame1;
 
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;

@@ -53,7 +53,7 @@ Game::~Game()
 	delete pixelShader;
 	delete particleVS;
 	delete particlePS;
-	delete emitter;
+	delete flame1;
 
 	blendState->Release();
 	particleBlendState->Release();
@@ -165,20 +165,24 @@ void Game::LoadModels()
 
 void Game::LoadTextures()
 {
-	ID3D11ShaderResourceView* texView1;
-	ID3D11ShaderResourceView* texView2;
-	ID3D11ShaderResourceView* texView3;
-	ID3D11ShaderResourceView* texView4;
-	ID3D11ShaderResourceView* texView5;
-	ID3D11ShaderResourceView* texView6;
-	ID3D11ShaderResourceView* texView7;
-	ID3D11ShaderResourceView* texView8;
-	ID3D11ShaderResourceView* texView9;
-	ID3D11ShaderResourceView* texView10;
-	ID3D11ShaderResourceView* texView11;
-	ID3D11ShaderResourceView* texView14;
-	ID3D11ShaderResourceView* texView13;
-	ID3D11ShaderResourceView* texView12;
+	ID3D11ShaderResourceView* texView1;		// Cobblestone
+	ID3D11ShaderResourceView* texView2;		// Dirt
+	ID3D11ShaderResourceView* texView3;		// StonePath
+	ID3D11ShaderResourceView* texView4;		// WoodCrate
+	ID3D11ShaderResourceView* texView5;		// skeleton texture
+	ID3D11ShaderResourceView* texView6;		// ghost texture 1 (P1)
+	ID3D11ShaderResourceView* texView7;		// ghost texture 2 (P2)
+	ID3D11ShaderResourceView* texView8;		// ghost texture 3 (P1 lighter)
+	ID3D11ShaderResourceView* texView9;		// ghost texture 4 (P2 lighter)
+	ID3D11ShaderResourceView* texView10;	// ghost texture 5 (red aka failed)
+	ID3D11ShaderResourceView* texView11;	// ground
+	ID3D11ShaderResourceView* texView14;	// test fire particle
+	ID3D11ShaderResourceView* texView13;	// ground normal map
+	ID3D11ShaderResourceView* texView12;	// fog
+	ID3D11ShaderResourceView* texView15;	// flame
+	ID3D11ShaderResourceView* texView16;	// basic particle
+	ID3D11ShaderResourceView* texView17;	// smoke particle
+
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Cobblestone.jpg", 0, &texView1);
 	textureViews.push_back(texView1);
 
@@ -225,6 +229,15 @@ void Game::LoadTextures()
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/fireParticle.jpg", 0, &texView14);
 	textureViews.push_back(texView14);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/fire.png", 0, &texView15);
+	textureViews.push_back(texView15);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/particleTest.png", 0, &texView16);
+	textureViews.push_back(texView16);
+
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/smoke.png", 0, &texView17);
+	textureViews.push_back(texView17);
 }
 
 void Game::CreateMaterials()
@@ -342,24 +355,7 @@ void Game::CreateBasicGeometry()
 	grave4 = new GameObject("Grave4", meshes[13], materials[10]);
 	grave5 = new GameObject("Grave5", meshes[13], materials[10]);
 	
-	emitter = new Emitter(
-		120,							// Max particles
-		20,								// Particles per second
-		5,								// Particle lifetime
-		0.1f,							// Start size
-		0.3f,							// End size
-		XMFLOAT4(1, 0.1f, 0.1f, 0.7f),	// Start color
-		XMFLOAT4(1, 0.6f, 0.1f, 0),		// End color
-		XMFLOAT3(0, .3f, 0),				// Start velocity
-		XMFLOAT3(0.1f, 0.1f, 0.1f),		// Velocity randomness range
-		XMFLOAT3(-11.67f, -1.0f, 12.8f),				// Emitter position
-		XMFLOAT3(0.2f, 0, 0.2f),		// Position randomness range
-		XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
-		XMFLOAT3(0, -0.01f, 0),				// Constant acceleration
-		device,
-		particleVS,
-		particlePS,
-		textureViews[14]);
+	flame1 = new Flame(XMFLOAT3(6.0f, -1.0f, -8.0f), textureViews[17], textureViews[15], textureViews[16], device, particleVS, particlePS);
 
 	// Skeletons
 	skel1 = new GameObject("Skeleton1", meshes[7], materials[4]);
@@ -560,7 +556,7 @@ void Game::Update(float deltaTime, float totalTime)
 	skel1Arm->transform->Rotate({ 0, 0, ropeSpeed * deltaTime});
 	skel2Arm->transform->Rotate({ 0, 0, -ropeSpeed * deltaTime});
 
-	emitter->Update(deltaTime);
+	flame1->Update(deltaTime);
 
 	for (int i = 0; i < players.size(); ++i)
 	{
@@ -615,7 +611,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->OMSetBlendState(particleBlendState, blend, 0xffffffff);	// Additive blending
 	context->OMSetDepthStencilState(particleDepthState, 0);
 
-	emitter->Draw(context, camera);
+	flame1->Draw(context, camera);
 
 	context->OMSetBlendState(blendState, blend, 0xffffffff);
 	context->OMSetDepthStencilState(0, 0);

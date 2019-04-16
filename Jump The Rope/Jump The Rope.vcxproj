@@ -156,6 +156,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClCompile Include="CentsAudioHandler.cpp" />
     <ClCompile Include="CentsSoundEffect.cpp" />
     <ClCompile Include="Emitter.cpp" />
+    <ClCompile Include="Flame.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -164,6 +165,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClInclude Include="CentsAudioHandler.h" />
     <ClInclude Include="CentsSoundEffect.h" />
     <ClInclude Include="Emitter.h" />
+    <ClInclude Include="Flame.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
