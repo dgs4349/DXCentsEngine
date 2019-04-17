@@ -90,15 +90,18 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 }
 
 float3 hashing(float2 uv, float intensity) {
-	float3 hash1 = hashTexture1.Sample(basicSampler, uv).rgb;
-	float3 hash2 = hashTexture2.Sample(basicSampler, uv).rgb;
+	//these get flipped just because the way the textures were created was opposite to how the code reads them in
+	float3 hash1 = hashTexture2.Sample(basicSampler, uv).bgr;
+	float3 hash2 = hashTexture1.Sample(basicSampler, uv).bgr;
 
-	float3 overbright = min(0, intensity); //how much over the limit of 1 the intensity is. Will have much less hashing
+	float3 overbright = max(0, intensity - 1.0f); //how much over the limit of 1 the intensity is. Will have much less hashing
 
 	//each hash texture represents an intensity of exactly a multiple of 1/6
+	
+	///* ------THIS CODE WILL CALCULATE HASH MARKS WITH BLENDING BETWEEN LEVELS-------
 	//handles weighting between hash textures if intensity != multiple of 1/6
-	float3 weights1 = saturate((intensity * 6.0f) + float3(0, -1.0f, -2.0f));
-	float3 weights2 = saturate((intensity * 6.0f) + float3(-3.0f, -4.0f, -5.0f));
+	float3 weights1 = saturate((intensity * 6.0f) + float3(-0, -1, -2));
+	float3 weights2 = saturate((intensity * 6.0f) + float3(-3, -4, -5));
 
 	weights1.xy -= weights1.yz;
 	weights1.z -= weights2.x;
@@ -111,7 +114,17 @@ float3 hashing(float2 uv, float intensity) {
 		hash1.g + hash1.b +
 		hash2.r + hash2.g +
 		hash2.b;
-
+	//*/
+	/* -------THIS CODE WILL CALCULATE HASH MARKS WITH HARD EDGES BETWEEN LEVELS-------
+	//converts intensity into an integer 0-6
+	int intensityIndex = (int)floor(intensity * 6.0f);
+	//which color to pick depending on which segment the intensity is in
+	float colors[] = {hash1.x, hash1.y, hash1.z, hash2.x, hash2.y, hash2.z, 1.0f};
+	//if index is over 6 pick 6
+	intensityIndex = min(6, intensityIndex);
+	
+	float3 hashing = colors[intensityIndex];
+	*/
 	return hashing;
 }
 
@@ -130,7 +143,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	// Use the normal from the map, after we've converted it to world space
 	float3 normal = normalize(mul(normalFromMap, TBN));
-
 
 	// AmbientColor Calculation
 	float3 ambientColor = float3(0, 0, 0);
@@ -162,17 +174,19 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	float3 finalLightColor = ambientColor + dirColor + pointColor + spotColor;
 
-	// hashmark shading code
+	// hashmark shading code (code primarily from Kyle Halladay, http://kylehalladay.com/blog/tutorial/2017/02/21/Pencil-Sketch-Effect.html)
+	// hashmark textures taken from this website's TAM generator https://sites.google.com/site/cs7490finalrealtimehatching/
 
 	// determines intensity of light at pixel
 	float intensity = dot(finalLightColor, float3(0.2326, 0.7152, 0.0722)); //constant vector from the luminosity function
 
-	intensity = 1.0 - intensity;
+	//intensity = 1.0 - intensity;
 	
 	//return float4(intensity, intensity, intensity, 1);
-	return float4(hashing(input.uv * 16.0f, intensity), 1.0f);
+	//return float4(hashing(input.uv * 16.0f, intensity), 1.0f);
+	surfaceColor.rgb *= hashing(input.uv * 6.0f, intensity + 0.4f); //the final float is just a modifier to make the scene brighter or darker
 
-	float3 gamma = float3(pow(abs(finalLightColor.rgb * surfaceColor.rgb), (1.0 / 2.2)));
+	float3 gamma = float3(pow(abs(finalLightColor * surfaceColor.rgb), (1.0 / 2.2)));
 	
 	return float4(gamma, surfaceColor.a);
 }

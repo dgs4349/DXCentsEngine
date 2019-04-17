@@ -587,6 +587,9 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 
+	//basic light modulation
+	lights.pointLights[0].range = sin(totalTime) + 12.0f;
+
 	// Animated the uv offset of the materials
 	materials[11]->uvOffset.x = totalTime * .1f;
 	materials[11]->uvOffset.y = cos(totalTime) / 20.0f;
