@@ -97,13 +97,14 @@ void Game::Init()
 	lights.ambientLights[0] = { Color(0.05f), 1 };
 	lights.ambientLightCount = 1;
 
-	lights.dirLights[0] = { Color(.1f, .05f, .05f, 1), XMFLOAT3(1, 1, 0) };
-	lights.dirLightCount = 1;
+	//lights.dirLights[0] = { Color(.1f, .05f, .05f, 1), XMFLOAT3(1, 1, 0) };
+	//lights.dirLightCount = 1;
 
 	lights.pointLights[0] = { XMFLOAT3(0.960f, 0.3f, 0.2f), 10, XMFLOAT3(-8.0f, 0.45f, 8.0f), 2 };
-	lights.pointLightCount = 1;
+	lights.pointLights[1] = { XMFLOAT3(0.960f, 0.3f, 0.2f), 10, XMFLOAT3(8.0f, 0.45f, 8.0f), 2 };
+	lights.pointLightCount = 2;
 
-	lights.spotLights[0] = { XMFLOAT3(.5f, .25f, 0), 25, XMFLOAT3(0, 10, 1), 10, XMFLOAT3(0, 1,-.1f), 3 };
+	lights.spotLights[0] = { XMFLOAT3(.5f, .25f, 0), 25, XMFLOAT3(0, 8, -5), 10, XMFLOAT3(0, 1,-.5f), 1 };
 	lights.spotLightCount = 1;
 
 	/*ambientLight = { Color(0.5f) };
@@ -243,6 +244,10 @@ void Game::LoadTextures()
 	ID3D11ShaderResourceView * blankNormal;
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/normal.png", 0, &blankNormal);
 	textureViews.push_back(blankNormal);
+
+	ID3D11ShaderResourceView * fogNormal;
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Fog_Normal.png", 0, &fogNormal);
+	textureViews.push_back(fogNormal);
 }
 
 void Game::CreateMaterials()
@@ -321,7 +326,7 @@ void Game::CreateMaterials()
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], textureViews[13], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
-	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], textureViews[18], samplerState));
+	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], textureViews[19], samplerState));
 
 
 }
@@ -586,6 +591,7 @@ void Game::Update(float deltaTime, float totalTime)
 	// Animated the uv offset of the materials
 	materials[11]->uvOffset.x = totalTime * .1f;
 	materials[11]->uvOffset.y = cos(totalTime) / 20.0f;
+
 
 	camera->Update(deltaTime);
 
