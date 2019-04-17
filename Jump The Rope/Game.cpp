@@ -54,6 +54,7 @@ Game::~Game()
 	delete particleVS;
 	delete particlePS;
 	delete flame1;
+	
 
 	blendState->Release();
 	particleBlendState->Release();
@@ -63,6 +64,13 @@ Game::~Game()
 	{
 		textureViews[i]->Release();
 	}
+
+	hashTexture1_1->Release();
+	hashTexture2_1->Release();
+	hashTexture1_2->Release();
+	hashTexture2_2->Release();
+	hashTexture1_3->Release();
+	hashTexture2_3->Release();
 
 	textureViews.clear();
 	materials.clear();
@@ -89,8 +97,6 @@ void Game::Init()
 	CreateMaterials();
 	LoadModels();
 	CreateBasicGeometry();
-
-	SetShaderHashTextures();
 
 	camera->transform->Position(7.0f, 2.0f, -13.0f);
 	camera->transform->Rotate(0.0f, -30.0f, 0.0f);
@@ -168,8 +174,12 @@ void Game::LoadModels()
 void Game::LoadTextures()
 {
 	//does hashmark shading
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light.png", 0, &hashTexture1);
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark.png", 0, &hashTexture2);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light.png", 0, &hashTexture1_1);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark.png", 0, &hashTexture2_1);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light2.png", 0, &hashTexture1_2);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark2.png", 0, &hashTexture2_2);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light3.png", 0, &hashTexture1_3);
+	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark3.png", 0, &hashTexture2_3);
 
 	//all other textures
 	ID3D11ShaderResourceView* texView1;		// Cobblestone
@@ -247,10 +257,34 @@ void Game::LoadTextures()
 	textureViews.push_back(texView17);
 }
 
-void Game::SetShaderHashTextures()
+void Game::SetShaderHashTextures(float deltaTime)
 {
-	pixelShader->SetShaderResourceView("hashTexture1", hashTexture1);
-	pixelShader->SetShaderResourceView("hashTexture2", hashTexture2);
+	animTimer -= deltaTime;
+	if (animTimer <= 0) {
+		animTimer = animSpeed;
+		animFrame++;
+		if (animFrame > 2)
+			animFrame = 0;
+	}
+
+	switch (animFrame) {
+	case 0:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_1);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_1);
+		break;
+	case 1:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_2);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_2);
+		break;
+	case 2:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_3);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_3);
+		break;
+	default:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_1);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_1);
+		break;
+	}
 }
 
 void Game::CreateMaterials()
@@ -478,6 +512,8 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	SetShaderHashTextures(deltaTime);
+
 	bool p1Input = GetAsyncKeyState(*"Q");
 	bool p2Input = GetAsyncKeyState(*"P");
 
