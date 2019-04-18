@@ -83,6 +83,7 @@ void CentsSoundEffect::Play(float volume, float pitch, float pan, float totaltim
 void CentsSoundEffect::Play()
 {
 	soundEffectInstance->Play(Loop);
+	state = Playing;
 }
 
 void CentsSoundEffect::PlayOnUpdate()

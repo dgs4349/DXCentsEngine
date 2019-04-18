@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 #include "CentsEngine.h"
 #include "Player.h"
@@ -34,6 +36,7 @@ public:
 	void OnResize();
 	void Update(float deltaTime, float totalTime);
 	void Draw(float deltaTime, float totalTime);
+	void DrawSky();
 
 	// Overridden mouse input helper methods
 	void OnMouseDown(WPARAM buttonState, int x, int y);
@@ -49,6 +52,7 @@ private:
 	Lights lights;
 
 	CentsAudioHandler* audioHandler;
+	std::vector<CentsSoundEffect*> jumpSfx;
 
 	float startRopeSpeed = 100.0f;
 	float ropeSpeed;
@@ -62,6 +66,9 @@ private:
 	float readyLength = 1.0f;
 	float endScreenLength = 1.0f;
 	GameState gameState;
+
+	bool awardedJump = false;
+	int numJumps = 0;
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders();
@@ -117,6 +124,14 @@ private:
 	ID3D11BlendState* blendState;
 	ID3D11DepthStencilState* particleDepthState;
 	ID3D11BlendState* particleBlendState;
+	
+	//ID3D11SamplerState* samplerState;
+
+	ID3D11ShaderResourceView* skySRV;
+	SimpleVertexShader* skyVS;
+	SimplePixelShader* skyPS;
+	ID3D11RasterizerState* skyRasterState;
+	ID3D11DepthStencilState* skyDepthState;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

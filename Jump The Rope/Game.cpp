@@ -69,7 +69,14 @@ Game::~Game()
 	gameObjects.clear();
 	meshes.clear();
 
+	jumpSfx.clear();
 	delete audioHandler;
+
+	skySRV->Release();
+	skyDepthState->Release();
+	skyRasterState->Release();
+	delete skyVS;
+	delete skyPS;
 
 	Logger::ReleaseInstance();
 }
@@ -111,18 +118,38 @@ void Game::Init()
 	directionalLight = { Color(0.5f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) };
 	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };*/
 
-	// Tell the input assembler stage of the pipeline what kind of
-	// geometric primitives (points, lines or triangles) we want to draw.  
-	// Essentially: "What kind of shape should the GPU draw with our data?"
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	audioHandler->Init();
 	// loading audio here for now
 	bgIntro = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_intro.wav");
 	bgLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_loop.wav", true);
 	bgIntro->Link(bgLoop);
-	bgIntro->Set(-0.5f); // not working
+	bgIntro->Set(0.5f);
 	bgIntro->PlayOnUpdate();
+
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_3.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_2.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
+	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(2.0f);
+
+	D3D11_RASTERIZER_DESC skyRD = {};
+	skyRD.CullMode = D3D11_CULL_FRONT;
+	skyRD.FillMode = D3D11_FILL_SOLID;
+	skyRD.DepthClipEnable = true;
+	device->CreateRasterizerState(&skyRD, &skyRasterState);
+
+	D3D11_DEPTH_STENCIL_DESC skyDS = {};
+	skyDS.DepthEnable = true;
+	skyDS.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	skyDS.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	device->CreateDepthStencilState(&skyDS, &skyDepthState);
+
+
+	// Tell the input assembler stage of the pipeline what kind of
+	// geometric primitives (points, lines or triangles) we want to draw.  
+	// Essentially: "What kind of shape should the GPU draw with our data?"
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 // --------------------------------------------------------
@@ -144,6 +171,12 @@ void Game::LoadShaders()
 
 	particlePS = new SimplePixelShader(device, context);
 	particlePS->LoadShaderFile(L"ParticlePS.cso");
+
+	skyVS = new SimpleVertexShader(device, context);
+	skyVS->LoadShaderFile(L"SkyVS.cso");
+
+	skyPS = new SimplePixelShader(device, context);
+	skyPS->LoadShaderFile(L"SkyPS.cso");
 }
 
 void Game::LoadModels()
@@ -184,6 +217,9 @@ void Game::LoadTextures()
 	ID3D11ShaderResourceView* texView15;	// flame
 	ID3D11ShaderResourceView* texView16;	// basic particle
 	ID3D11ShaderResourceView* texView17;	// smoke particle
+
+
+	CreateDDSTextureFromFile(device, L"Assets/Textures/SunnyCubeMap.dds", 0, &skySRV);
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Cobblestone.jpg", 0, &texView1);
 	textureViews.push_back(texView1);
@@ -248,6 +284,7 @@ void Game::LoadTextures()
 	ID3D11ShaderResourceView * fogNormal;
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Fog_Normal.png", 0, &fogNormal);
 	textureViews.push_back(fogNormal);
+
 }
 
 void Game::CreateMaterials()
@@ -327,8 +364,6 @@ void Game::CreateMaterials()
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], textureViews[13], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], textureViews[19], samplerState));
-
-
 }
 
 // --------------------------------------------------------
@@ -510,6 +545,8 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				gameState = GameState::Playing;
 
+				numJumps = 0;
+
 				timer = 0;
 				ropeSpeed = startRopeSpeed;
 
@@ -534,8 +571,10 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			players[1]->Jump(jumpHeight);
 		}
-
-		if (rope->transform->EulerAngles().x > 180 - ropeWidth && rope->transform->EulerAngles().x < 180 + ropeWidth)
+		if (rope->transform->EulerAngles().x < 90) {
+			awardedJump = false;
+		}
+		else if (rope->transform->EulerAngles().x > 180 - ropeWidth && rope->transform->EulerAngles().x < 180 + ropeWidth)
 		{
 			for (int i = 0; i < players.size(); ++i)
 			{
@@ -545,6 +584,12 @@ void Game::Update(float deltaTime, float totalTime)
 					gameState = GameState::End;
 				}
 			}
+		}
+		else if (rope->transform->EulerAngles().x > 225 && !awardedJump){
+			if(numJumps > 4) jumpSfx[(numJumps-2) % 4]->Stop(true);
+			jumpSfx[numJumps % 4]->Play();
+			numJumps++;
+			awardedJump = true;
 		}
 	}
 	if (gameState == GameState::End)
@@ -614,7 +659,9 @@ void Game::Update(float deltaTime, float totalTime)
 void Game::Draw(float deltaTime, float totalTime)
 {
 	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+	//const float color[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+	//const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
+	const float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	// Clear the render target and depth buffer (erases what's on the screen)
 	//  - Do this ONCE PER FRAME
@@ -625,6 +672,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		1.0f,
 		0);
+
 
 	RenderManager::GetInstance()->Render(camera, context, lights);
 
@@ -638,12 +686,47 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->OMSetDepthStencilState(0, 0);
 	context->RSSetState(0);
 
+	DrawSky();
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
 	swapChain->Present(0, 0);
 	context->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
 }
+
+void Game::DrawSky()
+{
+	// Set the vertex and index buffers
+
+	// Set buffers in the input assembler
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	context->IASetVertexBuffers(0, 1, meshes[1]->GetVertexBuffer(), &stride, &offset);
+	context->IASetIndexBuffer(meshes[1]->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
+
+	// Set up the shaders
+	skyVS->SetMatrix4x4("view", camera->ViewMatrix());
+	skyVS->SetMatrix4x4("projection", camera->ProjectionMatrix());
+	skyVS->CopyAllBufferData();
+	skyVS->SetShader();
+
+	skyPS->SetShaderResourceView("Sky", skySRV);
+	skyPS->SetSamplerState("BasicSampler", materials[0]->SamplerState());
+	skyPS->SetShader();
+
+	// Set up any new render states
+	context->RSSetState(skyRasterState);
+	context->OMSetDepthStencilState(skyDepthState, 0);
+
+	// Draw
+	context->DrawIndexed(meshes[1]->GetIndexCount(), 0, 0);
+
+	// Reset states
+	context->RSSetState(0);
+	context->OMSetDepthStencilState(0, 0);
+
+}
+
 
 
 #pragma region Mouse Input
