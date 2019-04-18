@@ -125,13 +125,20 @@ private:
 	ID3D11DepthStencilState* particleDepthState;
 	ID3D11BlendState* particleBlendState;
 	
-	//ID3D11SamplerState* samplerState;
+	ID3D11SamplerState* sampler;
 
 	ID3D11ShaderResourceView* skySRV;
 	SimpleVertexShader* skyVS;
 	SimplePixelShader* skyPS;
 	ID3D11RasterizerState* skyRasterState;
 	ID3D11DepthStencilState* skyDepthState;
+
+
+	// Post process stuff -------------------
+	ID3D11RenderTargetView* ppRTV;		// Allows us to render to a texture
+	ID3D11ShaderResourceView* ppSRV;	// Allows us to sample from the same texture
+	SimpleVertexShader* ppVS;
+	SimplePixelShader* ppPS;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

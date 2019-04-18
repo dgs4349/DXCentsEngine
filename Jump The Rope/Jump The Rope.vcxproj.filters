@@ -82,6 +82,12 @@
     <FxCompile Include="SkyVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\..\..\Users\Aidan\Desktop\Post Process Demo\DX11Starter\PostProcessPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\Users\Aidan\Desktop\Post Process Demo\DX11Starter\PostProcessVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

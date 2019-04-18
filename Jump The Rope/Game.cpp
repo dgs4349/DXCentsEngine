@@ -77,6 +77,12 @@ Game::~Game()
 	skyRasterState->Release();
 	delete skyVS;
 	delete skyPS;
+	sampler->Release();
+	// Clean up post process
+	ppSRV->Release();
+	ppRTV->Release();
+	delete ppVS;
+	delete ppPS;
 
 	Logger::ReleaseInstance();
 }
@@ -146,6 +152,55 @@ void Game::Init()
 	device->CreateDepthStencilState(&skyDS, &skyDepthState);
 
 
+	// Create post process resources -----------------------------------------
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	textureDesc.Width = width;
+	textureDesc.Height = height;
+	textureDesc.ArraySize = 1;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.MipLevels = 1;
+	textureDesc.MiscFlags = 0;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	ID3D11Texture2D* ppTexture;
+	device->CreateTexture2D(&textureDesc, 0, &ppTexture);
+	// Sampler state for post process
+	// Create a sampler state that holds options for sampling
+	// The descriptions should always just be local variables
+	D3D11_SAMPLER_DESC samplerDesc = {}; // The {} part zeros out the struct!
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.MaxAnisotropy = 16;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX; // Setting this allows for mip maps to work! (if they exist)
+
+	device->CreateSamplerState(&samplerDesc, &sampler);
+
+	// Create the Render Target View
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	rtvDesc.Format = textureDesc.Format;
+	rtvDesc.Texture2D.MipSlice = 0;
+	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+	device->CreateRenderTargetView(ppTexture, &rtvDesc, &ppRTV);
+
+	// Create the Shader Resource View
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.Texture2D.MipLevels = 1;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+	device->CreateShaderResourceView(ppTexture, &srvDesc, &ppSRV);
+
+	// We don't need the texture reference itself no mo'
+	ppTexture->Release();
+
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -177,6 +232,13 @@ void Game::LoadShaders()
 
 	skyPS = new SimplePixelShader(device, context);
 	skyPS->LoadShaderFile(L"SkyPS.cso");
+
+	// Post process stuff
+	ppVS = new SimpleVertexShader(device, context);
+	ppVS->LoadShaderFile(L"PostProcessVS.cso");
+
+	ppPS = new SimplePixelShader(device, context);
+	ppPS->LoadShaderFile(L"PostProcessPS.cso");
 }
 
 void Game::LoadModels()
@@ -674,6 +736,17 @@ void Game::Draw(float deltaTime, float totalTime)
 		0);
 
 
+	// POST PROCESS PRE-RENDER /////////////////////////////
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+
+	// Also clear the post process texture
+	context->ClearRenderTargetView(ppRTV, color);
+
+	// Set the post process RTV as the current render target
+	context->OMSetRenderTargets(1, &ppRTV, depthStencilView);
+
+
 	RenderManager::GetInstance()->Render(camera, context, lights);
 
 	float blend[4] = { 1,1,1,1 };
@@ -687,6 +760,35 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->RSSetState(0);
 
 	DrawSky();
+
+	// POST PROCESS POST-RENDER ///////////////////////////
+
+	// Set the target back to the back buffer
+	context->OMSetRenderTargets(1, &backBufferRTV, 0);
+
+	// Render a full-screen triangle using the post process shaders
+	ppVS->SetShader();
+
+	ppPS->SetShader();
+	ppPS->SetShaderResourceView("Pixels", ppSRV);
+	ppPS->SetSamplerState("Sampler", sampler);
+
+	ppPS->SetFloat("pixelWidth", 1.0f / width);
+	ppPS->SetFloat("pixelHeight", 1.0f / height);
+	ppPS->SetInt("blurAmount", 5);
+	ppPS->CopyAllBufferData();
+
+	// Deactivate vertex and index buffers
+	ID3D11Buffer* nothing = 0;
+	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
+	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+
+	// Draw a set number of vertices
+	context->Draw(3, 0);
+
+	// Unbind all pixel shader SRVs
+	ID3D11ShaderResourceView* nullSRVs[16] = {};
+	context->PSSetShaderResources(0, 16, nullSRVs);
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
