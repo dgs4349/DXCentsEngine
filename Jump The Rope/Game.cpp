@@ -69,8 +69,8 @@ Game::~Game()
 	gameObjects.clear();
 	meshes.clear();
 
+	jumpSfx.clear();
 	delete audioHandler;
-
 
 	skySRV->Release();
 	skyDepthState->Release();
@@ -124,9 +124,14 @@ void Game::Init()
 	bgIntro = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_intro.wav");
 	bgLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_loop.wav", true);
 	bgIntro->Link(bgLoop);
-	bgIntro->Set(-0.5f); // not working
+	bgIntro->Set(0.5f);
 	bgIntro->PlayOnUpdate();
 
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_3.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_2.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
+	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(2.0f);
 
 	D3D11_RASTERIZER_DESC skyRD = {};
 	skyRD.CullMode = D3D11_CULL_FRONT;
@@ -540,6 +545,8 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				gameState = GameState::Playing;
 
+				numJumps = 0;
+
 				timer = 0;
 				ropeSpeed = startRopeSpeed;
 
@@ -564,8 +571,10 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			players[1]->Jump(jumpHeight);
 		}
-
-		if (rope->transform->EulerAngles().x > 180 - ropeWidth && rope->transform->EulerAngles().x < 180 + ropeWidth)
+		if (rope->transform->EulerAngles().x < 90) {
+			awardedJump = false;
+		}
+		else if (rope->transform->EulerAngles().x > 180 - ropeWidth && rope->transform->EulerAngles().x < 180 + ropeWidth)
 		{
 			for (int i = 0; i < players.size(); ++i)
 			{
@@ -575,6 +584,12 @@ void Game::Update(float deltaTime, float totalTime)
 					gameState = GameState::End;
 				}
 			}
+		}
+		else if (rope->transform->EulerAngles().x > 225 && !awardedJump){
+			if(numJumps > 4) jumpSfx[(numJumps-2) % 4]->Stop(true);
+			jumpSfx[numJumps % 4]->Play();
+			numJumps++;
+			awardedJump = true;
 		}
 	}
 	if (gameState == GameState::End)

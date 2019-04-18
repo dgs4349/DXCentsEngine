@@ -52,6 +52,7 @@ private:
 	Lights lights;
 
 	CentsAudioHandler* audioHandler;
+	std::vector<CentsSoundEffect*> jumpSfx;
 
 	float startRopeSpeed = 100.0f;
 	float ropeSpeed;
@@ -65,6 +66,9 @@ private:
 	float readyLength = 1.0f;
 	float endScreenLength = 1.0f;
 	GameState gameState;
+
+	bool awardedJump = false;
+	int numJumps = 0;
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders();
