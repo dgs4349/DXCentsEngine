@@ -407,11 +407,11 @@ void Game::CreateBasicGeometry()
 	skel2 = new GameObject("Skeleton2", meshes[7], materials[4]);
 	skel1Arm = new GameObject("Skeleton1Arm", meshes[8], materials[4]);
 	skel2Arm = new GameObject("Skeleton2Arm", meshes[8], materials[4]);
-
+	torch = new GameObject("Torch", meshes[14], materials[10]);
 	// Fog
 	fog = new GameObject("Fog", meshes[1], materials[11]);
 
-	torch = new GameObject("Torch", meshes[14], materials[10]);
+
 
 	torch->transform->Position(-8.0f, 0.3f, 8.0f);
 
