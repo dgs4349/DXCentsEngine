@@ -140,6 +140,12 @@ private:
 	SimpleVertexShader* ppVS;
 	SimplePixelShader* ppPS;
 
+	ID3D11RenderTargetView* bloomRTV;		// Allows us to render to a texture
+	ID3D11ShaderResourceView* bloomSRV;	// Allows us to sample from the same texture
+	SimplePixelShader* bloomPS;
+
+
+
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;

@@ -84,6 +84,10 @@ Game::~Game()
 	delete ppVS;
 	delete ppPS;
 
+	bloomSRV->Release();
+	bloomRTV->Release();
+	delete bloomPS;
+
 	Logger::ReleaseInstance();
 }
 
@@ -152,6 +156,20 @@ void Game::Init()
 	device->CreateDepthStencilState(&skyDS, &skyDepthState);
 
 
+
+	// Sampler state for post process
+	// Create a sampler state that holds options for sampling
+	// The descriptions should always just be local variables
+	D3D11_SAMPLER_DESC samplerDesc = {}; // The {} part zeros out the struct!
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.MaxAnisotropy = 16;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX; // Setting this allows for mip maps to work! (if they exist)
+	device->CreateSamplerState(&samplerDesc, &sampler);
+
+
 	// Create post process resources -----------------------------------------
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = width;
@@ -166,20 +184,10 @@ void Game::Init()
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 
+	// ppTexture is the link between pprtv and ppsrv
 	ID3D11Texture2D* ppTexture;
 	device->CreateTexture2D(&textureDesc, 0, &ppTexture);
-	// Sampler state for post process
-	// Create a sampler state that holds options for sampling
-	// The descriptions should always just be local variables
-	D3D11_SAMPLER_DESC samplerDesc = {}; // The {} part zeros out the struct!
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.MaxAnisotropy = 16;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX; // Setting this allows for mip maps to work! (if they exist)
 
-	device->CreateSamplerState(&samplerDesc, &sampler);
 
 	// Create the Render Target View
 	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
@@ -200,6 +208,50 @@ void Game::Init()
 
 	// We don't need the texture reference itself no mo'
 	ppTexture->Release();
+
+
+
+
+
+	// BLOOM RESOURCES
+	// Create post process resources -----------------------------------------
+	D3D11_TEXTURE2D_DESC bloomTextureDesc = {};
+	bloomTextureDesc.Width = width/4;
+	bloomTextureDesc.Height = height/4;
+	bloomTextureDesc.ArraySize = 1;
+	bloomTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	bloomTextureDesc.CPUAccessFlags = 0;
+	bloomTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	bloomTextureDesc.MipLevels = 1;
+	bloomTextureDesc.MiscFlags = 0;
+	bloomTextureDesc.SampleDesc.Count = 1;
+	bloomTextureDesc.SampleDesc.Quality = 0;
+	bloomTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	// ppTexture is the link between pprtv and ppsrv
+	ID3D11Texture2D* bloomTexture;
+	device->CreateTexture2D(&bloomTextureDesc, 0, &bloomTexture);
+
+
+	// Create the Render Target View
+	D3D11_RENDER_TARGET_VIEW_DESC bloomRtvDesc = {};
+	bloomRtvDesc.Format = bloomTextureDesc.Format;
+	bloomRtvDesc.Texture2D.MipSlice = 0;
+	bloomRtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+	device->CreateRenderTargetView(bloomTexture, &bloomRtvDesc, &bloomRTV);
+
+	// Create the Shader Resource View
+	D3D11_SHADER_RESOURCE_VIEW_DESC bloomSrvDesc = {};
+	bloomSrvDesc.Format = bloomTextureDesc.Format;
+	bloomSrvDesc.Texture2D.MipLevels = 1;
+	bloomSrvDesc.Texture2D.MostDetailedMip = 0;
+	bloomSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+	device->CreateShaderResourceView(bloomTexture, &bloomSrvDesc, &bloomSRV);
+
+	// We don't need the texture reference itself no mo'
+	bloomTexture->Release();
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -239,6 +291,9 @@ void Game::LoadShaders()
 
 	ppPS = new SimplePixelShader(device, context);
 	ppPS->LoadShaderFile(L"PostProcessPS.cso");
+
+	bloomPS = new SimplePixelShader(device, context);
+	bloomPS->LoadShaderFile(L"BloomPS.cso");
 }
 
 void Game::LoadModels()
@@ -647,8 +702,8 @@ void Game::Update(float deltaTime, float totalTime)
 				}
 			}
 		}
-		else if (rope->transform->EulerAngles().x > 225 && !awardedJump){
-			if(numJumps > 4) jumpSfx[(numJumps-2) % 4]->Stop(true);
+		else if (rope->transform->EulerAngles().x > 225 && !awardedJump) {
+			if (numJumps > 4) jumpSfx[(numJumps - 2) % 4]->Stop(true);
 			jumpSfx[numJumps % 4]->Play();
 			numJumps++;
 			awardedJump = true;
@@ -707,7 +762,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	// animate the torches light
 	lights.pointLights[0].color = XMFLOAT3(1.0f, 0.3f, 0.1f);
-	lights.pointLights[0].intensity = sin(totalTime * 10.54f) * sin(totalTime * 3.78f) * sin(totalTime * 2.487f) * sin(totalTime * 0.879f) * 3 +4;
+	lights.pointLights[0].intensity = sin(totalTime * 10.54f) * sin(totalTime * 3.78f) * sin(totalTime * 2.487f) * sin(totalTime * 0.879f) * 3 + 4;
 
 
 	// Quit if the escape key is pressed
@@ -739,14 +794,16 @@ void Game::Draw(float deltaTime, float totalTime)
 	// POST PROCESS PRE-RENDER /////////////////////////////
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
+	ID3D11ShaderResourceView* nullSRVs[16] = {};
+	ID3D11Buffer* nothing = 0;
 
 	// Also clear the post process texture
 	context->ClearRenderTargetView(ppRTV, color);
-
+	context->ClearRenderTargetView(bloomRTV, color);
 	// Set the post process RTV as the current render target
 	context->OMSetRenderTargets(1, &ppRTV, depthStencilView);
 
-
+	// render normally, to ppRTV
 	RenderManager::GetInstance()->Render(camera, context, lights);
 
 	float blend[4] = { 1,1,1,1 };
@@ -762,7 +819,35 @@ void Game::Draw(float deltaTime, float totalTime)
 	DrawSky();
 
 	// POST PROCESS POST-RENDER ///////////////////////////
+	
+	
+	// render bloom
 
+	context->OMSetRenderTargets(1, &bloomRTV, 0);
+	// Render a full-screen triangle using the post process shaders
+	ppVS->SetShader();
+
+	bloomPS->SetShader();
+	bloomPS->SetShaderResourceView("Pixels", ppSRV);
+	bloomPS->SetSamplerState("Sampler", sampler);
+
+	bloomPS->SetFloat("pixelWidth", 1.0f / width );
+	bloomPS->SetFloat("pixelHeight", 1.0f / height  );
+	bloomPS->SetInt("blurAmount", 5);
+	bloomPS->CopyAllBufferData();
+
+	// Deactivate vertex and index buffers
+	
+	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
+	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+
+	// Draw a set number of vertices
+	context->Draw(3, 0);
+	context->PSSetShaderResources(0, 16, nullSRVs);
+	
+	
+	
+	// Render to the screen
 	// Set the target back to the back buffer
 	context->OMSetRenderTargets(1, &backBufferRTV, 0);
 
@@ -771,15 +856,15 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	ppPS->SetShader();
 	ppPS->SetShaderResourceView("Pixels", ppSRV);
+	ppPS->SetShaderResourceView("Bloom", bloomSRV);
 	ppPS->SetSamplerState("Sampler", sampler);
 
 	ppPS->SetFloat("pixelWidth", 1.0f / width);
 	ppPS->SetFloat("pixelHeight", 1.0f / height);
-	ppPS->SetInt("blurAmount", 5);
+	ppPS->SetInt("blurAmount", 25);
 	ppPS->CopyAllBufferData();
 
 	// Deactivate vertex and index buffers
-	ID3D11Buffer* nothing = 0;
 	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 
@@ -787,8 +872,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->Draw(3, 0);
 
 	// Unbind all pixel shader SRVs
-	ID3D11ShaderResourceView* nullSRVs[16] = {};
 	context->PSSetShaderResources(0, 16, nullSRVs);
+	
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)

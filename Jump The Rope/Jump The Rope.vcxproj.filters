@@ -82,10 +82,13 @@
     <FxCompile Include="SkyVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\..\..\Users\Aidan\Desktop\Post Process Demo\DX11Starter\PostProcessPS.hlsl">
+    <FxCompile Include="PostProcessPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\..\..\Users\Aidan\Desktop\Post Process Demo\DX11Starter\PostProcessVS.hlsl">
+    <FxCompile Include="PostProcessVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="BloomPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
