@@ -106,6 +106,8 @@ private:
 
 	Flame* flame1;
 
+	ID3D11SamplerState* hashSampler;
+
 	ID3D11ShaderResourceView* hashTexture1_1;
 	ID3D11ShaderResourceView* hashTexture2_1;
 	ID3D11ShaderResourceView* hashTexture1_2;

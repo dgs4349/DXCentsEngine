@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Vertex.h"
+#include <DDSTextureLoader.h>
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -71,6 +72,8 @@ Game::~Game()
 	hashTexture2_2->Release();
 	hashTexture1_3->Release();
 	hashTexture2_3->Release();
+
+	hashSampler->Release();
 
 	textureViews.clear();
 	materials.clear();
@@ -174,12 +177,12 @@ void Game::LoadModels()
 void Game::LoadTextures()
 {
 	//does hashmark shading
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light.png", 0, &hashTexture1_1);
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark.png", 0, &hashTexture2_1);
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light2.png", 0, &hashTexture1_2);
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark2.png", 0, &hashTexture2_2);
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light3.png", 0, &hashTexture1_3);
-	CreateWICTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark3.png", 0, &hashTexture2_3);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light.dds", 0, &hashTexture1_1);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark.dds", 0, &hashTexture2_1);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light2.dds", 0, &hashTexture1_2);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark2.dds", 0, &hashTexture2_2);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light3.dds", 0, &hashTexture1_3);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark3.dds", 0, &hashTexture2_3);
 
 	//all other textures
 	ID3D11ShaderResourceView* texView1;		// Cobblestone
@@ -259,6 +262,8 @@ void Game::LoadTextures()
 
 void Game::SetShaderHashTextures(float deltaTime)
 {
+	pixelShader->SetSamplerState("hashSampler", hashSampler);
+
 	animTimer -= deltaTime;
 	if (animTimer <= 0) {
 		animTimer = animSpeed;
@@ -365,7 +370,15 @@ void Game::CreateMaterials()
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], samplerState));
 	
-
+	//defines a separate sampler for the hash marks. It requires blending between mips
+	D3D11_SAMPLER_DESC hashDesc;
+	ZeroMemory(&hashDesc, sizeof(D3D11_SAMPLER_DESC));
+	hashDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	hashDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	hashDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	hashDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	hashDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&hashDesc, &hashSampler);
 }
 
 // --------------------------------------------------------
@@ -632,7 +645,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime);
 
-	audioHandler->Update(deltaTime, totalTime);
+	//audioHandler->Update(deltaTime, totalTime);
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))

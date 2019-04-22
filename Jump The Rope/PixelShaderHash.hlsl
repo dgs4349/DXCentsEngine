@@ -29,6 +29,7 @@ cbuffer externalData : register(b0)
 
 Texture2D diffuseTexture : register(t0);
 SamplerState basicSampler : register(s0);
+SamplerState hashSampler : register(s1);
 
 Texture2D normalTexture : register(t1);
 Texture2D hashTexture1 : register(t2);
@@ -91,8 +92,9 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 
 float3 hashing(float2 uv, float intensity) {
 	//these get flipped just because the way the textures were created was opposite to how the code reads them in
-	float3 hash1 = hashTexture2.Sample(basicSampler, uv).bgr;
-	float3 hash2 = hashTexture1.Sample(basicSampler, uv).bgr;
+	//SampleBias is used to get a level of mipmap more detailed than the default mip it spits out
+	float3 hash2 = hashTexture1.SampleBias(hashSampler, uv, -1.0f).rgb;
+	float3 hash1 = hashTexture2.SampleBias(hashSampler, uv, -1.0f).rgb;
 
 	float3 overbright = max(0, intensity - 1.0f); //how much over the limit of 1 the intensity is. Will have much less hashing
 
@@ -184,7 +186,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	
 	//return float4(intensity, intensity, intensity, 1);
 	//return float4(hashing(input.uv * 16.0f, intensity), 1.0f);
-	surfaceColor.rgb *= hashing(input.uv * 6.0f, intensity + 0.4f); //the final float is just a modifier to make the scene brighter or darker
+	surfaceColor.rgb *= hashing(input.uv * 6.0f, intensity); //the final float is just a modifier to make the scene brighter or darker
 
 	float3 gamma = float3(pow(abs(finalLightColor * surfaceColor.rgb), (1.0 / 2.2)));
 	
