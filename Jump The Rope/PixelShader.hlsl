@@ -92,7 +92,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 
 	float4 surfaceColor = diffuseTexture.Sample(basicSampler, input.uv + uvOffset);
-	float3 normalFromMap = normalTexture.Sample(basicSampler, input.uv).rgb * 2 - 1;
+	float3 normalFromMap = normalTexture.Sample(basicSampler, input.uv + uvOffset).rgb * 2 - 1;
 
 	// Calculate the matrix we'll use to convert from tangent to world space
 	float3 N = normalize(input.normal);
