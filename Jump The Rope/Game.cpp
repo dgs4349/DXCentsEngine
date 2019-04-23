@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Vertex.h"
+#include <DDSTextureLoader.h>
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -54,6 +55,7 @@ Game::~Game()
 	delete particleVS;
 	delete particlePS;
 	delete flame1;
+	
 
 	blendState->Release();
 	particleBlendState->Release();
@@ -63,6 +65,15 @@ Game::~Game()
 	{
 		textureViews[i]->Release();
 	}
+
+	hashTexture1_1->Release();
+	hashTexture2_1->Release();
+	hashTexture1_2->Release();
+	hashTexture2_2->Release();
+	hashTexture1_3->Release();
+	hashTexture2_3->Release();
+
+	hashSampler->Release();
 
 	textureViews.clear();
 	materials.clear();
@@ -164,7 +175,7 @@ void Game::LoadShaders()
 	vertexShader->LoadShaderFile(L"VertexShader.cso");
 
 	pixelShader = new SimplePixelShader(device, context);
-	pixelShader->LoadShaderFile(L"PixelShader.cso");
+	pixelShader->LoadShaderFile(L"PixelShaderHash.cso");
 
 	particleVS = new SimpleVertexShader(device, context);
 	particleVS->LoadShaderFile(L"ParticleVS.cso");
@@ -200,6 +211,15 @@ void Game::LoadModels()
 
 void Game::LoadTextures()
 {
+	//does hashmark shading
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light.dds", 0, &hashTexture1_1);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark.dds", 0, &hashTexture2_1);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light2.dds", 0, &hashTexture1_2);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark2.dds", 0, &hashTexture2_2);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_light3.dds", 0, &hashTexture1_3);
+	CreateDDSTextureFromFile(device, context, L"Assets/Textures/Hashing/hashing_biggest_dark3.dds", 0, &hashTexture2_3);
+
+	//all other textures
 	ID3D11ShaderResourceView* texView1;		// Cobblestone
 	ID3D11ShaderResourceView* texView2;		// Dirt
 	ID3D11ShaderResourceView* texView3;		// StonePath
@@ -287,6 +307,38 @@ void Game::LoadTextures()
 
 }
 
+void Game::SetShaderHashTextures(float deltaTime)
+{
+	pixelShader->SetSamplerState("hashSampler", hashSampler);
+
+	animTimer -= deltaTime;
+	if (animTimer <= 0) {
+		animTimer = animSpeed;
+		animFrame++;
+		if (animFrame > 2)
+			animFrame = 0;
+	}
+
+	switch (animFrame) {
+	case 0:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_1);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_1);
+		break;
+	case 1:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_2);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_2);
+		break;
+	case 2:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_3);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_3);
+		break;
+	default:
+		pixelShader->SetShaderResourceView("hashTexture1", hashTexture1_1);
+		pixelShader->SetShaderResourceView("hashTexture2", hashTexture2_1);
+		break;
+	}
+}
+
 void Game::CreateMaterials()
 {
 	ID3D11SamplerState* samplerState;
@@ -364,6 +416,16 @@ void Game::CreateMaterials()
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], textureViews[13], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], textureViews[19], samplerState));
+	
+	//defines a separate sampler for the hash marks. It requires blending between mips
+	D3D11_SAMPLER_DESC hashDesc;
+	ZeroMemory(&hashDesc, sizeof(D3D11_SAMPLER_DESC));
+	hashDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	hashDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	hashDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	hashDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	hashDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&hashDesc, &hashSampler);
 }
 
 // --------------------------------------------------------
@@ -514,6 +576,8 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	SetShaderHashTextures(deltaTime);
+
 	bool p1Input = GetAsyncKeyState(*"Q");
 	bool p2Input = GetAsyncKeyState(*"P");
 
@@ -633,6 +697,9 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 
+	//basic light modulation
+	lights.pointLights[0].range = sin(totalTime) + 12.0f;
+
 	// Animated the uv offset of the materials
 	materials[11]->uvOffset.x = totalTime * .1f;
 	materials[11]->uvOffset.y = cos(totalTime) / 20.0f;
@@ -640,7 +707,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime);
 
-	audioHandler->Update(deltaTime, totalTime);
+	//audioHandler->Update(deltaTime, totalTime);
 
 
 	// animate the torches light
@@ -680,7 +747,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->OMSetBlendState(particleBlendState, blend, 0xffffffff);	// Additive blending
 	context->OMSetDepthStencilState(particleDepthState, 0);
 
-	flame1->Draw(context, camera);
+	//flame1->Draw(context, camera);
 
 	context->OMSetBlendState(blendState, blend, 0xffffffff);
 	context->OMSetDepthStencilState(0, 0);
