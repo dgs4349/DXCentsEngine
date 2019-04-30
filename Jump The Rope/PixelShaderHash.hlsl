@@ -189,6 +189,8 @@ float4 main(VertexToPixel input) : SV_TARGET
 	surfaceColor.rgb *= hashing(input.uv * 6.0f, intensity); //the final float is just a modifier to make the scene brighter or darker
 
 	float3 gamma = float3(pow(abs(finalLightColor * surfaceColor.rgb), (1.0 / 2.2)));
-	
+	float depth = ((input.position.z - 1) * 75) + 1.1;
+	depth = clamp(depth, 0, 1);
+	//return float4(depth, depth, depth, 1.0);
 	return float4(gamma, surfaceColor.a);
 }

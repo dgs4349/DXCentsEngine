@@ -24,6 +24,6 @@ SamplerState Sampler	: register(s0);
 // Entry point for this pixel shader
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	return Pixels.Sample(Sampler, input.uv) + Bloom.Sample(Sampler, input.uv) * .5;
+	return Pixels.Sample(Sampler, input.uv) + Bloom.Sample(Sampler, input.uv);
 	//return Bloom.Sample(Sampler, input.uv);
 }

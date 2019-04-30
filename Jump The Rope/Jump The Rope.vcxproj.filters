@@ -13,6 +13,7 @@
     <FxCompile Include="SkyVS.hlsl" />
     <FxCompile Include="GaussianHorizontalPS.hlsl" />
     <FxCompile Include="GaussianVerticalPS.hlsl" />
+    <FxCompile Include="DepthPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CentsAudioHandler.cpp" />

@@ -81,7 +81,7 @@ private:
 	void CreateMaterials();
 	void CreateBasicGeometry();
 
-	void BlurRender(ID3D11RenderTargetView* RTV, ID3D11ShaderResourceView* SRV);
+	void BlurRender(ID3D11RenderTargetView* RTV, ID3D11ShaderResourceView* SRV, float blurAmount, float dofAmount);
 
 
 	GameObject* rope;
@@ -164,6 +164,11 @@ private:
 	ID3D11ShaderResourceView* blurSRV;	// Allows us to sample from the same texture
 	SimplePixelShader* GaussianHPS;
 	SimplePixelShader* GaussianVPS;
+
+	SimplePixelShader* DepthPS;
+
+	ID3D11RenderTargetView* depthRTV;		// Allows us to render to a texture
+	ID3D11ShaderResourceView* depthSRV;	// Allows us to sample from the same texture
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

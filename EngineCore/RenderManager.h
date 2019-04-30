@@ -20,6 +20,8 @@ public:
 
 	void Render(Camera* camera, ID3D11DeviceContext* context, Lights& lights) const;
 
+	void Render(Camera * camera, ID3D11DeviceContext * context, Lights & lights, SimplePixelShader * PS) const;
+
 protected:
 
 	std::vector<Renderer*> activeRenderers;
