@@ -104,6 +104,9 @@ Game::~Game()
 	delete GaussianHPS;
 	delete GaussianVPS;
 
+	depthSRV->Release();
+	depthRTV->Release();
+
 	Logger::ReleaseInstance();
 }
 
@@ -237,6 +240,17 @@ void Game::Init()
 	// We don't need the texture reference itself no mo'
 	blurTexture->Release();
 
+	// blurTexture is the link
+	ID3D11Texture2D* depthTexture;
+	device->CreateTexture2D(&textureDesc, 0, &depthTexture);
+
+	device->CreateRenderTargetView(depthTexture, &rtvDesc, &depthRTV);
+
+	device->CreateShaderResourceView(depthTexture, &srvDesc, &depthSRV);
+
+	// We don't need the texture reference itself no mo'
+	depthTexture->Release();
+
 
 	// BLOOM RESOURCES
 	// Create post process resources -----------------------------------------
@@ -325,6 +339,9 @@ void Game::LoadShaders()
 
 	GaussianVPS = new SimplePixelShader(device, context);
 	GaussianVPS->LoadShaderFile(L"GaussianVerticalPS.cso");
+
+	DepthPS = new SimplePixelShader(device, context);
+	DepthPS->LoadShaderFile(L"DepthPixelShader.cso");
 }
 
 void Game::LoadModels()
@@ -915,6 +932,18 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	DrawSky();
 
+	// Render DEPTH	
+	context->ClearDepthStencilView(
+		depthStencilView,
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+		1.0f,
+		0);
+	context->OMSetRenderTargets(1, &depthRTV, depthStencilView);
+	// BASE RENDER TO ppRTV /////////////////////////////////////
+	RenderManager::GetInstance()->Render(camera, context, lights, DepthPS);
+	DrawSky();
+	
+
 	// POST PROCESS POST-RENDER ///////////////////////////
 	
 	
@@ -945,7 +974,10 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->PSSetShaderResources(0, 16, nullSRVs);
 	
 	// TODO -> render the bloomRTV back to itself vith the gaussian blur shaders
-	BlurRender(bloomRTV, bloomSRV);
+	BlurRender(bloomRTV, bloomSRV, 3.0f, 1.0f);
+
+	// apply to the default also, so we can have dof
+	BlurRender(ppRTV, ppSRV, 1.0f, 2.0f);
 
 	// Set the target back to the back buffer to render to screen
 	context->OMSetRenderTargets(1, &backBufferRTV, 0);
@@ -973,7 +1005,11 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	// Unbind all pixel shader SRVs
 	context->PSSetShaderResources(0, 16, nullSRVs);
+
+
 	
+
+
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
@@ -1015,7 +1051,7 @@ void Game::DrawSky()
 }
 
 
-void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SRV)
+void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SRV, float blurAmount, float dofAmount)
 {
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -1035,11 +1071,13 @@ void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SR
 	// Set up horizontal blur
 	GaussianHPS->SetShader();
 	GaussianHPS->SetShaderResourceView("Pixels", SRV);
+	GaussianHPS->SetShaderResourceView("Depth", depthSRV);
 	GaussianHPS->SetSamplerState("Sampler", sampler);
 
 	GaussianHPS->SetFloat("pixelWidth", width);
-	//GaussianHPS->SetFloat("pixelHeight", 1.0f / height);
-	//GaussianHPS->SetInt("blurAmount", 5);
+	GaussianHPS->SetFloat("blurAmount", blurAmount);
+	GaussianHPS->SetFloat("dofAmount", dofAmount);
+
 	GaussianHPS->CopyAllBufferData();
 
 	// Deactivate vertex and index buffers	
@@ -1064,10 +1102,10 @@ void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SR
 	GaussianVPS->SetShader();
 	GaussianVPS->SetShaderResourceView("Pixels", blurSRV);
 	GaussianVPS->SetSamplerState("Sampler", sampler);
-
-	//GaussianHPS->SetFloat("pixelWidth", 1.0f / width);
+	GaussianVPS->SetShaderResourceView("Depth", depthSRV);
 	GaussianVPS->SetFloat("pixelHeight", height);
-	//GaussianHPS->SetInt("blurAmount", 5);
+	GaussianVPS->SetFloat("blurAmount", blurAmount);
+	GaussianVPS->SetFloat("dofAmount", dofAmount);
 	GaussianVPS->CopyAllBufferData();
 
 	// Deactivate vertex and index buffers	

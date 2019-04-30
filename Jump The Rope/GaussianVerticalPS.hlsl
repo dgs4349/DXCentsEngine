@@ -2,6 +2,8 @@
 cbuffer Data : register(b0)
 {
 	float pixelHeight;
+	float blurAmount;
+	float dofAmount;
 }
 
 
@@ -15,6 +17,7 @@ struct VertexToPixel
 
 // Textures and such
 Texture2D Pixels		: register(t0);
+Texture2D Depth			: register(t1);
 SamplerState Sampler	: register(s0);
 
 static const float KernelOffsets[5] = { 0.0f, 1.3846153846f, 3.2307692308f, 5.538461539f,8.307692308f};
@@ -26,17 +29,18 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 textureColor = float3(1.0f, 0.0f, 0.0f);
 	float2 uv = input.uv;
 
+	float depth = Depth.Sample(Sampler, input.uv).x;
 
 	textureColor = Pixels.Sample(Sampler, uv).xyz * BlurWeights[0];
 
 	for (int i = 1; i < 5; i++)
 	{
-		float2 normalizedOffset = float2(0.0f, KernelOffsets[i] * 3) / pixelHeight;
+		float2 normalizedOffset = float2(0.0f, KernelOffsets[i] * blurAmount * (distance(depth, 0.65) * dofAmount)) / pixelHeight;
 		textureColor += Pixels.Sample(Sampler, uv + normalizedOffset).xyz * BlurWeights[i];
 		textureColor += Pixels.Sample(Sampler, uv - normalizedOffset).xyz * BlurWeights[i];
 	}
 
 
-	return float4(textureColor, 1.0);
-
+	return float4(textureColor / 2, 1.0);
+	//return Depth.Sample(Sampler, input.uv);
 }
