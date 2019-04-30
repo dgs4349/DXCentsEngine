@@ -135,7 +135,9 @@ void Game::Init()
 
 	lights.pointLights[0] = { XMFLOAT3(0.960f, 0.3f, 0.2f), 10, XMFLOAT3(-8.0f, 0.45f, 8.0f), 2 };
 	lights.pointLights[1] = { XMFLOAT3(0.960f, 0.3f, 0.2f), 10, XMFLOAT3(8.0f, 0.45f, 8.0f), 2 };
-	lights.pointLightCount = 2;
+	lights.pointLights[2] = { XMFLOAT3(0.960f, 0.4f, 0.3f), 4, XMFLOAT3(-4.0f, 1.5f, -0.8f), 1 };
+	lights.pointLights[3] = { XMFLOAT3(0.960f, 0.4f, 0.3f), 4, XMFLOAT3(4.0f, 1.5f, -0.8f), 1 };
+	lights.pointLightCount = 4;
 
 	lights.spotLights[0] = { XMFLOAT3(.5f, .25f, 0), 25, XMFLOAT3(0, 8, -5), 10, XMFLOAT3(0, 1,-.5f), 1 };
 	lights.spotLightCount = 1;
@@ -376,7 +378,7 @@ void Game::LoadTextures()
 	ID3D11ShaderResourceView* texView17;	// smoke particle
 
 
-	CreateDDSTextureFromFile(device, L"Assets/Textures/SunnyCubeMap.dds", 0, &skySRV);
+	CreateDDSTextureFromFile(device, L"Assets/Textures/FireSkyCubeMap.dds", 0, &skySRV);
 
 	CreateWICTextureFromFile(device, context, L"Assets/Textures/Cobblestone.jpg", 0, &texView1);
 	textureViews.push_back(texView1);
@@ -843,7 +845,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime);
 
-	//audioHandler->Update(deltaTime, totalTime);
+	audioHandler->Update(deltaTime, totalTime);
 
 
 	// animate the torches light

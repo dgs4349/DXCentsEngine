@@ -17,5 +17,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	float4 skycolor = Sky.Sample(BasicSampler, input.cubeDirection);
 	// wxyz => yxwz
-	return skycolor.yxwz/4.0f;
+	return skycolor.xyzw / 1.7f;
 }
