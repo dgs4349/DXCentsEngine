@@ -1,97 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{041f7dfb-c3d2-4c58-acf3-c6c839c59d16}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Audio">
-      <UniqueIdentifier>{4a0baf77-5d32-4633-909f-7f3c79e2c8ae}</UniqueIdentifier>
-    </Filter>
+    <FxCompile Include="BloomPS.hlsl" />
+    <FxCompile Include="ParticlePS.hlsl" />
+    <FxCompile Include="ParticleVS.hlsl" />
+    <FxCompile Include="PixelShader.hlsl" />
+    <FxCompile Include="PostProcessPS.hlsl" />
+    <FxCompile Include="PostProcessVS.hlsl" />
+    <FxCompile Include="PixelShaderHash.hlsl" />
+    <FxCompile Include="VertexShader.hlsl" />
+    <FxCompile Include="SkyPS.hlsl" />
+    <FxCompile Include="SkyVS.hlsl" />
+    <FxCompile Include="GaussianHorizontalPS.hlsl" />
+    <FxCompile Include="GaussianVerticalPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CentsAudioHandler.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="CentsSoundEffect.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Emitter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Flame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="CentsAudioHandler.cpp" />
+    <ClCompile Include="CentsSoundEffect.cpp" />
+    <ClCompile Include="Emitter.cpp" />
+    <ClCompile Include="Flame.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CentsAudioHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CentsSoundEffect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Emitter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Flame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="PixelShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ParticlePS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ParticleVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PixelShaderHash.hlsl">
-    <FxCompile Include="SkyPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="SkyVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PostProcessPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PostProcessVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="BloomPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <ClInclude Include="CentsAudioHandler.h" />
+    <ClInclude Include="CentsSoundEffect.h" />
+    <ClInclude Include="Emitter.h" />
+    <ClInclude Include="Flame.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

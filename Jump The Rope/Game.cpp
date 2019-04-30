@@ -99,6 +99,11 @@ Game::~Game()
 	bloomRTV->Release();
 	delete bloomPS;
 
+	blurSRV->Release();
+	blurRTV->Release();
+	delete GaussianHPS;
+	delete GaussianVPS;
+
 	Logger::ReleaseInstance();
 }
 
@@ -221,14 +226,23 @@ void Game::Init()
 	ppTexture->Release();
 
 
+	// blurTexture is the link
+	ID3D11Texture2D* blurTexture;
+	device->CreateTexture2D(&textureDesc, 0, &blurTexture);
 
+	device->CreateRenderTargetView(blurTexture, &rtvDesc, &blurRTV);
+
+	device->CreateShaderResourceView(blurTexture, &srvDesc, &blurSRV);
+
+	// We don't need the texture reference itself no mo'
+	blurTexture->Release();
 
 
 	// BLOOM RESOURCES
 	// Create post process resources -----------------------------------------
 	D3D11_TEXTURE2D_DESC bloomTextureDesc = {};
-	bloomTextureDesc.Width = width/4;
-	bloomTextureDesc.Height = height/4;
+	bloomTextureDesc.Width = width;
+	bloomTextureDesc.Height = height;
 	bloomTextureDesc.ArraySize = 1;
 	bloomTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	bloomTextureDesc.CPUAccessFlags = 0;
@@ -305,6 +319,12 @@ void Game::LoadShaders()
 
 	bloomPS = new SimplePixelShader(device, context);
 	bloomPS->LoadShaderFile(L"BloomPS.cso");
+
+	GaussianHPS = new SimplePixelShader(device, context);
+	GaussianHPS->LoadShaderFile(L"GaussianHorizontalPS.cso");
+
+	GaussianVPS = new SimplePixelShader(device, context);
+	GaussianVPS->LoadShaderFile(L"GaussianVerticalPS.cso");
 }
 
 void Game::LoadModels()
@@ -676,7 +696,6 @@ void Game::CreateBasicGeometry()
 	fog->transform->Position(0.0f, -1.0f, 0.0f);
 }
 
-
 // --------------------------------------------------------
 // Handle resizing DirectX "stuff" to match the new window size.
 // For instance, updating our projection matrix's aspect ratio.
@@ -842,6 +861,15 @@ void Game::Update(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void Game::Draw(float deltaTime, float totalTime)
 {
+
+	// THE STEPS OF RENDERING //////////////////////
+	// This bit of documentation serves to help keep track of the order of operations
+	// step 1. Render normally, but to a rendertexture, in this case ppRTV, with normal shaders
+	// step 2. Render again to bloomRTV, clipping pixels below a certain brightness, using the bloom pixel shader
+	// step 3. Render a third time, to the screen, with the postprocess shaders that combine the results of the previous two steps
+
+
+
 	// Background color (Cornflower Blue in this case) for clearing
 	//const float color[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
 	//const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
@@ -864,20 +892,22 @@ void Game::Draw(float deltaTime, float totalTime)
 	ID3D11ShaderResourceView* nullSRVs[16] = {};
 	ID3D11Buffer* nothing = 0;
 
-	// Also clear the post process texture
+	//  clear the post process texture
 	context->ClearRenderTargetView(ppRTV, color);
 	context->ClearRenderTargetView(bloomRTV, color);
+
 	// Set the post process RTV as the current render target
 	context->OMSetRenderTargets(1, &ppRTV, depthStencilView);
 
-	// render normally, to ppRTV
+	// BASE RENDER TO ppRTV /////////////////////////////////////
 	RenderManager::GetInstance()->Render(camera, context, lights);
+
 
 	float blend[4] = { 1,1,1,1 };
 	context->OMSetBlendState(particleBlendState, blend, 0xffffffff);	// Additive blending
 	context->OMSetDepthStencilState(particleDepthState, 0);
 
-	//flame1->Draw(context, camera);
+	flame1->Draw(context, camera);
 
 	context->OMSetBlendState(blendState, blend, 0xffffffff);
 	context->OMSetDepthStencilState(0, 0);
@@ -890,11 +920,14 @@ void Game::Draw(float deltaTime, float totalTime)
 	
 	// render bloom
 
+	// set render target to the bloomRTV
 	context->OMSetRenderTargets(1, &bloomRTV, 0);
-	// Render a full-screen triangle using the post process shaders
+
+	// Render a full-screen triangle using the post process vertex shader
 	ppVS->SetShader();
 
-	bloomPS->SetShader();
+	// Set up bloom shader
+	bloomPS->SetShader(); 
 	bloomPS->SetShaderResourceView("Pixels", ppSRV);
 	bloomPS->SetSamplerState("Sampler", sampler);
 
@@ -903,29 +936,29 @@ void Game::Draw(float deltaTime, float totalTime)
 	bloomPS->SetInt("blurAmount", 5);
 	bloomPS->CopyAllBufferData();
 
-	// Deactivate vertex and index buffers
-	
+	// Deactivate vertex and index buffers	
 	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 
-	// Draw a set number of vertices
+	// render the clipped bloom texture
 	context->Draw(3, 0);
 	context->PSSetShaderResources(0, 16, nullSRVs);
 	
-	
-	
-	// Render to the screen
-	// Set the target back to the back buffer
+	// TODO -> render the bloomRTV back to itself vith the gaussian blur shaders
+	BlurRender(bloomRTV, bloomSRV);
+
+	// Set the target back to the back buffer to render to screen
 	context->OMSetRenderTargets(1, &backBufferRTV, 0);
 
-	// Render a full-screen triangle using the post process shaders
+	// Render a full-screen triangle using the post process vertex shader
 	ppVS->SetShader();
 
 	ppPS->SetShader();
-	ppPS->SetShaderResourceView("Pixels", ppSRV);
-	ppPS->SetShaderResourceView("Bloom", bloomSRV);
-	ppPS->SetSamplerState("Sampler", sampler);
+	ppPS->SetShaderResourceView("Pixels", ppSRV); // pass in the plain game render
+	ppPS->SetShaderResourceView("Bloom", bloomSRV); // pass in the clipped bloom texture
 
+	// pass in all of our data
+	ppPS->SetSamplerState("Sampler", sampler);
 	ppPS->SetFloat("pixelWidth", 1.0f / width);
 	ppPS->SetFloat("pixelHeight", 1.0f / height);
 	ppPS->SetInt("blurAmount", 25);
@@ -935,7 +968,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 
-	// Draw a set number of vertices
+	// Draw using the final PPVS, which currently combines the bloom and the normal render
 	context->Draw(3, 0);
 
 	// Unbind all pixel shader SRVs
@@ -978,6 +1011,74 @@ void Game::DrawSky()
 	// Reset states
 	context->RSSetState(0);
 	context->OMSetDepthStencilState(0, 0);
+
+}
+
+
+void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SRV)
+{
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	ID3D11ShaderResourceView* nullSRVs[16] = {};
+	ID3D11Buffer* nothing = 0;
+	const float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	// Horizontal //////////////////////////////////
+
+	context->ClearRenderTargetView(blurRTV, color);
+
+	// set render target to the blurRTV
+	context->OMSetRenderTargets(1, &blurRTV, 0);
+
+	// Render a full-screen triangle using the post process vertex shader
+	ppVS->SetShader();
+
+	// Set up horizontal blur
+	GaussianHPS->SetShader();
+	GaussianHPS->SetShaderResourceView("Pixels", SRV);
+	GaussianHPS->SetSamplerState("Sampler", sampler);
+
+	GaussianHPS->SetFloat("pixelWidth", width);
+	//GaussianHPS->SetFloat("pixelHeight", 1.0f / height);
+	//GaussianHPS->SetInt("blurAmount", 5);
+	GaussianHPS->CopyAllBufferData();
+
+	// Deactivate vertex and index buffers	
+	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
+	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+
+
+	// render the horizontally blurred texture
+	context->Draw(3, 0);
+	context->PSSetShaderResources(0, 16, nullSRVs);
+
+
+	// VERTICAL //////////////////////////////////
+	context->ClearRenderTargetView(RTV, color);
+	// set render target to the RTV
+	context->OMSetRenderTargets(1, &RTV, 0);
+
+	// Render a full-screen triangle using the post process vertex shader
+	ppVS->SetShader();
+
+	// Set up vertical blur
+	GaussianVPS->SetShader();
+	GaussianVPS->SetShaderResourceView("Pixels", blurSRV);
+	GaussianVPS->SetSamplerState("Sampler", sampler);
+
+	//GaussianHPS->SetFloat("pixelWidth", 1.0f / width);
+	GaussianVPS->SetFloat("pixelHeight", height);
+	//GaussianHPS->SetInt("blurAmount", 5);
+	GaussianVPS->CopyAllBufferData();
+
+	// Deactivate vertex and index buffers	
+	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
+	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+
+
+	// render the horizontally blurred texture
+	context->Draw(3, 0);
+	context->PSSetShaderResources(0, 16, nullSRVs);
+
 
 }
 

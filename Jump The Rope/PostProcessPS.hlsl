@@ -24,23 +24,6 @@ SamplerState Sampler	: register(s0);
 // Entry point for this pixel shader
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	// Track the total color and samples
-	float4 totalColor = float4(0,0,0,0);
-	uint numSamples = 0;
-
-	// Loop and sample surrounding pixels
-	// A "box blur", if you will
-	for (int y = -blurAmount; y <= blurAmount; y += 2)
-	{
-		for (int x = -blurAmount; x <= blurAmount; x += 2)
-		{
-			float2 uv = input.uv + float2(x * pixelWidth, y * pixelHeight);
-			totalColor += Bloom.Sample(Sampler, uv);
-
-			numSamples++;
-		}
-	}
-
-	totalColor /= 1;
-	return Pixels.Sample(Sampler, input.uv) + totalColor / numSamples;
+	return Pixels.Sample(Sampler, input.uv) + Bloom.Sample(Sampler, input.uv) * .5;
+	//return Bloom.Sample(Sampler, input.uv);
 }

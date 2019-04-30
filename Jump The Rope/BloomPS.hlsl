@@ -24,9 +24,9 @@ SamplerState Sampler	: register(s0);
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	// Track the total color and samples
-	float4 color = Pixels.Sample(Sampler, input.uv*4);
+	float4 color = Pixels.Sample(Sampler, input.uv);
 
-	clip(((color.r + color.g + color.b)/3)-.5);
+	clip(((color.r + color.g + color.b)/3)-.7);
 
 
 	return color;
