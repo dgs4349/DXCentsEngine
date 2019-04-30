@@ -65,6 +65,9 @@ private:
 	float timer;
 	float readyLength = 1.0f;
 	float endScreenLength = 1.0f;
+	float animSpeed = 0.2f; // the speed of the animation in seconds
+	float animTimer = animSpeed; // the time it takes for the hash animation to move to the next frame
+	int animFrame = 0; // the current frame of the animation
 	GameState gameState;
 
 	bool awardedJump = false;
@@ -74,6 +77,7 @@ private:
 	void LoadShaders();
 	void LoadModels();
 	void LoadTextures();
+	void SetShaderHashTextures(float deltaTime);
 	void CreateMaterials();
 	void CreateBasicGeometry();
 
@@ -110,6 +114,15 @@ private:
 	GameObject* fog;
 
 	Flame* flame1;
+
+	ID3D11SamplerState* hashSampler;
+
+	ID3D11ShaderResourceView* hashTexture1_1;
+	ID3D11ShaderResourceView* hashTexture2_1;
+	ID3D11ShaderResourceView* hashTexture1_2;
+	ID3D11ShaderResourceView* hashTexture2_2;
+	ID3D11ShaderResourceView* hashTexture1_3;
+	ID3D11ShaderResourceView* hashTexture2_3;
 
 	std::vector<Mesh*> meshes;
 	std::vector<GameObject*> gameObjects;
