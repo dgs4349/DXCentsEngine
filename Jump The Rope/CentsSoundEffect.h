@@ -38,22 +38,23 @@ public:
 		float pmin; float pmax; float pval; 
 		float* control; float cmin; float cmax; float cval; 
 	};
-	struct AudioParams { float* volume; float* pitch; float* pan; };
-	AudioParams RTPCParameters = {nullptr, nullptr, nullptr};
-
-	void Bind(float* param, float* control, float pmin, float pmax, float cmin, float cmax);
+	struct RTPCParams { float* volume; float* pitch; float* pan; };
+	
+	RTPCParams* CreateRTPCParams();
+	void Bind(float*& param, float* control, float pmin, float pmax, float cmin, float cmax);
 
 	void SetLoop(bool loop);
 
 	void Stop(bool immediate = true);
 	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f, bool setLinked=true);
-	void Set(AudioParams params);
+	void SetRTPCs();
 
 	bool IsReady();
 	SoundEffectState GetPlaybackStatus() { return state; }
 
 private:
 	CentsSoundEffect * linked = nullptr;
+	bool isLinked = false;
 	
 	SoundEffectState state = Ready;
 
@@ -61,12 +62,12 @@ private:
 
 	// used in Set to prevent stack overflow
 	bool paramsSetting = false;
-
 	bool rtpcUpdate = false;
 
 	// parameters held and updated on 
-	bool bound;
+	bool bound = false;
 	std::vector<RTPC> rtpcs;
+	std::vector<RTPCParams> rtpcParams;
 
 	float length;
 	bool Loop = false;

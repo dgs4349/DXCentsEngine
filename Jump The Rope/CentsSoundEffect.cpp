@@ -10,14 +10,12 @@ CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t* locati
 {
 	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
 	soundEffectInstance = soundEffect->CreateInstance();
-	rtpcs = std::vector<RTPC>();
 }
 CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t* location, bool loop)
 {
 	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 	Loop = loop;
-	rtpcs = std::vector<RTPC>();
 }
 
 void CentsSoundEffect::Update(float deltaTime, float totalTime)
@@ -32,17 +30,20 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 		break;
 	case Playing:
 		// update value, and then set 
-		for (RTPC rtpc : rtpcs) {
+		// we have to reference the actual rtpcs[i].pval due to references, foreach is a copy
+		for (int i = 0; i < rtpcs.size(); i++) {
+			RTPC rtpc = rtpcs[i];
 			if (rtpc.cval != *rtpc.control) {
 				rtpcUpdate = true;
 				rtpc.cval = *rtpc.control;
-				rtpc.pval = rtpc.pmin + ((rtpc.pmax - rtpc.pmin) / (rtpc.cmax - rtpc.cmin)) * (rtpc.cval - rtpc.cmin);
-				printf("val: %f, min:%f, max:%f\n", rtpc.pval, rtpc.pmin, rtpc.pmax);
+				rtpcs[i].pval = rtpc.pmin + ((rtpc.pmax - rtpc.pmin) / (rtpc.cmax - rtpc.cmin)) * (rtpc.cval - rtpc.cmin);
 			}
 		}
 		if (rtpcUpdate) {
-			Set(RTPCParameters);
+			SetRTPCs();
 			rtpcUpdate = false;
+			// pitch adjusts length, length is currently uncalculable if adjusted, this may cause bugs
+			if (isLinked && soundEffectInstance->GetState() == STOPPED) endTime = totalTime - 1;
 		}
 		if (!Loop && totalTime > endTime) {
 			state = Completed;
@@ -50,14 +51,15 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 				Loop = true;
 				Play(startTime);
 			}
-			else if (linked != nullptr) {
+			else if (isLinked) {
 				linked->rtpcs = rtpcs;
+				linked->rtpcParams = rtpcParams;
 				linked->Play(totalTime);
 			}
 		}
 		break;
 	case Completed:
-		if(linked == nullptr) soundEffectInstance->Stop(true);
+		if(!isLinked) soundEffectInstance->Stop(true);
 		state = Ready;
 		break;
 	}
@@ -73,12 +75,14 @@ void CentsSoundEffect::Start(float totalTime) {
 void CentsSoundEffect::Link(CentsSoundEffect * linkee)
 {
 	linked = linkee;
+	isLinked = true;
 }
 
 void CentsSoundEffect::Link(CentsSoundEffect * linkee, bool loop)
 {
 	linked = linkee;
 	linked->SetLoop(loop);
+	isLinked = true;
 }
 
 
@@ -118,10 +122,15 @@ void CentsSoundEffect::PlayOnUpdate(float volume, float pitch, float pan)
 	state = DelayStart;
 }
 
-void CentsSoundEffect::Bind(float * param, float * control, float pmin, float pmax, float cmin, float cmax)
+CentsSoundEffect::RTPCParams* CentsSoundEffect::CreateRTPCParams()
 {
-	RTPC rtpc = { pmin, pmax, pmin, control, cmin, cmax, cmin };
-	rtpcs.push_back(rtpc);
+	rtpcParams.push_back({ nullptr, nullptr, nullptr });
+	return &rtpcParams[rtpcParams.size() - 1];
+}
+
+void CentsSoundEffect::Bind(float *& param, float * control, float pmin, float pmax, float cmin, float cmax)
+{
+	rtpcs.push_back({ pmin, pmax, pmin, control, cmin, cmax, cmin });
 	bound = true;
 	param = &rtpcs[rtpcs.size() -1].pval;
 }
@@ -138,7 +147,10 @@ void CentsSoundEffect::SetLoop(bool loop)
 void CentsSoundEffect::Stop(bool immediate)
 {
 	soundEffectInstance->Stop(immediate);
-	if (linked != nullptr) linked->Stop(immediate);
+	state = Ready;
+	if (isLinked) {
+		linked->Stop(immediate);
+	}
 }
 
 void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
@@ -148,19 +160,20 @@ void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
 		soundEffectInstance->SetPitch(pitch);
 		soundEffectInstance->SetPan(pan);
 		paramsSetting = true;
-		if (setLinked && linked != nullptr) {
+		if (setLinked && isLinked) {
 			linked->Set(volume, pitch, pan, setLinked);
 		}
 		paramsSetting = false;
 	}
 }
 
-void CentsSoundEffect::Set(AudioParams params)
+void CentsSoundEffect::SetRTPCs()
 {
-	if(params.pitch !=nullptr) printf("Params recieved: %f\n", *params.pitch);
-	if(params.volume	!= nullptr) soundEffectInstance->SetVolume(*params.volume);
-	if(params.pitch		!= nullptr) soundEffectInstance->SetPitch(*params.pitch);
-	if(params.pan		!= nullptr) soundEffectInstance->SetPan(*params.pan);
+	for (RTPCParams params : rtpcParams) {
+		if (params.volume != nullptr) soundEffectInstance->SetVolume(*params.volume);
+		if (params.pan != nullptr) soundEffectInstance->SetPan(*params.pan);
+		if (params.pitch != nullptr) soundEffectInstance->SetPitch(*params.pitch);
+	}
 }
 
 bool CentsSoundEffect::IsReady()

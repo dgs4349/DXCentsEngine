@@ -158,7 +158,8 @@ void Game::Init()
 	bgLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_loop.wav", true);
 	bgIntro->Link(bgLoop);
 	bgIntro->Set(0.5f);
-	bgIntro->Bind(bgIntro->RTPCParameters.pitch, &ropeSpeed, 0.0f, 1.0f, startRopeSpeed, speedIncreaseMax);
+	CentsSoundEffect::RTPCParams* introParams = bgIntro->CreateRTPCParams();
+	bgIntro->Bind(introParams->pitch, &ropeSpeed, 0.0f, 1.0f, startRopeSpeed, speedIncreaseMax);
 
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
@@ -784,7 +785,8 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	if (gameState == GameState::Playing)
 	{
-		if(ropeSpeed != speedIncreaseMax) ropeSpeed += speedIncrease * deltaTime;
+		if (ropeSpeed < speedIncreaseMax) ropeSpeed += speedIncrease * deltaTime;
+		if (ropeSpeed > speedIncreaseMax) ropeSpeed = speedIncreaseMax;
 
 		if (p1Input)
 		{
