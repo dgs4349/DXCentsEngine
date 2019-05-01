@@ -157,9 +157,9 @@ void Game::Init()
 	bgIntro = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_intro.wav");
 	bgLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_loop.wav", true);
 	bgIntro->Link(bgLoop);
-	bgIntro->Set(0.5f);
+	bgIntro->Set(0.35f);
 	CentsSoundEffect::RTPCParams* introParams = bgIntro->CreateRTPCParams();
-	bgIntro->Bind(introParams->pitch, &ropeSpeed, 0.0f, 1.0f, startRopeSpeed, speedIncreaseMax);
+	bgIntro->Bind(introParams->pitch, &ropeSpeed, 0.0f, 0.4f, startRopeSpeed, speedIncreaseMax);
 
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
