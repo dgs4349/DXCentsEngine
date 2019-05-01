@@ -57,7 +57,7 @@ private:
 	float startRopeSpeed = 100.0f;
 	float ropeSpeed;
 	float speedIncrease = 4.0f;
-	float speedIncreaseMax = 500.0f;
+	float speedIncreaseMax = 800.0f;
 	float floorHeight = 0.0;
 	float gravity = 6.5f;
 	float jumpHeight = 4.0f;

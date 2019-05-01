@@ -9,6 +9,9 @@ using namespace DirectX;
 	- Wraps SoundEffect and SoundEffectInstance from DirectXTK Audio
 	- Allows chaining soundeffects to play in sequence
 	- Adds playback status
+
+	- Link: chains this sound effect to another
+	- Bind: binds a pointer from a RTPCParam object to a reference of a game variable
 */
 
 class CentsSoundEffect
