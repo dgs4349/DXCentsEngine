@@ -119,9 +119,10 @@ void CentsSoundEffect::PlayOnUpdate(float volume, float pitch, float pan)
 
 void CentsSoundEffect::Bind(float ** param, float * control, float pmin, float pmax, float cmin, float cmax)
 {
-	rtpcs.push_back(RTPC{ param, pmin, pmax, **param, control, cmin, cmax, *control });
+	RTPC rtpc = { pmin, pmax, pmin, control, cmin, cmax, cmin };
+	rtpcs.push_back(rtpc);
 	bound = true;
-	*param = &rtpcs[rtpcs.size() - 1].pval;
+	*param = &rtpc.pval;
 }
 
 void CentsSoundEffect::SetLoop(bool loop)
@@ -155,9 +156,9 @@ void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
 
 void CentsSoundEffect::Set(AudioParams params)
 {
-	soundEffectInstance->SetVolume(*params.volume);
-	soundEffectInstance->SetPitch(*params.pitch);
-	soundEffectInstance->SetPan(*params.pan);
+	if(params.volume	!= nullptr) soundEffectInstance->SetVolume(*params.volume);
+	if(params.pitch		!= nullptr) soundEffectInstance->SetPitch(*params.pitch);
+	if(params.pan		!= nullptr) soundEffectInstance->SetPan(*params.pan);
 }
 
 bool CentsSoundEffect::IsReady()

@@ -35,11 +35,11 @@ public:
 	void PlayOnUpdate(float volume, float pitch, float pan);
 
 	struct RTPC { 
-		float** param; float pmin; float pmax; float pval; 
+		float pmin; float pmax; float pval; 
 		float* control; float cmin; float cmax; float cval; 
 	};
 	struct AudioParams { float* volume; float* pitch; float* pan; };
-	AudioParams RTPCParameters;
+	AudioParams RTPCParameters = {nullptr, nullptr, nullptr};
 
 	void Bind(float** param, float* control, float pmin, float pmax, float cmin, float cmax);
 
