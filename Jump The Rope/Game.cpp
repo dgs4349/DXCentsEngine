@@ -166,8 +166,8 @@ void Game::Init()
 	menuIntro->Link(menuLoop);
 	menuIntro->Set(menuVolume);
 	menuIntro->PlayOnUpdate();
-	//menuFadeIn = audioHandler->CreateFade(menuIntro, 0.0f, menuVolume, readyLength);
-	//menuFadeOut = audioHandler->CreateFade(menuIntro, menuVolume, 0.0f, readyLength);
+	menuFadeIn = audioHandler->CreateFade(menuIntro, 0.0f, menuVolume, readyLength);
+	menuFadeOut = audioHandler->CreateFade(menuIntro, menuVolume, 0.0f, readyLength);
 
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
@@ -773,8 +773,9 @@ void Game::Update(float deltaTime, float totalTime)
 			timer += deltaTime;
 
 			if (!menuFading) {
-				//audioHandler->SetFade(menuFadeIn, menuFadeOut);
-				menuIntro->Stop(true);
+				audioHandler->ReplaceFade(menuFadeIn, menuFadeOut);
+				//menuIntro->Stop(true);
+				printf("Start fading!");
 				menuFading = true;
 			}
 
@@ -797,8 +798,8 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			timer = 0;
 			if (menuFading) {
-				//audioHandler->SetFade(menuFadeOut, menuFadeIn);
-				menuIntro->Play();
+				audioHandler->ReplaceFade(menuFadeOut, menuFadeIn);
+				//menuIntro->Play();
 				menuFading = false;
 			}
 		}
@@ -839,8 +840,8 @@ void Game::Update(float deltaTime, float totalTime)
 	if (gameState == GameState::End)
 	{
 		bgIntro->Stop(true);
-		//audioHandler->AddFade(menuFadeIn);
-		menuIntro->Play();
+		audioHandler->StartFade(menuFadeIn);
+		//menuIntro->Play();
 		timer += deltaTime;
 
 		if (timer > endScreenLength && rope->transform->EulerAngles().x == 0)

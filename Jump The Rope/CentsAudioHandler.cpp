@@ -32,16 +32,18 @@ void CentsAudioHandler::Update(float deltaTime, float totalTime)
 			 effects[i]->Update(deltaTime, totalTime);
 		 }
 		 for (int i = fades.size() - 1; i >= 0; i--) {
+			 if (!fades[i].active) continue;
 			 if (fades[i].startTime <= 0.0f) fades[i].startTime = totalTime;
+			 
+			 printf("fades active: %f\n", totalTime - (fades[i].startTime + fades[i].timeMillis));
 
-			 bool remove = false;
 			 float desiredVolume = ((fades[i].toVolume - fades[i].fromVolume) / fades[i].timeMillis) * (totalTime - fades[i].startTime);
 			 if (desiredVolume >= fades[i].toVolume) {
 				 desiredVolume = fades[i].toVolume;
-				 remove = true;
+				 fades[i].startTime = 0.0f;
+				 fades[i].active = false;
 			 }
-			 effects[fades[i].index]->Set(desiredVolume);
-			 if (remove) fades.erase(fades.begin() + i);
+			 effects[fades[i].effectIndex]->Set(desiredVolume);
 		 }
 	 }
 }
@@ -91,35 +93,31 @@ CentsAudioHandler::Fade CentsAudioHandler::CreateFade(CentsSoundEffect * effect,
 	else {
 		i = std::distance(effects.begin(), it);
 	}
-	return { i, fromVolume, toVolume, timeMillis, 0.0f };
-}
-
-CentsAudioHandler::Fade CentsAudioHandler::AddCreateFade(CentsSoundEffect * effect, float fromVolume, float toVolume, float timeMillis)
-{
-	Fade fade = CreateFade(effect, fromVolume, toVolume, timeMillis);
-	AddFade(fade);
+	Fade fade = { i, fades.size(), fromVolume, toVolume, timeMillis, 0.0f, false };
+	fades.push_back(fade);
 	return fade;
 }
 
-void CentsAudioHandler::AddFade(Fade fade)
+CentsAudioHandler::Fade CentsAudioHandler::CreateStartFade(CentsSoundEffect * effect, float fromVolume, float toVolume, float timeMillis)
 {
-	/*std::vector<Fade>::iterator it = std::find(fades.begin(), fades.end(), fade);
-	if (it == fades.end()) {
-		fades.push_back(fade);
-	}*/
+	return StartFade(CreateFade(effect, fromVolume, toVolume, timeMillis));
 }
 
-CentsAudioHandler::Fade CentsAudioHandler::SetFade(Fade oldFade, Fade newFade)
+CentsAudioHandler::Fade CentsAudioHandler::StartFade(Fade fade)
 {
-	//std::vector<Fade>::iterator it = std::find(fades.begin(), fades.end(), oldFade);
-	//if (it == fades.end()) {
-	//	fades.push_back(newFade);
-	//}
-	//else {
-	//	int i = std::distance(fades.begin(), it);
-	//	fades[i] = newFade;
-	//}
-	return Fade{};
+	fades[fade.fadeIndex].active = true;
+	return fade;
+}
+
+CentsAudioHandler::Fade CentsAudioHandler::ReplaceFade(Fade oldFade, Fade newFade)
+{
+	if (oldFade.fadeIndex >= 0 && oldFade.fadeIndex < fades.size()) {
+		fades[oldFade.fadeIndex] = newFade;
+		newFade.startTime = 0;
+		newFade.active = true;
+	}
+	else StartFade(newFade);
+	return newFade;
 }
 
 void CentsAudioHandler::Manage(CentsSoundEffect * effect)
