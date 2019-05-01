@@ -52,6 +52,9 @@ public:
 	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f, bool setLinked=true);
 	void SetRTPCs();
 
+	void Fade(float from, float to, float timeMillis);
+	void Fade(float from, float to, float timeMillis, float startTime);
+
 	bool IsReady();
 	SoundEffectState GetPlaybackStatus() { return state; }
 
@@ -75,6 +78,13 @@ private:
 	float length;
 	bool Loop = false;
 	bool SetLoopDelayed = false;
+
+	float fadeStartTime = -1.0f;
+	float fadeTo;
+	float fadeFrom;
+	float fadeEndTime;
+
+	float map(float in, float inmin, float inmax, float outmin, float outmax);
 
 	float startTime;
 	float endTime;

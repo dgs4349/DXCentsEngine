@@ -36,7 +36,7 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 			if (rtpc.cval != *rtpc.control) {
 				rtpcUpdate = true;
 				rtpc.cval = *rtpc.control;
-				rtpcs[i].pval = rtpc.pmin + ((rtpc.pmax - rtpc.pmin) / (rtpc.cmax - rtpc.cmin)) * (rtpc.cval - rtpc.cmin);
+				rtpcs[i].pval = map(rtpc.cval, rtpc.cmin, rtpc.cmax, rtpc.pmin, rtpc.pmax);
 			}
 		}
 		if (rtpcUpdate) {
@@ -63,6 +63,17 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 		state = Ready;
 		break;
 	}
+
+	if (fadeStartTime == 0.0f) {
+
+		fadeStartTime = totalTime;
+		fadeEndTime += fadeStartTime;
+
+	}
+	if (totalTime < fadeEndTime) {
+		Set(map(totalTime, fadeStartTime, fadeEndTime, fadeFrom, fadeTo));
+	}
+
 }
 
 void CentsSoundEffect::Start(float totalTime) {
@@ -71,6 +82,12 @@ void CentsSoundEffect::Start(float totalTime) {
 	state = Playing;
 }
 
+float CentsSoundEffect::map(float in, float inmin, float inmax, float outmin, float outmax)
+{
+	if (in < inmin) in = inmin;
+	if (in > inmax) in = inmax;
+	return outmin + ((outmax - outmin) / (inmax - inmin)) * (in - inmin);
+}
 
 void CentsSoundEffect::Link(CentsSoundEffect * linkee)
 {
@@ -174,6 +191,22 @@ void CentsSoundEffect::SetRTPCs()
 		if (params.pan != nullptr) soundEffectInstance->SetPan(*params.pan);
 		if (params.pitch != nullptr) soundEffectInstance->SetPitch(*params.pitch);
 	}
+}
+
+void CentsSoundEffect::Fade(float from, float to, float timeMillis)
+{
+	fadeStartTime = 0.0f;
+	fadeTo = to;
+	fadeFrom = from;
+	fadeEndTime = timeMillis;
+}
+
+void CentsSoundEffect::Fade(float from, float to, float timeMillis, float startTime)
+{
+	fadeStartTime = startTime;
+	fadeTo = to;
+	fadeFrom = from;
+	fadeEndTime = startTime + timeMillis;
 }
 
 bool CentsSoundEffect::IsReady()
