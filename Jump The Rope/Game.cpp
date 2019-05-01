@@ -161,6 +161,14 @@ void Game::Init()
 	CentsSoundEffect::RTPCParams* introParams = bgIntro->CreateRTPCParams();
 	bgIntro->Bind(introParams->pitch, &ropeSpeed, -0.01f, 0.75f, startRopeSpeed, speedIncreaseMax);
 
+	menuIntro = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_menu_intro.wav");
+	menuLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_menu_loop.wav", true);
+	menuIntro->Link(menuLoop);
+	menuIntro->Set(menuVolume);
+	menuIntro->PlayOnUpdate();
+	//menuFadeIn = audioHandler->CreateFade(menuIntro, 0.0f, menuVolume, readyLength);
+	//menuFadeOut = audioHandler->CreateFade(menuIntro, menuVolume, 0.0f, readyLength);
+
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_2.wav"));
@@ -764,8 +772,15 @@ void Game::Update(float deltaTime, float totalTime)
 
 			timer += deltaTime;
 
+			if (!menuFading) {
+				//audioHandler->SetFade(menuFadeIn, menuFadeOut);
+				menuIntro->Stop(true);
+				menuFading = true;
+			}
+
 			if (timer >= readyLength)
 			{
+				menuFading = false;
 				bgIntro->PlayOnUpdate();
 				gameState = GameState::Playing;
 
@@ -781,6 +796,11 @@ void Game::Update(float deltaTime, float totalTime)
 		else
 		{
 			timer = 0;
+			if (menuFading) {
+				//audioHandler->SetFade(menuFadeOut, menuFadeIn);
+				menuIntro->Play();
+				menuFading = false;
+			}
 		}
 	}
 	if (gameState == GameState::Playing)
@@ -819,6 +839,8 @@ void Game::Update(float deltaTime, float totalTime)
 	if (gameState == GameState::End)
 	{
 		bgIntro->Stop(true);
+		//audioHandler->AddFade(menuFadeIn);
+		menuIntro->Play();
 		timer += deltaTime;
 
 		if (timer > endScreenLength && rope->transform->EulerAngles().x == 0)

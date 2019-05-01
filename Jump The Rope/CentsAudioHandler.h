@@ -35,6 +35,12 @@ public:
 	// adds sound effect to update list
 	void Add(CentsSoundEffect* effect);
 
+	struct Fade { int index; float fromVolume; float toVolume; float timeMillis; float startTime; };
+	Fade CreateFade(CentsSoundEffect* effect, float fromVolume, float toVolume, float timeMillis);
+	Fade AddCreateFade(CentsSoundEffect* effect, float fromVoume, float toVolume, float timeMillis);
+	void AddFade(Fade fade);
+	Fade SetFade(Fade oldFade, Fade newFade);
+
 	// will call destruct on sound effect on delete
 	void Manage(CentsSoundEffect* effect);
 
@@ -43,4 +49,5 @@ private:
 	bool isSilent = false;
 	std::vector<CentsSoundEffect*> effects;
 	std::vector<CentsSoundEffect*> managedEffects;
+	std::vector<Fade> fades;
 };

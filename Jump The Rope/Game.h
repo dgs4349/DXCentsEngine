@@ -114,6 +114,12 @@ private:
 
 	CentsSoundEffect* bgIntro;
 	CentsSoundEffect* bgLoop;
+	CentsSoundEffect* menuIntro;
+	CentsSoundEffect* menuLoop;
+	float menuVolume = 0.4f;
+	CentsAudioHandler::Fade menuFadeOut;
+	CentsAudioHandler::Fade menuFadeIn;
+	bool menuFading = false;
 
 	GameObject* fog;
 
