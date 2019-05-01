@@ -2,16 +2,13 @@
 
 
 
-CentsSoundEffect::CentsSoundEffect()
-{
-}
-
+CentsSoundEffect::CentsSoundEffect(){}
+CentsSoundEffect::~CentsSoundEffect() {}
 CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location)
 {
 	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 }
-
 CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t* location, bool loop)
 {
 	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
@@ -19,25 +16,18 @@ CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t* locat
 	Loop = loop;
 }
 
-
-CentsSoundEffect::~CentsSoundEffect()
-{
-}
-
 void CentsSoundEffect::Update(float deltaTime, float totalTime)
 {
-	if (state == DelayStart) {
+	switch (state) {
+	case DelayStart:
 		Play(totalTime);
-		state = Playing;
-		endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
-	}
-	if (state == Starting) {
-		startTime = totalTime;
-		state = Playing;
-		endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
-	}
-	if (state == Playing && !Loop) {
-		if (totalTime > endTime) {
+		state = Starting;
+		// fallthrough
+	case Starting:
+		Start(totalTime);
+		break;
+	case Playing:
+		if (!Loop && totalTime > endTime) {
 			state = Completed;
 			if (SetLoopDelayed) {
 				Loop = true;
@@ -47,8 +37,20 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 				linked->Play(totalTime);
 			}
 		}
+		break;
+	case Completed:
+		soundEffectInstance->Stop(true);
+		state = Ready;
+		break;
 	}
 }
+
+void CentsSoundEffect::Start(float totalTime) {
+	startTime = totalTime;
+	endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
+	state = Playing;
+}
+
 
 void CentsSoundEffect::Link(CentsSoundEffect * linkee)
 {
@@ -61,29 +63,30 @@ void CentsSoundEffect::Link(CentsSoundEffect * linkee, bool loop)
 	linked->SetLoop(loop);
 }
 
-void CentsSoundEffect::Play(float volume, float pitch, float pan)
-{
-	Set(volume, pitch, pan);
-	soundEffectInstance->Play(Loop);
-}
-
-void CentsSoundEffect::Play(float totaltime)
-{
-	soundEffectInstance->Play(Loop);
-	state = Playing;
-	startTime = totaltime;
-}
-
-void CentsSoundEffect::Play(float volume, float pitch, float pan, float totaltime)
-{
-	Set(volume, pitch, pan);
-	Play(totaltime);
-}
 
 void CentsSoundEffect::Play()
 {
 	soundEffectInstance->Play(Loop);
-	state = Playing;
+	state = Starting;
+}
+
+void CentsSoundEffect::Play(float volume, float pitch, float pan)
+{
+	Set(volume, pitch, pan);
+	Play();
+}
+
+void CentsSoundEffect::Play(float totalTime)
+{
+	soundEffectInstance->Play(Loop);
+	Start(totalTime);
+}
+
+void CentsSoundEffect::Play(float volume, float pitch, float pan, float totalTime)
+{
+	Set(volume, pitch, pan);
+	soundEffectInstance->Play(Loop);
+	Start(totalTime);
 }
 
 void CentsSoundEffect::PlayOnUpdate()
@@ -126,7 +129,7 @@ void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
 	}
 }
 
-bool CentsSoundEffect::IsComplete()
+bool CentsSoundEffect::IsReady()
 {
-	return state == Completed;
+	return state == Ready;
 }

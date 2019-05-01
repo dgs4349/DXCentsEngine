@@ -158,10 +158,10 @@ void Game::Init()
 	bgIntro->Set(0.5f);
 	bgIntro->PlayOnUpdate();
 
-	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_3.wav"));
-	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_2.wav"));
-	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_2.wav"));
+	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_3.wav"));
 	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(2.0f);
 
 	D3D11_RASTERIZER_DESC skyRD = {};
@@ -805,7 +805,6 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 		}
 		else if (rope->transform->EulerAngles().x > 225 && !awardedJump) {
-			if (numJumps > 4) jumpSfx[(numJumps - 2) % 4]->Stop(true);
 			jumpSfx[numJumps % 4]->Play();
 			numJumps++;
 			awardedJump = true;

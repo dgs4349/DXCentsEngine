@@ -19,7 +19,7 @@ public:
 	CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location, bool loop);
 	~CentsSoundEffect();
 
-	enum SoundEffectState { DelayStart = 0, Starting = 1, Playing = 2, Completed = 3 };
+	enum SoundEffectState { Ready = 0, DelayStart = 1, Starting = 2, Playing = 3, Completed = 4 };
 
 	void Update(float deltaTime, float totaltime);
 
@@ -28,25 +28,28 @@ public:
 
 	void Play();
 	void Play(float volume, float pitch, float pan);
-
-	void Play(float totaltime);
-	void Play(float volume, float pitch, float pan, float totaltime);
+	void Play(float totalTime);
+	void Play(float volume, float pitch, float pan, float totalTime);
 
 	void PlayOnUpdate();
 	void PlayOnUpdate(float volume, float pitch, float pan);
+
+	void Bind(float* param, float* control, float pmin, float pmax, float cmin, float cmax);
 
 	void SetLoop(bool loop);
 
 	void Stop(bool immediate = true);
 	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f, bool setLinked=true);
 
-	bool IsComplete();
+	bool IsReady();
 	SoundEffectState GetPlaybackStatus() { return state; }
 
 private:
 	CentsSoundEffect * linked = nullptr;
 	
-	SoundEffectState state = Completed;
+	SoundEffectState state = Ready;
+
+	void Start(float totalTime);
 
 	// used in Set to prevent stack overflow
 	bool paramsSetting = false;
