@@ -34,12 +34,20 @@ public:
 	void PlayOnUpdate();
 	void PlayOnUpdate(float volume, float pitch, float pan);
 
-	void Bind(float* param, float* control, float pmin, float pmax, float cmin, float cmax);
+	struct RTPC { 
+		float** param; float pmin; float pmax; float pval; 
+		float* control; float cmin; float cmax; float cval; 
+	};
+	struct AudioParams { float* volume; float* pitch; float* pan; };
+	AudioParams RTPCParameters;
+
+	void Bind(float** param, float* control, float pmin, float pmax, float cmin, float cmax);
 
 	void SetLoop(bool loop);
 
 	void Stop(bool immediate = true);
 	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f, bool setLinked=true);
+	void Set(AudioParams params);
 
 	bool IsReady();
 	SoundEffectState GetPlaybackStatus() { return state; }
@@ -53,6 +61,12 @@ private:
 
 	// used in Set to prevent stack overflow
 	bool paramsSetting = false;
+
+	bool rtpcUpdate = false;
+
+	// parameters held and updated on 
+	bool bound;
+	std::vector<RTPC> rtpcs;
 
 	float length;
 	bool Loop = false;

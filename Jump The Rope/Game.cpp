@@ -158,7 +158,7 @@ void Game::Init()
 	bgLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_loop.wav", true);
 	bgIntro->Link(bgLoop);
 	bgIntro->Set(0.5f);
-	bgIntro->PlayOnUpdate();
+	bgIntro->Bind(&bgIntro->RTPCParameters.pitch, &ropeSpeed, 0.0f, 1.0f, startRopeSpeed, speedIncreaseMax);
 
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
 	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
@@ -760,10 +760,12 @@ void Game::Update(float deltaTime, float totalTime)
 
 		if (p1Input && p2Input)
 		{
+
 			timer += deltaTime;
 
 			if (timer >= readyLength)
 			{
+				bgIntro->PlayOnUpdate();
 				gameState = GameState::Playing;
 
 				numJumps = 0;
@@ -782,7 +784,7 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	if (gameState == GameState::Playing)
 	{
-		ropeSpeed += speedIncrease * deltaTime;
+		if(ropeSpeed != speedIncreaseMax) ropeSpeed += speedIncrease * deltaTime;
 
 		if (p1Input)
 		{
@@ -814,7 +816,7 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	if (gameState == GameState::End)
 	{
-
+		bgIntro->Stop(true);
 		timer += deltaTime;
 
 		if (timer > endScreenLength && rope->transform->EulerAngles().x == 0)
