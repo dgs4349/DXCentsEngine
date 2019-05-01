@@ -41,7 +41,7 @@ public:
 	struct AudioParams { float* volume; float* pitch; float* pan; };
 	AudioParams RTPCParameters = {nullptr, nullptr, nullptr};
 
-	void Bind(float** param, float* control, float pmin, float pmax, float cmin, float cmax);
+	void Bind(float* param, float* control, float pmin, float pmax, float cmin, float cmax);
 
 	void SetLoop(bool loop);
 

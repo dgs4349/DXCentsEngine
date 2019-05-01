@@ -37,6 +37,7 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 				rtpcUpdate = true;
 				rtpc.cval = *rtpc.control;
 				rtpc.pval = rtpc.pmin + ((rtpc.pmax - rtpc.pmin) / (rtpc.cmax - rtpc.cmin)) * (rtpc.cval - rtpc.cmin);
+				printf("val: %f, min:%f, max:%f\n", rtpc.pval, rtpc.pmin, rtpc.pmax);
 			}
 		}
 		if (rtpcUpdate) {
@@ -117,12 +118,12 @@ void CentsSoundEffect::PlayOnUpdate(float volume, float pitch, float pan)
 	state = DelayStart;
 }
 
-void CentsSoundEffect::Bind(float ** param, float * control, float pmin, float pmax, float cmin, float cmax)
+void CentsSoundEffect::Bind(float * param, float * control, float pmin, float pmax, float cmin, float cmax)
 {
 	RTPC rtpc = { pmin, pmax, pmin, control, cmin, cmax, cmin };
 	rtpcs.push_back(rtpc);
 	bound = true;
-	*param = &rtpc.pval;
+	param = &rtpcs[rtpcs.size() -1].pval;
 }
 
 void CentsSoundEffect::SetLoop(bool loop)
@@ -156,6 +157,7 @@ void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
 
 void CentsSoundEffect::Set(AudioParams params)
 {
+	if(params.pitch !=nullptr) printf("Params recieved: %f\n", *params.pitch);
 	if(params.volume	!= nullptr) soundEffectInstance->SetVolume(*params.volume);
 	if(params.pitch		!= nullptr) soundEffectInstance->SetPitch(*params.pitch);
 	if(params.pan		!= nullptr) soundEffectInstance->SetPan(*params.pan);
