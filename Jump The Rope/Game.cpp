@@ -55,7 +55,7 @@ Game::~Game()
 	delete particleVS;
 	delete particlePS;
 	delete flame1;
-	
+
 
 	blendState->Release();
 	particleBlendState->Release();
@@ -103,6 +103,8 @@ Game::~Game()
 	blurRTV->Release();
 	delete GaussianHPS;
 	delete GaussianVPS;
+
+	delete DepthPS;
 
 	depthSRV->Release();
 	depthRTV->Release();
@@ -295,7 +297,7 @@ void Game::Init()
 	bloomTexture->Release();
 
 	// Tell the input assembler stage of the pipeline what kind of
-	// geometric primitives (points, lines or triangles) we want to draw.  
+	// geometric primitives (points, lines or triangles) we want to draw.
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -572,7 +574,7 @@ void Game::CreateMaterials()
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[10], textureViews[13], samplerState));
 	device->CreateSamplerState(&samplerDesc, &samplerState);
 	materials.push_back(new Material(vertexShader, pixelShader, textureViews[12], textureViews[19], samplerState));
-	
+
 	//defines a separate sampler for the hash marks. It requires blending between mips
 	D3D11_SAMPLER_DESC hashDesc;
 	ZeroMemory(&hashDesc, sizeof(D3D11_SAMPLER_DESC));
@@ -933,7 +935,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	DrawSky();
 
-	// Render DEPTH	
+	// Render DEPTH
 	context->ClearDepthStencilView(
 		depthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
@@ -943,11 +945,11 @@ void Game::Draw(float deltaTime, float totalTime)
 	// BASE RENDER TO ppRTV /////////////////////////////////////
 	RenderManager::GetInstance()->Render(camera, context, lights, DepthPS);
 	DrawSky();
-	
+
 
 	// POST PROCESS POST-RENDER ///////////////////////////
-	
-	
+
+
 	// render bloom
 
 	// set render target to the bloomRTV
@@ -957,7 +959,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	ppVS->SetShader();
 
 	// Set up bloom shader
-	bloomPS->SetShader(); 
+	bloomPS->SetShader();
 	bloomPS->SetShaderResourceView("Pixels", ppSRV);
 	bloomPS->SetSamplerState("Sampler", sampler);
 
@@ -966,14 +968,14 @@ void Game::Draw(float deltaTime, float totalTime)
 	bloomPS->SetInt("blurAmount", 5);
 	bloomPS->CopyAllBufferData();
 
-	// Deactivate vertex and index buffers	
+	// Deactivate vertex and index buffers
 	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 
 	// render the clipped bloom texture
 	context->Draw(3, 0);
 	context->PSSetShaderResources(0, 16, nullSRVs);
-	
+
 	// TODO -> render the bloomRTV back to itself vith the gaussian blur shaders
 	BlurRender(bloomRTV, bloomSRV, 3.0f, 1.0f);
 
@@ -1008,7 +1010,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->PSSetShaderResources(0, 16, nullSRVs);
 
 
-	
+
 
 
 	// Present the back buffer to the user
@@ -1081,7 +1083,7 @@ void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SR
 
 	GaussianHPS->CopyAllBufferData();
 
-	// Deactivate vertex and index buffers	
+	// Deactivate vertex and index buffers
 	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 
@@ -1109,7 +1111,7 @@ void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SR
 	GaussianVPS->SetFloat("dofAmount", dofAmount);
 	GaussianVPS->CopyAllBufferData();
 
-	// Deactivate vertex and index buffers	
+	// Deactivate vertex and index buffers
 	context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 
@@ -1158,7 +1160,7 @@ void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 
 // --------------------------------------------------------
 // Helper method for mouse movement.  We only get this message
-// if the mouse is currently over the window, or if we're 
+// if the mouse is currently over the window, or if we're
 // currently capturing the mouse.
 // --------------------------------------------------------
 void Game::OnMouseMove(WPARAM buttonState, int x, int y)
@@ -1175,8 +1177,8 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 }
 
 // --------------------------------------------------------
-// Helper method for mouse wheel scrolling.  
-// WheelDelta may be positive or negative, depending 
+// Helper method for mouse wheel scrolling.
+// WheelDelta may be positive or negative, depending
 // on the direction of the scroll
 // --------------------------------------------------------
 void Game::OnMouseWheel(float wheelDelta, int x, int y)
