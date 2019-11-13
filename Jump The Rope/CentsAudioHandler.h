@@ -4,6 +4,8 @@
 #include "CentsEngine.h"
 #include "CentsSoundEffect.h"
 #include <vector>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 using namespace DirectX;
 
