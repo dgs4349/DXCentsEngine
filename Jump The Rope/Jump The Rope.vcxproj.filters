@@ -1,38 +1,105 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="BloomPS.hlsl" />
-    <FxCompile Include="ParticlePS.hlsl" />
-    <FxCompile Include="ParticleVS.hlsl" />
-    <FxCompile Include="PixelShader.hlsl" />
-    <FxCompile Include="PostProcessPS.hlsl" />
-    <FxCompile Include="PostProcessVS.hlsl" />
-    <FxCompile Include="PixelShaderHash.hlsl" />
-    <FxCompile Include="VertexShader.hlsl" />
-    <FxCompile Include="SkyPS.hlsl" />
-    <FxCompile Include="SkyVS.hlsl" />
-    <FxCompile Include="GaussianHorizontalPS.hlsl" />
-    <FxCompile Include="GaussianVerticalPS.hlsl" />
-    <FxCompile Include="DepthPixelShader.hlsl" />
+    <FxCompile Include="BloomPS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="DepthPixelShader.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="GaussianHorizontalPS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="GaussianVerticalPS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticlePS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleVS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShaderHash.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="PostProcessPS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="PostProcessVS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyPS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyVS.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Util</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CentsAudioHandler.cpp" />
-    <ClCompile Include="CentsSoundEffect.cpp" />
-    <ClCompile Include="Emitter.cpp" />
-    <ClCompile Include="Flame.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="CentsAudioHandler.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="CentsSoundEffect.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Emitter.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Flame.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ALAudioHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CentsAudioHandler.h" />
-    <ClInclude Include="CentsSoundEffect.h" />
-    <ClInclude Include="Emitter.h" />
-    <ClInclude Include="Flame.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="CentsAudioHandler.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="CentsSoundEffect.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Emitter.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Flame.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="ALAudioHandler.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Filter Include="Audio">
+      <UniqueIdentifier>{fbafbdee-5c7d-44ea-b4e2-f7c6059e1085}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{d655c2c9-f0f5-40d4-8fba-e6604be1a2f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{d4b089f8-a3b9-4203-816f-c45336e62e4b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <Filter>Util</Filter>
+    </None>
   </ItemGroup>
 </Project>
