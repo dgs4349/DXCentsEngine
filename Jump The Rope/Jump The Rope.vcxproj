@@ -153,6 +153,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="SoundEngine.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Emitter.cpp" />
@@ -162,6 +163,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Effect.h" />
     <ClInclude Include="SoundEngine.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Emitter.h" />
