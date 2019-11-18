@@ -37,7 +37,7 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camera = camObject->AddComponent<Camera>();
 	lights = Lights();
 
-	audioHandler = new CentsAudioHandler();
+	soundEngine = new SoundEngine();
 }
 
 // --------------------------------------------------------
@@ -81,7 +81,7 @@ Game::~Game()
 	meshes.clear();
 
 	jumpSfx.clear();
-	delete audioHandler;
+	delete soundEngine;
 
 	skySRV->Release();
 	skyDepthState->Release();
@@ -152,25 +152,25 @@ void Game::Init()
 	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };*/
 
 
-	audioHandler->Init();
+	soundEngine->Init();
 	// loading audio here for now
-	bgIntro = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_intro.wav");
-	bgLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_background_loop.wav", true);
+	bgIntro = soundEngine->CreateSound(L"Assets/Audio/audio_background_intro.wav");
+	bgLoop = soundEngine->CreateSound(L"Assets/Audio/audio_background_loop.wav", true);
 	bgIntro->Link(bgLoop);
 	bgIntro->Set(0.35f);
-	CentsSoundEffect::RTPCParams* introParams = bgIntro->CreateRTPCParams();
+	Sound::RTPCParams* introParams = bgIntro->CreateRTPCParams();
 	bgIntro->Bind(introParams->pitch, &ropeSpeed, -0.01f, 0.75f, startRopeSpeed, speedIncreaseMax);
 
-	menuIntro = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_menu_intro.wav");
-	menuLoop = audioHandler->CreateSoundEffect(L"Assets/Audio/audio_menu_loop.wav", true);
+	menuIntro = soundEngine->CreateSound(L"Assets/Audio/audio_menu_intro.wav");
+	menuLoop = soundEngine->CreateSound(L"Assets/Audio/audio_menu_loop.wav", true);
 	menuIntro->Link(menuLoop);
 	menuIntro->Set(menuVolume);
 	menuIntro->PlayOnUpdate();
 
-	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_0.wav"));
-	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_1.wav"));
-	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_2.wav"));
-	jumpSfx.push_back(audioHandler->CreateSoundEffect(L"Assets/Audio/sfx/jump_3.wav"));
+	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_0.wav"));
+	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_1.wav"));
+	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_2.wav"));
+	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_3.wav"));
 	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.0f, 0.95f);
 
 	D3D11_RASTERIZER_DESC skyRD = {};
@@ -795,7 +795,7 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			timer = 0;
 			if (menuFading) {
-				//audioHandler->ReplaceFade(menuFadeOut, menuFadeIn);
+				//soundEngine->ReplaceFade(menuFadeOut, menuFadeIn);
 				menuIntro->Fade(0.0f, menuVolume, readyLength);
 				//menuIntro->Play();
 				menuFading = false;
@@ -889,7 +889,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime);
 
-	audioHandler->Update(deltaTime, totalTime);
+	soundEngine->Update(deltaTime, totalTime);
 
 
 	// animate the torches light
@@ -1213,10 +1213,10 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 }
 void Game::OnSuspending()
 {
-	audioHandler->Suspend();
+	soundEngine->Suspend();
 }
 void Game::OnResuming()
 {
-	audioHandler->Resume();
+	soundEngine->Resume();
 }
 #pragma endregion

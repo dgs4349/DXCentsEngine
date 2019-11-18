@@ -1,24 +1,24 @@
-#include "CentsSoundEffect.h"
+#include "Sound.h"
 
 
 
-CentsSoundEffect::CentsSoundEffect(){}
+Sound::Sound(){}
 
-CentsSoundEffect::~CentsSoundEffect() {}
+Sound::~Sound() {}
 
-CentsSoundEffect::CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location)
+Sound::Sound(AudioEngine* audioEngineDX, const wchar_t* location)
 {
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audioEngineDX, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 }
-CentsSoundEffect::CentsSoundEffect(AudioEngine * audEngine, const wchar_t* location, bool loop)
+Sound::Sound(AudioEngine * audioEngineDX, const wchar_t* location, bool loop)
 {
-	soundEffect = std::make_unique<DirectX::SoundEffect>(audEngine, location);
+	soundEffect = std::make_unique<DirectX::SoundEffect>(audioEngineDX, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 	Loop = loop;
 }
 
-void CentsSoundEffect::Update(float deltaTime, float totalTime)
+void Sound::Update(float deltaTime, float totalTime)
 {
 	switch (state) {
 	case DelayStart:
@@ -76,26 +76,26 @@ void CentsSoundEffect::Update(float deltaTime, float totalTime)
 
 }
 
-void CentsSoundEffect::Start(float totalTime) {
+void Sound::Start(float totalTime) {
 	startTime = totalTime;
 	endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
 	state = Playing;
 }
 
-float CentsSoundEffect::map(float in, float inmin, float inmax, float outmin, float outmax)
+float Sound::map(float in, float inmin, float inmax, float outmin, float outmax)
 {
 	if (in < inmin) in = inmin;
 	if (in > inmax) in = inmax;
 	return outmin + ((outmax - outmin) / (inmax - inmin)) * (in - inmin);
 }
 
-void CentsSoundEffect::Link(CentsSoundEffect * linkee)
+void Sound::Link(Sound * linkee)
 {
 	linked = linkee;
 	isLinked = true;
 }
 
-void CentsSoundEffect::Link(CentsSoundEffect * linkee, bool loop)
+void Sound::Link(Sound * linkee, bool loop)
 {
 	linked = linkee;
 	linked->SetLoop(loop);
@@ -103,56 +103,56 @@ void CentsSoundEffect::Link(CentsSoundEffect * linkee, bool loop)
 }
 
 
-void CentsSoundEffect::Play()
+void Sound::Play()
 {
 	soundEffectInstance->Play(Loop);
 	state = Starting;
 }
 
-void CentsSoundEffect::Play(float volume, float pitch, float pan)
+void Sound::Play(float volume, float pitch, float pan)
 {
 	Set(volume, pitch, pan);
 	Play();
 }
 
-void CentsSoundEffect::Play(float totalTime)
+void Sound::Play(float totalTime)
 {
 	soundEffectInstance->Play(Loop);
 	Start(totalTime);
 }
 
-void CentsSoundEffect::Play(float volume, float pitch, float pan, float totalTime)
+void Sound::Play(float volume, float pitch, float pan, float totalTime)
 {
 	Set(volume, pitch, pan);
 	soundEffectInstance->Play(Loop);
 	Start(totalTime);
 }
 
-void CentsSoundEffect::PlayOnUpdate()
+void Sound::PlayOnUpdate()
 {
 	state = DelayStart;
 }
 
-void CentsSoundEffect::PlayOnUpdate(float volume, float pitch, float pan)
+void Sound::PlayOnUpdate(float volume, float pitch, float pan)
 {
 	Set(volume, pitch, pan);
 	state = DelayStart;
 }
 
-CentsSoundEffect::RTPCParams* CentsSoundEffect::CreateRTPCParams()
+Sound::RTPCParams* Sound::CreateRTPCParams()
 {
 	rtpcParams.push_back({ nullptr, nullptr, nullptr });
 	return &rtpcParams[rtpcParams.size() - 1];
 }
 
-void CentsSoundEffect::Bind(float *& param, float * control, float pmin, float pmax, float cmin, float cmax)
+void Sound::Bind(float *& param, float * control, float pmin, float pmax, float cmin, float cmax)
 {
 	rtpcs.push_back({ pmin, pmax, pmin, control, cmin, cmax, cmin });
 	bound = true;
 	param = &rtpcs[rtpcs.size() -1].pval;
 }
 
-void CentsSoundEffect::SetLoop(bool loop)
+void Sound::SetLoop(bool loop)
 {
 	if (Loop != loop && Playing) {
 		if (Loop) SetLoopDelayed = true;
@@ -161,7 +161,7 @@ void CentsSoundEffect::SetLoop(bool loop)
 	Loop = loop;
 }
 
-void CentsSoundEffect::Stop(bool immediate)
+void Sound::Stop(bool immediate)
 {
 	soundEffectInstance->Stop(immediate);
 	state = Ready;
@@ -170,7 +170,7 @@ void CentsSoundEffect::Stop(bool immediate)
 	}
 }
 
-void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
+void Sound::Set(float volume, float pitch, float pan, bool setLinked)
 {
 	if (!paramsSetting) { // prevent recusion loop
 		soundEffectInstance->SetVolume(volume);
@@ -184,7 +184,7 @@ void CentsSoundEffect::Set(float volume, float pitch, float pan, bool setLinked)
 	}
 }
 
-void CentsSoundEffect::SetRTPCs()
+void Sound::SetRTPCs()
 {
 	for (RTPCParams params : rtpcParams) {
 		if (params.volume != nullptr) soundEffectInstance->SetVolume(*params.volume);
@@ -193,7 +193,7 @@ void CentsSoundEffect::SetRTPCs()
 	}
 }
 
-void CentsSoundEffect::Fade(float from, float to, float timeMillis)
+void Sound::Fade(float from, float to, float timeMillis)
 {
 	fadeStartTime = 0.0f;
 	fadeTo = to;
@@ -201,7 +201,7 @@ void CentsSoundEffect::Fade(float from, float to, float timeMillis)
 	fadeEndTime = timeMillis;
 }
 
-void CentsSoundEffect::Fade(float from, float to, float timeMillis, float startTime)
+void Sound::Fade(float from, float to, float timeMillis, float startTime)
 {
 	fadeStartTime = startTime;
 	fadeTo = to;
@@ -209,7 +209,7 @@ void CentsSoundEffect::Fade(float from, float to, float timeMillis, float startT
 	fadeEndTime = startTime + timeMillis;
 }
 
-bool CentsSoundEffect::IsReady()
+bool Sound::IsReady()
 {
 	return state == Ready;
 }

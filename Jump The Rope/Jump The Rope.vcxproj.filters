@@ -42,12 +42,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CentsAudioHandler.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="CentsSoundEffect.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -63,15 +57,14 @@
     <ClCompile Include="Flame.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="ALAudioHandler.cpp" />
+    <ClCompile Include="SoundEngine.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CentsAudioHandler.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="CentsSoundEffect.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -84,7 +77,12 @@
     <ClInclude Include="Flame.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="ALAudioHandler.h" />
+    <ClInclude Include="SoundEngine.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">

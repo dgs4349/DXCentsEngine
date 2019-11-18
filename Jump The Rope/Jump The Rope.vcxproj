@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\OpenAL.Soft.1.19.1\build\openal.soft.props" Condition="Exists('..\packages\OpenAL.Soft.1.19.1\build\openal.soft.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -154,9 +153,8 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ALAudioHandler.cpp" />
-    <ClCompile Include="CentsAudioHandler.cpp" />
-    <ClCompile Include="CentsSoundEffect.cpp" />
+    <ClCompile Include="SoundEngine.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Emitter.cpp" />
     <ClCompile Include="Flame.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -164,9 +162,8 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ALAudioHandler.h" />
-    <ClInclude Include="CentsAudioHandler.h" />
-    <ClInclude Include="CentsSoundEffect.h" />
+    <ClInclude Include="SoundEngine.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="Emitter.h" />
     <ClInclude Include="Flame.h" />
     <ClInclude Include="Game.h" />
@@ -264,6 +261,5 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets'))" />
-    <Error Condition="!Exists('..\packages\OpenAL.Soft.1.19.1\build\openal.soft.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenAL.Soft.1.19.1\build\openal.soft.props'))" />
   </Target>
 </Project>

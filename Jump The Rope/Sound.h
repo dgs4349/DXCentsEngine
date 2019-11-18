@@ -14,20 +14,20 @@ using namespace DirectX;
 	- Bind: binds a pointer from a RTPCParam object to a reference of a game variable
 */
 
-class CentsSoundEffect
+class Sound
 {
 public:
-	CentsSoundEffect();
-	CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location);
-	CentsSoundEffect(AudioEngine* audEngine, const wchar_t* location, bool loop);
-	~CentsSoundEffect();
+	Sound();
+	Sound(AudioEngine* audioEngineDX, const wchar_t* location);
+	Sound(AudioEngine* audioEngineDX, const wchar_t* location, bool loop);
+	~Sound();
 
 	enum SoundEffectState { Ready = 0, DelayStart = 1, Starting = 2, Playing = 3, Completed = 4 };
 
 	void Update(float deltaTime, float totaltime);
 
-	void Link(CentsSoundEffect* linkee);
-	void Link(CentsSoundEffect* linkee, bool loop);
+	void Link(Sound* linkee);
+	void Link(Sound* linkee, bool loop);
 
 	void Play();
 	void Play(float volume, float pitch, float pan);
@@ -59,7 +59,7 @@ public:
 	SoundEffectState GetPlaybackStatus() { return state; }
 
 private:
-	CentsSoundEffect * linked = nullptr;
+	Sound * linked = nullptr;
 	bool isLinked = false;
 	
 	SoundEffectState state = Ready;

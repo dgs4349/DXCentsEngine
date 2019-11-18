@@ -6,7 +6,7 @@
 
 #include "CentsEngine.h"
 #include "Player.h"
-#include "CentsAudioHandler.h"
+#include "SoundEngine.h"
 #include "Emitter.h"
 #include "Flame.h"
 
@@ -51,8 +51,8 @@ private:
 
 	Lights lights;
 
-	CentsAudioHandler* audioHandler;
-	std::vector<CentsSoundEffect*> jumpSfx;
+	SoundEngine* soundEngine;
+	std::vector<Sound*> jumpSfx;
 
 	float startRopeSpeed = 100.0f;
 	float ropeSpeed;
@@ -112,10 +112,10 @@ private:
 
 	GameObject* testParticle;
 
-	CentsSoundEffect* bgIntro;
-	CentsSoundEffect* bgLoop;
-	CentsSoundEffect* menuIntro;
-	CentsSoundEffect* menuLoop;
+	Sound* bgIntro;
+	Sound* bgLoop;
+	Sound* menuIntro;
+	Sound* menuLoop;
 	float menuVolume = 0.4f;
 	bool menuFading = false;
 
