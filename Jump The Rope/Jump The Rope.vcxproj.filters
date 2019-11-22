@@ -66,7 +66,9 @@
     <ClCompile Include="Effect.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="CurrAudImp.cpp" />
+    <ClCompile Include="CurrAudImp.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -93,7 +95,9 @@
     <ClInclude Include="Effect.h">
       <Filter>Audio</Filter>
     </ClInclude>
-    <ClInclude Include="CurrAudImp.h" />
+    <ClInclude Include="CurrAudImp.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">

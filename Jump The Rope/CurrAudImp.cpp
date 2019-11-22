@@ -1,7 +1,5 @@
 #include "CurrAudImp.h"
 
-
-
 CurrAudImp::CurrAudImp()
 {
 }
@@ -22,7 +20,9 @@ void CurrAudImp::Init()
 	bgLoop = soundEngine->CreateSound(L"Assets/Audio/audio_background_loop.wav", true);
 	bgIntro->Link(bgLoop);
 	bgIntro->Set(0.35f);
+
 	Sound::RTPCParams* introParams = bgIntro->CreateRTPCParams();
+
 	bgIntro->Bind(introParams->pitch, &ropeSpeed, -0.01f, 0.75f, startRopeSpeed, speedIncreaseMax);
 
 	menuIntro = soundEngine->CreateSound(L"Assets/Audio/audio_menu_intro.wav");
@@ -38,6 +38,31 @@ void CurrAudImp::Init()
 	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.0f, 0.95f);
 }
 
+void CurrAudImp::Update(float deltaTime, float totalTime)
+{
+	soundEngine->Update(deltaTime, totalTime);
+}
+
+void CurrAudImp::Suspend()
+{
+	soundEngine->Suspend();
+}
+
+void CurrAudImp::Resume()
+{
+	soundEngine->Resume();
+}
+
+
+void CurrAudImp::OneHit(SFX_ONE_HIT event)
+{
+	switch (event) {
+	case JUMP:
+		Jump();
+		break;
+	}
+}
+
 void CurrAudImp::SwitchScene(SCENE scene)
 {
 	switch (scene) {
@@ -50,9 +75,29 @@ void CurrAudImp::SwitchScene(SCENE scene)
 			menuFading = true;
 		}
 		break;
-	}
 	case GAME:
 		menuFading = false;
 		bgIntro->PlayOnUpdate();
 		break;
+	case TO_MENU:
+		bgIntro->Stop(true);
+		//menuIntro->Play();
+		menuIntro->Fade(0.0f, menuVolume, menuFadeLength);
+		jumpCount = 0;
+		break;
+	case MENU:
+		if (menuFading) {
+			//soundEngine->ReplaceFade(menuFadeOut, menuFadeIn);
+			menuIntro->Fade(0.0f, menuVolume, menuFadeLength);
+			//menuIntro->Play();
+			menuFading = false;
+		}
+		break;
+	}
+}
+
+void CurrAudImp::Jump()
+{
+	jumpSfx[jumpCount % 4]->Play();
+	jumpCount++;
 }

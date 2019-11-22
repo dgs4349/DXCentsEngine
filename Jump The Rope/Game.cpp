@@ -771,12 +771,7 @@ void Game::Update(float deltaTime, float totalTime)
 		else
 		{
 			timer = 0;
-			if (menuFading) {
-				//soundEngine->ReplaceFade(menuFadeOut, menuFadeIn);
-				menuIntro->Fade(0.0f, menuVolume, readyLength);
-				//menuIntro->Play();
-				menuFading = false;
-			}
+			audImp->SwitchScene(CurrAudImp::MENU);
 		}
 	}
 	if (gameState == GameState::Playing)
@@ -807,17 +802,15 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 		}
 		else if (rope->transform->EulerAngles().x > 180 + ropeWidth && !awardedJump) {
-			jumpSfx[numJumps % 4]->Play();
 			numJumps++;
 			awardedJump = true;
+			if (awardedJump) audImp->OneHit(CurrAudImp::JUMP);
 		}
 	}
 	if (gameState == GameState::End)
 	{
-		bgIntro->Stop(true);
-		menuIntro->Fade(0.0f, menuVolume, readyLength);
+		audImp->SwitchScene(CurrAudImp::TO_MENU);
 
-		//menuIntro->Play();
 		timer += deltaTime;
 
 		if (timer > endScreenLength && rope->transform->EulerAngles().x == 0)
@@ -866,7 +859,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime);
 
-	soundEngine->Update(deltaTime, totalTime);
+	audImp->Update(deltaTime, totalTime);
 
 
 	// animate the torches light
@@ -1190,10 +1183,10 @@ void Game::OnMouseWheel(float wheelDelta, int x, int y)
 }
 void Game::OnSuspending()
 {
-	soundEngine->Suspend();
+	audImp->Suspend();
 }
 void Game::OnResuming()
 {
-	soundEngine->Resume();
+	audImp->Resume();
 }
 #pragma endregion
