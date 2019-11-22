@@ -63,7 +63,10 @@
     <ClCompile Include="Sound.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="Effect.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="CurrAudImp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -84,7 +87,13 @@
     <ClInclude Include="Sound.h">
       <Filter>Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Effect.h" />
+    <ClInclude Include="example.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="CurrAudImp.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">

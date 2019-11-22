@@ -37,7 +37,7 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camera = camObject->AddComponent<Camera>();
 	lights = Lights();
 
-	soundEngine = new SoundEngine();
+	audImp = new CurrAudImp();
 }
 
 // --------------------------------------------------------
@@ -49,6 +49,8 @@ Game::~Game()
 {
 	ObjectManager::ReleaseInstance();
 	RenderManager::ReleaseInstance();
+
+	delete audImp;
 
 	delete vertexShader;
 	delete pixelShader;
@@ -79,9 +81,6 @@ Game::~Game()
 	materials.clear();
 	gameObjects.clear();
 	meshes.clear();
-
-	jumpSfx.clear();
-	delete soundEngine;
 
 	skySRV->Release();
 	skyDepthState->Release();
@@ -132,6 +131,8 @@ void Game::Init()
 	camera->transform->Rotate(0.0f, -30.0f, 0.0f);
 	camera->SetScreenSize(width, height);
 
+	audImp->Init();
+
 	lights.ambientLights[0] = { Color(0.05f), 1 };
 	lights.ambientLightCount = 1;
 
@@ -152,26 +153,6 @@ void Game::Init()
 	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };*/
 
 
-	soundEngine->Init();
-	// loading audio here for now
-	bgIntro = soundEngine->CreateSound(L"Assets/Audio/audio_background_intro.wav");
-	bgLoop = soundEngine->CreateSound(L"Assets/Audio/audio_background_loop.wav", true);
-	bgIntro->Link(bgLoop);
-	bgIntro->Set(0.35f);
-	Sound::RTPCParams* introParams = bgIntro->CreateRTPCParams();
-	bgIntro->Bind(introParams->pitch, &ropeSpeed, -0.01f, 0.75f, startRopeSpeed, speedIncreaseMax);
-
-	menuIntro = soundEngine->CreateSound(L"Assets/Audio/audio_menu_intro.wav");
-	menuLoop = soundEngine->CreateSound(L"Assets/Audio/audio_menu_loop.wav", true);
-	menuIntro->Link(menuLoop);
-	menuIntro->Set(menuVolume);
-	menuIntro->PlayOnUpdate();
-
-	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_0.wav"));
-	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_1.wav"));
-	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_2.wav"));
-	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_3.wav"));
-	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.0f, 0.95f);
 
 	D3D11_RASTERIZER_DESC skyRD = {};
 	skyRD.CullMode = D3D11_CULL_FRONT;
@@ -770,16 +751,12 @@ void Game::Update(float deltaTime, float totalTime)
 
 			timer += deltaTime;
 
-			if (!menuFading) {
-				menuIntro->Fade(menuVolume, 0.0f, readyLength);
-				//menuIntro->Stop(true);
-				menuFading = true;
-			}
+			// NOTE: while this is safe, calling scene transition every frame during inputs is poor design
+			audImp->SwitchScene(CurrAudImp::TO_GAME);
 
 			if (timer >= readyLength)
 			{
-				menuFading = false;
-				bgIntro->PlayOnUpdate();
+				audImp->SwitchScene(CurrAudImp::GAME);
 				gameState = GameState::Playing;
 
 				numJumps = 0;

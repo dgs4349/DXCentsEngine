@@ -13,7 +13,6 @@ using namespace DirectX;
 	- Link: chains this sound effect to another
 	- Bind: binds a pointer from a RTPCParam object to a reference of a game variable
 */
-
 class Sound
 {
 public:
@@ -22,7 +21,20 @@ public:
 	Sound(AudioEngine* audioEngineDX, const wchar_t* location, bool loop);
 	~Sound();
 
+	enum PARAMS{VOLUME, PITCH, PAN, PLAY};
+
+	// todo: fix
 	enum SoundEffectState { Ready = 0, DelayStart = 1, Starting = 2, Playing = 3, Completed = 4 };
+
+	struct Connection { float* gameVar; float varMin; float varMax; };
+
+	// TODO deprecate RTPC, RTPCParams, Bind=>Connect/Effect
+	struct RTPC {
+		float pmin; float pmax; float pval;
+		float* control; float cmin; float cmax; float cval;
+	};
+	struct RTPCParams { float* volume; float* pitch; float* pan; };
+
 
 	void Update(float deltaTime, float totaltime);
 
@@ -37,21 +49,24 @@ public:
 	void PlayOnUpdate();
 	void PlayOnUpdate(float volume, float pitch, float pan);
 
-	struct RTPC { 
-		float pmin; float pmax; float pval; 
-		float* control; float cmin; float cmax; float cval; 
-	};
-	struct RTPCParams { float* volume; float* pitch; float* pan; };
-	
 	RTPCParams* CreateRTPCParams();
 	void Bind(float*& param, float* control, float pmin, float pmax, float cmin, float cmax);
 
 	void SetLoop(bool loop);
 
+	void Volume(float vol = 1.0f);
+	void Pitch(float pitch = 0.0f);
+	void Pan(float pan = 0.0f);
+
+	Sound* Effect(PARAMS param, float min, float max, Connection connect);
+
+	Connection Connect(float* gameVar, float varMin, float varMax);
+
 	void Stop(bool immediate = true);
 	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f, bool setLinked=true);
 	void SetRTPCs();
 
+	// TODO replace with Effect Class to hold various Effects, including Effect.Fade for instance
 	void Fade(float from, float to, float timeMillis);
 	void Fade(float from, float to, float timeMillis, float startTime);
 

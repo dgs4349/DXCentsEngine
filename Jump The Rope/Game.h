@@ -6,9 +6,10 @@
 
 #include "CentsEngine.h"
 #include "Player.h"
-#include "SoundEngine.h"
 #include "Emitter.h"
 #include "Flame.h"
+
+#include "CurrAudImp.h"
 
 namespace GameState
 {
@@ -49,10 +50,9 @@ public:
 
 private:
 
-	Lights lights;
+	CurrAudImp* audImp;
 
-	SoundEngine* soundEngine;
-	std::vector<Sound*> jumpSfx;
+	Lights lights;
 
 	float startRopeSpeed = 100.0f;
 	float ropeSpeed;
@@ -111,13 +111,6 @@ private:
 	GameObject* torch;
 
 	GameObject* testParticle;
-
-	Sound* bgIntro;
-	Sound* bgLoop;
-	Sound* menuIntro;
-	Sound* menuLoop;
-	float menuVolume = 0.4f;
-	bool menuFading = false;
 
 	GameObject* fog;
 
