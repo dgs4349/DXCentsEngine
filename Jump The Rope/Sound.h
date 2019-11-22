@@ -26,7 +26,7 @@ public:
 	// todo: fix
 	enum SoundEffectState { Ready = 0, DelayStart = 1, Starting = 2, Playing = 3, Completed = 4 };
 
-	struct Connection { float* gameVar; float varMin; float varMax; };
+	struct Connection { float* gameVar; float varMin; float varMax; float prevValue; };
 
 	// TODO deprecate RTPC, RTPCParams, Bind=>Connect/Effect
 	struct RTPC {
@@ -89,6 +89,8 @@ private:
 	bool bound = false;
 	std::vector<RTPC> rtpcs;
 	std::vector<RTPCParams> rtpcParams;
+
+	std::vector<Connection> connections;
 
 	float length;
 	bool Loop = false;
