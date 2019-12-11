@@ -1,6 +1,9 @@
 #pragma once
-#include "SoundEngine.h"
+#include "Flashbang/SoundEngine.h"
 #include <vector>
+#include "nlohmann/json.hpp"
+
+namespace j = nlohmann;
 
 class CurrAudImp
 {
@@ -27,8 +30,24 @@ public:
 	void Resume();
 
 	// move this somehow else, even strings could work?
+	j::json SCENE = R"(
+		"MENU": {
+
+		}		
+
+
+	)"_json;
+
 	enum SCENE { MENU, TO_MENU, TO_GAME, GAME };
 	enum SFX_ONE_HIT { JUMP };
+	/*
+		!!!!!!!!!!!!!!!!
+		with nlohmann we can now create a json object and we can do
+
+		SFX["jump"]() !!!!!!!!!!!!!!
+	*/
+
+
 	// bit field struct?
 	
 	// okay for sfx, we need some kind of Event system for single playbacks?

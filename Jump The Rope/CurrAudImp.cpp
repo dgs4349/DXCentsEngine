@@ -8,7 +8,7 @@ CurrAudImp::CurrAudImp()
 CurrAudImp::~CurrAudImp()
 {
 	jumpSfx.clear();
-	delete soundEngine;
+	soundEngine->Release();
 }
 
 void CurrAudImp::Init()

@@ -2,12 +2,15 @@
 
 using namespace DirectX;
 
+
+SoundEngine* SoundEngine::instance = nullptr;
+int SoundEngine::refs = 0;
+
 SoundEngine::SoundEngine()
 {
 	effects = std::vector<Sound*>();
 	managedEffects = std::vector<Sound*>();
 }
-
 
 SoundEngine::~SoundEngine()
 {
@@ -16,6 +19,28 @@ SoundEngine::~SoundEngine()
 		audioEngineDX->Suspend();
 	}
 	for (int i = 0; i < managedEffects.size(); i++) delete managedEffects[i];
+
+	instance = nullptr;
+}
+
+SoundEngine* SoundEngine::Get()
+{
+	if (instance == nullptr) {
+		instance = new SoundEngine();
+	}
+
+	addRef();
+
+	return instance;
+}
+
+void SoundEngine::Release() {
+	releaseRef();
+
+	if ((refs == 0) && (instance != nullptr)) {
+		delete instance;
+		instance = nullptr;
+	}
 }
 
 void SoundEngine::Update(float deltaTime, float totalTime)

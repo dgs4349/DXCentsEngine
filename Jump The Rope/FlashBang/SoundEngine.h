@@ -3,6 +3,7 @@
 #include <Audio.h>
 #include "CentsEngine.h"
 #include "Sound.h"
+#include "Scene.h"
 #include <vector>
 
 using namespace DirectX;
@@ -18,8 +19,8 @@ using namespace DirectX;
 class SoundEngine
 {
 public:
-	SoundEngine();
-	~SoundEngine();
+	static SoundEngine* Get();
+	static void Release();
 	
 	void Update(float deltaTime, float totalTime);
 	void Init();
@@ -32,6 +33,14 @@ public:
 
 	DirectX::AudioEngine* GetAudioEngine() { return audioEngineDX.get(); }
 
+	/*
+		or do we want Scenes to be set active or inactive in Scene itself?
+	*/
+	void AddScene(Scene scene);
+
+	void SetActiveScene();
+	void AddActiveScene();
+
 	// adds sound effect to update list
 	void Add(Sound* effect);
 
@@ -39,8 +48,23 @@ public:
 	void Manage(Sound* effect);
 
 private:
+	SoundEngine();
+	~SoundEngine();
+	
+	static SoundEngine* instance;
+	void operator=(SoundEngine const&);
+
+	static int refs;
+	
+	static void addRef() { ++refs; }
+	static void releaseRef() { --refs;}
+
 	std::unique_ptr<AudioEngine> audioEngineDX;
 	bool isSilent = false;
 	std::vector<Sound*> effects;
 	std::vector<Sound*> managedEffects;
+
+public:
+	SoundEngine(SoundEngine const&) = delete;
+	void operator=(SoundEngine const*) = delete;
 };

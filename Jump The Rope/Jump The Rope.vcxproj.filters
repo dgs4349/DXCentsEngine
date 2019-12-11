@@ -57,17 +57,26 @@
     <ClCompile Include="Flame.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="SoundEngine.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Effect.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="CurrAudImp.cpp">
       <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\Effect.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\Sound.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundContainer.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\SoundContainer.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\SoundEngine.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>FlashBang</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,21 +92,28 @@
     <ClInclude Include="Flame.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="SoundEngine.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
     <ClInclude Include="example.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Effect.h">
       <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="CurrAudImp.h">
       <Filter>Audio</Filter>
     </ClInclude>
+    <ClInclude Include="FlashBang\SoundEngine.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\Effect.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\Sound.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundContainer.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\SoundContainer.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">
@@ -109,10 +125,18 @@
     <Filter Include="Util">
       <UniqueIdentifier>{d4b089f8-a3b9-4203-816f-c45336e62e4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FlashBang">
+      <UniqueIdentifier>{ac792ef2-82b8-4463-80a4-018170b58e41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
       <Filter>Util</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="FlashBang\goal.txt">
+      <Filter>Audio</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -13,6 +13,10 @@ using namespace DirectX;
 	- Link: chains this sound effect to another
 	- Bind: binds a pointer from a RTPCParam object to a reference of a game variable
 */
+
+// speed?
+enum SOUNDPARAMS { VOLUME, PITCH, PAN, ORDER };
+
 class Sound
 {
 public:
@@ -24,33 +28,40 @@ public:
 	enum PARAMS{VOLUME, PITCH, PAN, PLAY};
 
 	// todo: fix
-	enum SoundEffectState { Ready = 0, DelayStart = 1, Starting = 2, Playing = 3, Completed = 4 };
+	enum SoundEffectState { Stopped = 0, Ready = 1, Playing = 2, Completed = 3 };
 
+	/*
+		Connect(&ref, min max)
+
+		To add:
+		Time(start, end) //total time in audio handler to effect
+		Lifetime(start, end) // lifetime of audio as it's playing
+	
+	*/
 	struct Connection { float* gameVar; float varMin; float varMax; float prevValue; };
 
 	// TODO deprecate RTPC, RTPCParams, Bind=>Connect/Effect
-	struct RTPC {
-		float pmin; float pmax; float pval;
-		float* control; float cmin; float cmax; float cval;
-	};
-	struct RTPCParams { float* volume; float* pitch; float* pan; };
+	//struct RTPC {
+	//	float pmin; float pmax; float pval;
+	//	float* control; float cmin; float cmax; float cval;
+	//};
+	//struct RTPCParams { float* volume; float* pitch; float* pan; };
 
 
 	void Update(float deltaTime, float totaltime);
 
-	void Link(Sound* linkee);
-	void Link(Sound* linkee, bool loop);
+	void Next(Sound* linkee);
+	void Next(Sound* linkee, bool loop);
 
 	void Play();
 	void Play(float volume, float pitch, float pan);
 	void Play(float totalTime);
 	void Play(float volume, float pitch, float pan, float totalTime);
 
-	void PlayOnUpdate();
-	void PlayOnUpdate(float volume, float pitch, float pan);
+	void Ready();
 
-	RTPCParams* CreateRTPCParams();
-	void Bind(float*& param, float* control, float pmin, float pmax, float cmin, float cmax);
+	//RTPCParams* CreateRTPCParams();
+	//void Bind(float*& param, float* control, float pmin, float pmax, float cmin, float cmax);
 
 	void SetLoop(bool loop);
 
