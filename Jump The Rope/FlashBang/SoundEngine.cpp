@@ -1,6 +1,6 @@
 #include "SoundEngine.h"
 
-using namespace DirectX;
+using namespace FlashBang;
 
 
 SoundEngine* SoundEngine::instance = nullptr;
@@ -10,6 +10,7 @@ SoundEngine::SoundEngine()
 {
 	effects = std::vector<Sound*>();
 	managedEffects = std::vector<Sound*>();
+	audioEngineDX = audioEngineDX.get();
 }
 
 SoundEngine::~SoundEngine()

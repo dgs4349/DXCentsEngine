@@ -155,11 +155,10 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
   <ItemGroup>
     <ClCompile Include="CurrAudImp.cpp" />
     <ClCompile Include="FlashBang\Effect.cpp" />
+    <ClCompile Include="FlashBang\Scene.cpp" />
     <ClCompile Include="FlashBang\Sound.cpp" />
     <ClCompile Include="FlashBang\SoundContainer.cpp" />
     <ClCompile Include="FlashBang\SoundEngine.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SoundContainer.cpp" />
     <ClCompile Include="Emitter.cpp" />
     <ClCompile Include="Flame.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -170,11 +169,10 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClInclude Include="CurrAudImp.h" />
     <ClInclude Include="example.h" />
     <ClInclude Include="FlashBang\Effect.h" />
+    <ClInclude Include="FlashBang\Scene.h" />
     <ClInclude Include="FlashBang\Sound.h" />
     <ClInclude Include="FlashBang\SoundContainer.h" />
     <ClInclude Include="FlashBang\SoundEngine.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="SoundContainer.h" />
     <ClInclude Include="Emitter.h" />
     <ClInclude Include="Flame.h" />
     <ClInclude Include="Game.h" />
@@ -268,14 +266,14 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets" Condition="Exists('..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets')" />
     <Import Project="..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2015.2019.12.17.1\build\native\directxtk_desktop_2015.targets" Condition="Exists('..\packages\directxtk_desktop_2015.2019.12.17.1\build\native\directxtk_desktop_2015.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets'))" />
     <Error Condition="!Exists('..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2019.12.17.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2019.12.17.1\build\native\directxtk_desktop_2015.targets'))" />
   </Target>
 </Project>

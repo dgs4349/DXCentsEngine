@@ -1,4 +1,8 @@
 #pragma once
+
+#include "SoundEngine.h"
+using namespace FlashBang;
+
 class Effect
 {
 

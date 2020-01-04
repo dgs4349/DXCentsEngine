@@ -66,16 +66,13 @@
     <ClCompile Include="FlashBang\Sound.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="SoundContainer.cpp">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundContainer.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
     <ClCompile Include="FlashBang\SoundEngine.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="FlashBang\Scene.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,13 +104,12 @@
     <ClInclude Include="FlashBang\Sound.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="SoundContainer.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
     <ClInclude Include="FlashBang\SoundContainer.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h" />
+    <ClInclude Include="FlashBang\Scene.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">
