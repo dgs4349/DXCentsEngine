@@ -48,6 +48,11 @@ Scene game = new Scene(R"(
 		}),
 
 		"OnStart": "background",
+		"3D": false,
+
+		(or ListenerPostition:, and with sound just Position, Velocity, etc)
+
+
 	}
 )"_json);
 
@@ -59,11 +64,73 @@ Scene menu = new Scene({
 // or this could be in a scene
 SoundContainer* SFX = new SoundContainer({
 	{"jump", 
-		{"files", L"Assets/Audio/sfx/jump_||n=0; n<4; n++||.wav"}, // schema parser
+		{"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav"}, // schema parser
 		{"volume", 0.5f},
 		{"pan", 0.95f},
 		{"order", "sequential"}
 	}
 });
 
-SFX["jump"].Play(); //goal, one offs invoked without member play?
+SFX["jump"]->Play(); //goal, one offs invoked without member play?
+
+
+/** Notes
+!!!! syntax:
+	each object begin, if key is a class we know, begin parsing accordingly
+	!!!!!!!!!all system params should begin with a capital, all user variables should be lowercase
+
+instead of this:
+	SoundContainer* SFX = new SoundContainer({
+		{"jump", 
+			{"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav"}, // schema parser
+			{"volume", 0.5f},
+			{"pan", 0.95f},
+			{"order", "sequential"}
+		}
+	});
+
+this:
+	SoundContainer* SFX = new SoundContainer({
+		{"jump", 
+			Group{
+				"Files", L"Assets/Audio/sfx/jump_||0-4,1||.wav", // schema parser
+				"Volume", 0.5f,
+				"Pan", 0.95f,
+				"Order", "sequential"
+			}
+			
+		}
+	});
+
+new class: Group => plural sounds with identical parameters (files:"||~~||" or files:[] instead of file:"~~");
+				 => like a container but all sounds are identical and parsed together
+				 => either this or SoundContainer works, but Group can be parsed together and more compact declaring params, its just easier
+
+SoundContainers can be recursive, this is fine
+
+but make these macros, or could they replace the whole "volume": 3 and so on?
+would doing a fuck ton of macros just make this whole thing easier?
+
+Container.Orders.Sequential
+Containers.Wrap = true;
+
+orders: sequential, reverse, random, randomother, 
+wrap: true (default), false, doesn't affect random containers
+obvi we can do more but this is good for now
+
+||0-4-1||, ||0-4|| from, to
+||a, b, c||, each
+
+file: parse string
+files: parse group
+parse(files names) {
+	length > 1
+		parse each
+	length = 1
+		regex split || -> only have one, make a note of that
+			try regex split -
+				for(args) do parse, [0]+n+[2] of filename
+			try regex split ,
+				foreach(args) do parse [0]+i+[2]of filename
+
+**/

@@ -63,16 +63,22 @@
     <ClCompile Include="FlashBang\Effect.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\Sound.cpp">
+    <ClCompile Include="FlashBang\SoundContainer.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\SoundContainer.cpp">
+    <ClCompile Include="FlashBang\Scene.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
     <ClCompile Include="FlashBang\SoundEngine.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\Scene.cpp">
+    <ClCompile Include="FlashBang\OldSound.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\AudioJsonParser.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\Sound.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,19 +101,25 @@
     <ClInclude Include="CurrAudImp.h">
       <Filter>Audio</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\SoundEngine.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
     <ClInclude Include="FlashBang\Effect.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\Sound.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\SoundContainer.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\Scene.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\SoundEngine.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\OldSound.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\AudioJsonParser.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\Sound.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
   </ItemGroup>
