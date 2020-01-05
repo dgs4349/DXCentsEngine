@@ -32,7 +32,7 @@ for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.0f, 0.95f);
 // json literal string format
 Scene game = new Scene(R"(
 	{
-		"background": SoundContainer({
+		"$background": SoundContainer({
 			"files": {
 				L"Assets/Audio/audio_background_intro.wav",
 				L"Assets/Audio/audio_background_loop.wav"
@@ -101,6 +101,27 @@ this:
 			
 		}
 	});
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	names MUST begin with a non-alpha character, a non alpha character of
+
+	SoundContainer* SFX = new SoundContainer({
+		{"\jump", 
+		{"$jump", 
+		{"!jump", 
+		{"_jump", 
+
+			group{
+				"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav", // schema parser
+				"volume", 0.5f,
+				"pan", 0.95f,
+				"order", "sequential"
+			}
+			
+		}
+	});
+
+
 
 new class: Group => plural sounds with identical parameters (files:"||~~||" or files:[] instead of file:"~~");
 				 => like a container but all sounds are identical and parsed together

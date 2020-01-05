@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SoundEngine.h"
+#include "FlashBang.hpp"
 using namespace FlashBang;
 
-class Scene
+class SoundScene
 {
 	/*
 		Container to hold Sounds and SoundContainers to be updated when scene is active
@@ -12,8 +12,8 @@ class Scene
 	
 	*/
 public:
-	Scene();
-	~Scene();
+	SoundScene();
+	~SoundScene();
 
 	void SetListenerPosition();
 	void SetListenerVelocity();

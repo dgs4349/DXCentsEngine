@@ -3,17 +3,18 @@
 #include <iomanip>
 #include <sstream>
 #include <nlohmann/json.hpp>
+#include <exception>
 
-#include "SoundEngine.h"
+#include "FlashBang.hpp"
 
 using json = nlohmann::json;
 using namespace FlashBang;
 
-class AudioJsonParser : public json::json_sax_t
+class AudioJsonSax : public json::json_sax_t
 {
 public:
-	AudioJsonParser();
-	~AudioJsonParser();
+	AudioJsonSax();
+	~AudioJsonSax();
 
 	bool string(string_t& val) override;
 
@@ -26,6 +27,5 @@ public:
 	bool key(string_t& val) override;
 
 private:
-	bool ParseCommand(string_t& val);
+	bool SerializeParamEvent(string_t& val);
 };
-
