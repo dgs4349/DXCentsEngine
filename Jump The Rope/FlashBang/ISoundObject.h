@@ -19,6 +19,8 @@ public:
 	float	Pan		= 0.0f;
 	int		Order	= 0;
 
+	std::string File = nullptr;
+
 	void from_json(const json& j, ISoundObject& s);
 };
 

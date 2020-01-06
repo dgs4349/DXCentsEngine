@@ -47,6 +47,8 @@ bool AudioJsonSax::SerializeParamEvent(string_t& val) {
 	// events as in "OnStart", do nothing
 	if (val[0] == 'O') return true;
 
-	val = val[0];
+	if (val == "Files") return true;
+
+	val = tolower(val[0]);
 	return true;
 }
