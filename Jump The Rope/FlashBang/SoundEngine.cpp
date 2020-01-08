@@ -1,100 +1,56 @@
-#include "FlashBang.hpp"
+#include "SoundEngine.h"
 
-using namespace FlashBang;
-
-
-SoundEngine* SoundEngine::instance = nullptr;
-int SoundEngine::refs = 0;
-
-SoundEngine::SoundEngine()
-{
-	effects = std::vector<Sound*>();
-	managedEffects = std::vector<Sound*>();
-	audioEngineDX = audioEngineDX.get();
-}
-
-SoundEngine::~SoundEngine()
-{
-	if (audioEngineDX)
-	{
-		audioEngineDX->Suspend();
-	}
-	for (int i = 0; i < managedEffects.size(); i++) delete managedEffects[i];
-
-	instance = nullptr;
-}
 
 SoundEngine* SoundEngine::Get()
 {
-	if (instance == nullptr) {
-		instance = new SoundEngine();
-	}
-
-	addRef();
-
-	return instance;
 }
 
-void SoundEngine::Release() {
-	releaseRef();
-
-	if ((refs == 0) && (instance != nullptr)) {
-		delete instance;
-		instance = nullptr;
-	}
-}
-
-void SoundEngine::Update(float deltaTime, float totalTime)
+void SoundEngine::Release()
 {
-	 if (!audioEngineDX->Update())
-	{
-		if (audioEngineDX->IsCriticalError())
-		{
-			printf("AUDIO DEVICE LOST\n");
-		}
-	}
-	 else {
-		 for (int i = 0; i < effects.size(); i++) {
-			 effects[i]->Update(deltaTime, totalTime);
-		 }
-	 }
+}
+
+void SoundEngine::Update()
+{
+}
+
+void SoundEngine::Update(float deltaTime)
+{
 }
 
 void SoundEngine::Init()
 {
-	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
-	#ifdef _DEBUG
-	eflags = eflags | AudioEngine_Debug;
-	#endif
-	audioEngineDX = std::make_unique<AudioEngine>(eflags);
-
-	isSilent = !audioEngineDX->IsAudioDevicePresent();
 }
 
 void SoundEngine::Suspend()
 {
-	audioEngineDX->Suspend();
 }
 
 void SoundEngine::Resume()
 {
-	audioEngineDX->Resume();
 }
 
-Sound * SoundEngine::CreateSound(const wchar_t* location, bool loop)
+std::unique_ptr<DirectX::SoundEffect> SoundEngine::LoadSoundDX(const wchar_t* location)
 {
-	Sound* effect = new Sound(audioEngineDX.get(), location, loop);
-	Add(effect);
-	Manage(effect);
-	return effect;
+	return 
 }
 
-void SoundEngine::Add(Sound * effect)
+void SoundEngine::AddSoundObject(ISoundObject* object)
 {
-	effects.push_back(effect);
 }
 
-void SoundEngine::Manage(Sound * effect)
+void SoundEngine::AddSoundContainer(ISoundJson* container)
 {
-	managedEffects.push_back(effect);
+}
+
+SoundEngine::SoundEngine()
+{
+	_audioEngineDX = _audioEngineDX.get();
+
+	_sounds = std::vector<ISoundObject*>();
+	
+}
+
+
+SoundEngine::~SoundEngine()
+{
 }

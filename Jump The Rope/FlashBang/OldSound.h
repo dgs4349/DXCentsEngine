@@ -116,7 +116,7 @@ private:
 
 	float startTime;
 	float endTime;
-	std::unique_ptr<OldSoundEffect> soundEffect;
-	std::unique_ptr<OldSoundEffectInstance> soundEffectInstance;
+	std::unique_ptr<SoundEffect> soundEffect;
+	std::unique_ptr<SoundEffectInstance> soundEffectInstance;
 };
 

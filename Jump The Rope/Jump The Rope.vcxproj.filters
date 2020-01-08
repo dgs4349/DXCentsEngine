@@ -66,23 +66,23 @@
     <ClCompile Include="FlashBang\SoundContainer.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\Scene.cpp">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
-    <ClCompile Include="FlashBang\SoundEngine.cpp">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\OldSound.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
     <ClCompile Include="FlashBang\Sound.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\AudioJsonParser.cpp">
+    <ClCompile Include="FlashBang\AudioJsonSax.cpp">
       <Filter>FlashBang\Parsing</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\SoundObject.cpp">
-      <Filter>FlashBang\Parsing</Filter>
+    <ClCompile Include="FlashBang\SoundScene.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\OldSoundEngine.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\SoundEngine.cpp">
+      <Filter>FlashBang</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,22 +110,31 @@
     <ClInclude Include="FlashBang\SoundContainer.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\Scene.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\SoundEngine.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
     <ClInclude Include="FlashBang\OldSound.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\Sound.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\AudioJsonParser.h">
+    <ClInclude Include="FlashBang\FlashBang.hpp">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\AudioJsonSax.h">
       <Filter>FlashBang\Parsing</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\SoundObject.h">
+    <ClInclude Include="FlashBang\ISoundObject.hpp">
+      <Filter>FlashBang\Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\SoundScene.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\OldSoundEngine.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\SoundEngine.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\ISoundContainer.hpp">
       <Filter>FlashBang\Parsing</Filter>
     </ClInclude>
   </ItemGroup>
@@ -144,6 +153,9 @@
     </Filter>
     <Filter Include="FlashBang\Parsing">
       <UniqueIdentifier>{11128d3d-de07-45aa-b5c0-b98cf57a04f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FlashBang\SoundObjects">
+      <UniqueIdentifier>{0347a4f4-6990-4778-9044-e24180cb9103}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "FlashBang.hpp"
+#include "ISoundObject.hpp"
+#include "ISoundContainer.hpp"
+
 using namespace FlashBang;
 
 class SoundScene
@@ -25,5 +28,7 @@ public:
 	void AddContainer();
 
 	void SetReverb();
+
+	
 };
 

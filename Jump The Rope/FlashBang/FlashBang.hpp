@@ -2,13 +2,13 @@
 
 namespace FlashBang {
 
-	class SoundEngine;
+	/*class SoundEngine;
 
 	class Sound;
 	class SoundGroup;
 	class SoundContainer;
 	class SoundScene;
-
+*/
 
 
 }
