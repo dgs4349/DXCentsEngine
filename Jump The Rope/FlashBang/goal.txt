@@ -67,7 +67,7 @@ SoundContainer* SFX = new SoundContainer({
 		{"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav"}, // schema parser
 		{"volume", 0.5f},
 		{"pan", 0.95f},
-		{"order", "sequential"}
+		{"index", "sequential"}
 	}
 });
 
@@ -85,7 +85,7 @@ instead of this:
 			{"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav"}, // schema parser
 			{"volume", 0.5f},
 			{"pan", 0.95f},
-			{"order", "sequential"}
+			{"index", "sequential"}
 		}
 	});
 
@@ -96,7 +96,7 @@ this:
 				"Files", L"Assets/Audio/sfx/jump_||0-4,1||.wav", // schema parser
 				"Volume", 0.5f,
 				"Pan", 0.95f,
-				"Order", "sequential"
+				"Index", "sequential"
 			}
 			
 		}
@@ -115,7 +115,7 @@ this:
 				"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav", // schema parser
 				"volume", 0.5f,
 				"pan", 0.95f,
-				"order", "sequential"
+				"index", "sequential"
 			}
 			
 		}
@@ -132,10 +132,10 @@ SoundContainers can be recursive, this is fine
 but make these macros, or could they replace the whole "volume": 3 and so on?
 would doing a fuck ton of macros just make this whole thing easier?
 
-Container.Orders.Sequential
+Container.Indexs.Sequential
 Containers.Wrap = true;
 
-orders: sequential, reverse, random, randomother, 
+indexs: sequential, reverse, random, randomother, 
 wrap: true (default), false, doesn't affect random containers
 obvi we can do more but this is good for now
 

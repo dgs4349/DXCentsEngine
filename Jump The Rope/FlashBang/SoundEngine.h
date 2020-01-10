@@ -4,8 +4,7 @@
 
 #include "FlashBang.hpp"
 #include "SoundEngine.h"
-#include "ISoundObject.hpp"
-#include "ISoundContainer.hpp"
+#include "SoundScene.h"
 
 using namespace FlashBang;
 
@@ -22,12 +21,16 @@ public:
 	void Suspend();
 	void Resume();
 
-	std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location);
+	static std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location)
+	{
+		if (!initiated_) SoundEngine();
+		return std::make_unique<DirectX::SoundEffect>(instance_->audioEngineDX_, location);
+	}
 
 	/* *
-	 * TODO: move these to one container with an id. This id can be used with order to maintain and manage
-	 *	positions within array. If changing order is necessary, just swap with element at that position, but
-	 *	hopefully the order within sound engine shouldn't be touched
+	 * TODO: move these to one container with an id. This id can be used with index to maintain and manage
+	 *	positions within array. If changing index is necessary, just swap with element at that position, but
+	 *	hopefully the index within sound engine shouldn't be touched
 	 *
 	 *	but do we need this? i guesss we could set it to nullptr so it doesnt shift indeces, that could make sense
 	 *		when a new scene is loaded all objects of that scene should be cleared or changed.
@@ -37,18 +40,28 @@ public:
 	 *		does this have a real advantage? Guess it would maintain a sort of cache so vector won't reshuffle as much
 	 * */
 	void AddSoundObject(ISoundObject* object);
-	void AddSoundContainer(ISoundJson* container);
-	
+	void AddSoundContainer(ISoundContainer* container);
+
 private:
 	SoundEngine();
 	~SoundEngine();
 
-	std::vector<ISoundObject*> _sounds;
+	std::vector<
+	
+	DirectX::AudioEngine* audioEngineDX_;
+	std::unique_ptr<DirectX::AudioEngine> audioEngineDXPointer_;
+	bool isSilent_ = false;
 
-	DirectX::AudioEngine _audioEngineDX;
+
+	static SoundEngine* instance_;
+	
+	static bool initiated_;
+	
+	static int refs_;
+	static void addRef_() { ++refs_; }
+	static void releaseRef_() { --refs_; }
 	
 public:
 	SoundEngine(SoundEngine const&) = delete;
 	void operator=(SoundEngine const*) = delete;
 };
-

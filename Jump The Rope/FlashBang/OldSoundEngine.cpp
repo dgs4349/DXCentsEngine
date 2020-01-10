@@ -1,5 +1,4 @@
 #include "FlashBang.hpp"
-#include "OldOldSoundEngine.h"
 #include "OldSoundEngine.h"
 
 using namespace FlashBang;
@@ -65,7 +64,7 @@ void OldSoundEngine::Update(float deltaTime, float totalTime)
 void OldSoundEngine::Init()
 {
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
-	#ifdef _DEBUG
+	#ifdef %!%DEBUG
 	eflags = eflags | AudioEngine_Debug;
 	#endif
 	audioEngineDX = std::make_unique<AudioEngine>(eflags);

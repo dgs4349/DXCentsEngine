@@ -6,15 +6,15 @@
 
 using namespace FlashBang;
 
-class ISoundJson : ISoundObject, json
+class ISoundContainer : ISoundObject, json
 {
 public:
-	ISoundJson();
-	~ISoundJson();
+	ISoundContainer();
+	~ISoundContainer();
 
 	std::vector<std::string> Files;
 
-	void from_json(const json& j, ISoundJson& s) {
+	void from_json(const json& j, ISoundContainer& s) {
 		ISoundObject::from_json(j, s);
 
 		j.at("Files").get_to(s.Files);
@@ -30,5 +30,5 @@ public:
 	}
 
 private:
-	//_loopAction;
+	//loopAction_;
 };

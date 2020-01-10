@@ -11,55 +11,83 @@ using namespace FlashBang;
 class ISoundObject
 {
 public:
-	ISoundObject(){}
-	~ISoundObject(){}
+	ISoundObject() = default;
+	virtual ~ISoundObject(){}
 
 	std::string File = nullptr;
 
-	float Volume() { return _volume; }
-	virtual float Volume(float val) { _volume = val; return _volume; }
+	// todo fix these recent updates in other imlpementations
+	virtual float Volume() { return volume_; }
+	virtual float Volume(float val)
+	{
+		setVolume_(val);
+		volume_ = val;
+		return volume_;
+	}
 
-	float Tune() { return _tune; }
-	virtual float Tune(float val) { _tune = val; return _tune; }
-
-	float Pan() { return _pan; }
-	virtual float Pan(float val) { _pan = val; return _pan; }
-
-	int Order() { return _order; }
-	virtual int Order(int val) { _order = val; return _order; }
-
-	int Loop() { return _loop; }
-	virtual int Loop(int val) { _loop = val; return _loop; }
-
-	virtual void Play();
-	virtual void Pause();
-	virtual void Resume();
-	virtual void Stop();
-
-	virtual void Load();
-	virtual void UnLoad();
+	virtual float Tune() { return tune_; }
+	virtual float Tune(float val)
+	{
+	    setTune_(val);
+	    tune_ = val;
+		return tune_;
+	}
 	
-	void from_json(const json& j, ISoundObject& s) {
-		j.at("v").get_to(s._volume);
-		j.at("t").get_to(s._tune);
-		j.at("p").get_to(s._pan);
-		j.at("o").get_to(s._order);
-		j.at("l").get_to(s._loop);
+	virtual float Pan() { return pan_; }
+	virtual float Pan(float val)
+	{
+	    setPan_(val);
+	    pan_ = val;
+		return pan_;
+	}
+
+	/*
+	 * _index: the index
+	 */
+	virtual int Index() { return index_; }
+	virtual int Index(int val)
+	{
+	    setIndex_(val);
+	    index_ = val;
+		return index_;
+	}
+
+	virtual int Loop() { return loop_; }
+	virtual int Loop(int val)
+	{
+	    setLoop_(val);
+	    loop_ = val;
+		return loop_;
+	}
+
+	virtual void Play() = 0;
+	virtual void Pause() = 0;
+	virtual void Resume() = 0;
+	virtual void Stop() = 0;
+
+	virtual void Load() = 0;
+	virtual void Unload() = 0;
+	
+	static void from_json(const json& j, ISoundObject& s) {
+		j.at("v").get_to(s.volume_);
+		j.at("t").get_to(s.tune_);
+		j.at("p").get_to(s.pan_);
+		j.at("l").get_to(s.loop_);
 
 		j.at("f").get_to(s.File);
 	}
 	
 protected:
-	float	_volume = 0.0f;
-	float	_tune = 0.0f;
-	float	_pan = 0.0f;
-	int		_order = 0;
-	int		_loop = 0;
+	float	volume_ = 0.0f;
+	float	tune_ = 0.0f;
+	float	pan_ = 0.0f;
+	int		index_ = 0;
+	int		loop_ = 0;
 
-	virtual float _setVolume(float val);
-	virtual float _setTune(float val);
-	virtual float _setPan(float val);
-	virtual int _setOrder(int val);
-	virtual int _setLoop(int val);
+	virtual void setVolume_(float val) = 0;
+	virtual void setTune_(float val) = 0;
+	virtual void setPan_(float val) = 0;
+	virtual void setIndex_(int val) = 0;
+	virtual void setLoop_(int val) = 0;
 };
 

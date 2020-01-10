@@ -2,6 +2,7 @@
 
 #include "FlashBang.hpp"
 #include "ISoundObject.hpp"
+#include "SoundEngine.h"
 
 #include <Audio.h>
 
@@ -18,22 +19,18 @@ public:
 	void Resume() override;
 	void Stop() override;
 	void Load() override;
-	void UnLoad() override;
-
-
-	float Volume(float val) override;
-	float Tune(float val) override;
-	float Pan(float val) override;
-	int Order(int val) override;
+	void Unload() override{ unload_(); }
 	
 protected:
-	float _setVolume(float val) override;
-	float _setTune(float val) override;
-	float _setPan(float val) override;
-	int _setOrder(int val) override;
+	void setVolume_(float val) override;
+	void setTune_(float val) override;
+	void setPan_(float val) override;
+	void setIndex_(int val) override;
 
 private:
 	std::unique_ptr<DirectX::SoundEffect> soundEffect;
 	std::unique_ptr<DirectX::SoundEffectInstance> soundEffectInstance;
+
+	void unload_();
 };
 
