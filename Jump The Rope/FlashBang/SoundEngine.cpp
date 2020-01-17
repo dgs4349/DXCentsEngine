@@ -37,9 +37,9 @@ void SoundEngine::Update()
 void SoundEngine::Update(float deltaTime)
 {
 
-	if (!audioEngineDX_->Update())
+	if (!DirectXAudioEngine->Update())
 	{
-		if (audioEngineDX_->IsCriticalError())
+		if (DirectXAudioEngine->IsCriticalError())
 		{
 			printf("AUDIO DEVICE LOST\n");
 			throw std::exception("Critical DirectX::AudioEngine error occured!");
@@ -60,22 +60,22 @@ void SoundEngine::Init()
 				eflags = eflags | DirectX::AudioEngine_Debug;
 		#endif
 	
-		audioEngineDXPointer_ = std::make_unique<DirectX::AudioEngine>(eflags);
-		audioEngineDX_ = audioEngineDXPointer_.get();
+		directXAudioEnginePointer = std::make_unique<DirectX::AudioEngine>(eflags);
+		DirectXAudioEngine = directXAudioEnginePointer.get();
 
-		isSilent_ = !audioEngineDX_->IsAudioDevicePresent();
+		isSilent_ = !DirectXAudioEngine->IsAudioDevicePresent();
 		initiated_ = true;
 	}
 }
 
 void SoundEngine::Suspend()
 {
-	audioEngineDX_->Suspend();
+	DirectXAudioEngine->Suspend();
 }
 
 void SoundEngine::Resume()
 {
-	audioEngineDX_->Resume();
+	DirectXAudioEngine->Resume();
 }
 
 void SoundEngine::AddSoundObject(ISoundObject* object)
@@ -95,10 +95,10 @@ SoundEngine::SoundEngine()
 
 SoundEngine::~SoundEngine()
 {
-	if(audioEngineDX_)
+	if(DirectXAudioEngine)
 	{
-		audioEngineDX_->Suspend();
-		audioEngineDXPointer_.release();
+		DirectXAudioEngine->Suspend();
+		directXAudioEnginePointer.release();
 	}
 	for (int i = 0; i < sounds_.size(); i++) delete sounds_[i];
 	for (auto it = sounds_.begin(); )

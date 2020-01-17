@@ -30,14 +30,14 @@ public:
 	void SetReverb();
 
 	void Load() override;
-	void UnLoad() override;
+	void Unload() override;
 
 	int Index(int val) override;
 
-	float GlobVolume(float val) { Volume(val); }
-	float GlobTune(float val)   { Tune(val); }
-	float GlobPan(float val)	{ Pan(val); }
-	int   GlobLoop(int val)		{ Loop(val); }
+	float GlobalVolume	(float val) { return Volume(val); }
+	float GlobalTune	(float val) { return Tune(val); }
+	float GlobalPan		(float val) { return Pan(val); }
+	int   GlobalLoop	(int val)	{ return Loop(val); }
 
 	void Play() override;
 	void Pause() override;

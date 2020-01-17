@@ -91,14 +91,14 @@ instead of this:
 
 this:
 	SoundContainer* SFX = new SoundContainer({
-		{"jump", 
+		{"_jump", 
 			Group{
 				"Files", L"Assets/Audio/sfx/jump_||0-4,1||.wav", // schema parser
 				"Volume", 0.5f,
 				"Pan", 0.95f,
 				"Index", "sequential"
 			}
-			
+		
 		}
 	});
 
@@ -153,5 +153,20 @@ parse(files names) {
 				for(args) do parse, [0]+n+[2] of filename
 			try regex split ,
 				foreach(args) do parse [0]+i+[2]of filename
+
+
+
+// FILES SHOULD ALWAYS BE AN ARRAY
+
+so, SoundContainer{
+	Sounds{
+		//multiple sounds
+	}
+	Files{
+		// this is now a sound group instead of a sound container
+		//		note: no need to parse vars since we expect vars to adjust played sounds
+
+	}
+}
 
 **/

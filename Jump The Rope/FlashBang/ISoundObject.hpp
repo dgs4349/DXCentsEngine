@@ -12,6 +12,8 @@ class ISoundObject
 {
 public:
 	ISoundObject() = default;
+	ISoundObject(json& j) { from_json(j, *this); }
+
 	virtual ~ISoundObject(){}
 
 	std::string File = nullptr;
@@ -67,27 +69,43 @@ public:
 
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
-	
-	static void from_json(const json& j, ISoundObject& s) {
-		j.at("v").get_to(s.volume_);
-		j.at("t").get_to(s.tune_);
-		j.at("p").get_to(s.pan_);
-		j.at("l").get_to(s.loop_);
 
-		j.at("f").get_to(s.File);
+	static void from_json(const json& j, ISoundObject& s) {
+		
+		const auto end = j.end();
+		
+		if (j.find("v") != end) j["v"].get_to(s.volume_);
+		if (j.find("t") != end) j["t"].get_to(s.tune_);
+		if (j.find("p") != end) j["p"].get_to(s.pan_);
+		if (j.find("l") != end) j["l"].get_to(s.loop_);
+		
+		if (j.find("f") != end && j["f"].is_string()) {
+			j["f"].get_to(s.File);
+		}
 	}
+	
+	void operator() () { Play(); }
 	
 protected:
 	float	volume_ = 0.0f;
 	float	tune_ = 0.0f;
 	float	pan_ = 0.0f;
-	int		index_ = 0;
+	int		index_ = -1;
 	int		loop_ = 0;
-
+	
 	virtual void setVolume_(float val) = 0;
 	virtual void setTune_(float val) = 0;
 	virtual void setPan_(float val) = 0;
 	virtual void setIndex_(int val) = 0;
 	virtual void setLoop_(int val) = 0;
+
+	// copy constructor specifically to copy parameters
+	ISoundObject(const ISoundObject& s)
+	{
+		volume_ = s.volume_;
+		tune_ = s.tune_;
+		pan_ = s.pan_;
+		loop_ = s.loop_;
+	}
 };
 

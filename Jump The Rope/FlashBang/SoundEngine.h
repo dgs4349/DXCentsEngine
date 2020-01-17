@@ -24,7 +24,7 @@ public:
 	static std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location)
 	{
 		if (!initiated_) SoundEngine();
-		return std::make_unique<DirectX::SoundEffect>(instance_->audioEngineDX_, location);
+		return std::make_unique<DirectX::SoundEffect>(instance_->DirectXAudioEngine, location);
 	}
 
 	/* *
@@ -42,14 +42,12 @@ public:
 	void AddSoundObject(ISoundObject* object);
 	void AddSoundContainer(ISoundContainer* container);
 
+	DirectX::AudioEngine* DirectXAudioEngine;
 private:
 	SoundEngine();
 	~SoundEngine();
 
-	std::vector<
-	
-	DirectX::AudioEngine* audioEngineDX_;
-	std::unique_ptr<DirectX::AudioEngine> audioEngineDXPointer_;
+	std::unique_ptr<DirectX::AudioEngine> directXAudioEnginePointer;
 	bool isSilent_ = false;
 
 

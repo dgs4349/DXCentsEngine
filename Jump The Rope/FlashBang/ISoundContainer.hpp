@@ -9,26 +9,33 @@ using namespace FlashBang;
 class ISoundContainer : ISoundObject, json
 {
 public:
-	ISoundContainer();
+	ISoundContainer(){}
 	~ISoundContainer();
 
 	std::vector<std::string> Files;
 
-	void from_json(const json& j, ISoundContainer& s) {
+	static void from_json(const json& j, ISoundContainer& s) {
+
 		ISoundObject::from_json(j, s);
-
-		j.at("Files").get_to(s.Files);
-
-		for (auto& el : j.items()) {
-			std::string key = el.key();
-			std::string newKey;
-			if (!isalpha(key[0])) {
-				newKey = key.substr(1, key.length() - 1);
-				((json)*this)[newKey] = el.value();
+		
+		if (j.find("f") != j.end())
+		{
+			if (j["f"].is_array())
+			{
+				for (auto e : j["f"]) s.Files.push_back(e);
 			}
+			else
+			{
+				s.Files.push_back(j["f"]);
+			}
+		}
+		
+		for (auto& el : j.items()) {
+			if (!isalpha(el.key()[0])) s.createSound_(el.key());
 		}
 	}
 
-private:
-	//loopAction_;
+protected:
+
+	virtual void createSound_(std::string const& key) = 0;
 };
