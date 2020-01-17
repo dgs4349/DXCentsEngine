@@ -9,11 +9,16 @@ bool SoundEngine::initiated_ = false;
 
 SoundEngine* SoundEngine::Get()
 {
+	addRef_();
+
+	return GetOnce();
+}
+
+SoundEngine* SoundEngine::GetOnce()
+{
 	if (instance_ == nullptr) {
 		instance_ = new SoundEngine();
 	}
-
-	addRef_();
 
 	return instance_;
 }

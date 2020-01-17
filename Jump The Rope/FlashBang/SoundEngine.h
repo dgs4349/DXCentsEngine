@@ -12,6 +12,7 @@ class SoundEngine
 {
 public:
 	static SoundEngine* Get();
+	static SoundEngine* GetOnce();
 	static void Release();
 
 	void Update();
@@ -23,7 +24,7 @@ public:
 
 	static std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location)
 	{
-		if (!initiated_) SoundEngine();
+		if (!initiated_) GetOnce();
 		return std::make_unique<DirectX::SoundEffect>(instance_->DirectXAudioEngine, location);
 	}
 
@@ -39,8 +40,8 @@ public:
 	 *
 	 *		does this have a real advantage? Guess it would maintain a sort of cache so vector won't reshuffle as much
 	 * */
-	void AddSoundObject(ISoundObject* object);
-	void AddSoundContainer(ISoundContainer* container);
+	void AddGlobalSoundObject(ISoundObject* object);
+	void AddGlobalSoundContainer(ISoundContainer* container);
 
 	DirectX::AudioEngine* DirectXAudioEngine;
 private:
@@ -50,7 +51,9 @@ private:
 	std::unique_ptr<DirectX::AudioEngine> directXAudioEnginePointer;
 	bool isSilent_ = false;
 
+	private SoundScene globalScene_;
 
+	
 	static SoundEngine* instance_;
 	
 	static bool initiated_;

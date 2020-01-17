@@ -6,7 +6,7 @@
 
 using namespace FlashBang;
 
-class ISoundContainer : ISoundObject, json
+class ISoundContainer : ISoundObject, protected json
 {
 public:
 	ISoundContainer(){}
