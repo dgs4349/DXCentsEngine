@@ -167,5 +167,8 @@
     <Text Include="FlashBang\goal.txt">
       <Filter>Audio</Filter>
     </Text>
+    <Text Include="args.txt">
+      <Filter>FlashBang\Parsing</Filter>
+    </Text>
   </ItemGroup>
 </Project>

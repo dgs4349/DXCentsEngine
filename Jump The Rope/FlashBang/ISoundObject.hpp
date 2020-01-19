@@ -7,7 +7,6 @@ using nlohmann::json;
 
 using namespace FlashBang;
 
-
 class ISoundObject
 {
 public:
@@ -85,6 +84,19 @@ public:
 	}
 	
 	void operator() () { Play(); }
+
+	ISoundObject& operator= (const ISoundObject& s)
+	{
+		if (this == &s) return *this;
+
+		volume_ = s.volume_;
+		tune_ = s.tune_;
+		pan_ = s.pan_;
+		loop_ = s.loop_;
+	}
+
+
+	ISoundObject(const ISoundObject& s) = delete;
 	
 protected:
 	float	volume_ = 0.0f;
@@ -92,6 +104,8 @@ protected:
 	float	pan_ = 0.0f;
 	int		index_ = -1;
 	int		loop_ = 0;
+
+	bool	managed_ = true;
 	
 	virtual void setVolume_(float val) = 0;
 	virtual void setTune_(float val) = 0;
@@ -99,13 +113,5 @@ protected:
 	virtual void setIndex_(int val) = 0;
 	virtual void setLoop_(int val) = 0;
 
-	// copy constructor specifically to copy parameters
-	ISoundObject(const ISoundObject& s)
-	{
-		volume_ = s.volume_;
-		tune_ = s.tune_;
-		pan_ = s.pan_;
-		loop_ = s.loop_;
-	}
 };
 

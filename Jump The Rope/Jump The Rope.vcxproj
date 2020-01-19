@@ -271,6 +271,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="args.txt" />
     <Text Include="FlashBang\goal.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

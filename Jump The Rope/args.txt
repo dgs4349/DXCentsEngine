@@ -1,0 +1,14 @@
+Current Args:
+
+ISoundObject:
+	- v: volume
+	- t: tune/pitch
+	- p: pan
+	- l: loop
+
+	- f: file/files (context dependent)
+
+ISoundContainer:
+	- i
+		- items
+	- Container (full word, cap)

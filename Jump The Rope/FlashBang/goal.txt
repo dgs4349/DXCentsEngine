@@ -169,4 +169,131 @@ so, SoundContainer{
 	}
 }
 
+
+
+
+
+
+
+
+
+
+
+
+details on json format and syntax
+
+
+Scene game = new Scene(R"(
+	{
+		"$background": {
+			"files": {
+				L"Assets/Audio/audio_background_intro.wav",
+				L"Assets/Audio/audio_background_loop.wav"
+			}
+			"volume": 0.35f,
+			"effects": {
+				new Effect(
+					Effects.Volume(-0.0f, 0.75f), 
+					Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
+				),
+			}
+			"OnComplete": Effects.Container.LoopLast(),
+			
+		}
+		
+		
+		talking this out, how do we determine what is and isnt a sound container
+
+		honestly we could do it automatically, but that might be difficult
+			- we'd need to either have SoundObject figure out if it's a SoundContainer
+				- that would require SoundContainer being included in SoundObject
+				- we would then need to either forward declare or somehow make soundcontainer
+					a different beast altogether
+
+		but the bottom line is that doing it automatically makes it harder to read for the client
+
+		so, lets do this (pretend all items are strings)
+
+		$background {
+			Container {
+				"files": {
+					L"Assets/Audio/audio_background_intro.wav",
+					L"Assets/Audio/audio_background_loop.wav"
+				}
+				"volume": 0.35f,
+				"effects": {
+					new Effect(
+						Effects.Volume(-0.0f, 0.75f), 
+						Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
+					),
+				}
+				"OnComplete": Effects.Container.LoopLast(),
+			}
+		}
+		$background {
+			Container {
+				{
+				"file": L"Assets/Audio/audio_background_intro.wav",
+				"volume": 0.35f,
+				"effects": {
+					new Effect(
+						Effects.Volume(-0.0f, 0.75f), 
+						Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
+					),
+				}
+				"OnComplete": Effects.Container.LoopLast(),
+				}
+				
+			}
+		}
+
+		// maybe it's a scene, etc.
+			shit speaking of, we will need to figure out what is and isnt a scene
+			but im pretty sure that will just be scenes added to sound engine seperately
+			and no need to complicate it further
+
+		$background {
+			Scene {
+				"files": {
+					L"Assets/Audio/audio_background_intro.wav",
+					L"Assets/Audio/audio_background_loop.wav"
+				}
+				"volume": 0.35f,
+				"effects": {
+					new Effect(
+						Effects.Volume(-0.0f, 0.75f), 
+						Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
+					),
+				}
+				"OnComplete": Effects.Container.LoopLast(),
+			}
+		}
+
+		
+		
+		
+		SoundContainer({
+			"files": {
+				L"Assets/Audio/audio_background_intro.wav",
+				L"Assets/Audio/audio_background_loop.wav"
+			}
+			"volume": 0.35f,
+			"effects": {
+				new Effect(
+					Effects.Volume(-0.0f, 0.75f), 
+					Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
+				),
+			}
+			"OnComplete": Effects.Container.LoopLast(),
+		}),
+
+		"OnStart": "background",
+		"3D": false,
+
+		(or ListenerPostition:, and with sound just Position, Velocity, etc)
+
+
+	}
+)"_json);
+
 **/

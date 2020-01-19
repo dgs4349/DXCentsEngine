@@ -41,12 +41,20 @@ bool AudioJsonSax::SerializeParamEvent(string_t& val) {
 		Does NOT convert events such as "OnStart"
 	*/
 
-	// names such as "_jump", do nothing
-	if (!isalpha(val[0])) return true;
+	// TODO: debug all param/events,
+		// - if debug, print out all received args or output to file
 	
-	// events as in "OnStart", do nothing
-	if (val[0] == 'O') return true;
+	// names such as "_jump", do nothing
+	// todo: output what named sounds were received
+	if (!isalpha(val[0])) return true;
 
+	// events such as in OnStart or descriptors such as Container
+	// todo: output what was received and what the action will do
+	if (isupper(val[0])) return true;
+	
+
+	// if nothing above matches, return just the first (lowercased) letter
+	// todo: output what we received, what it will be (if recognized) interpreted as, and what that might do
 	val = tolower(val[0]);
 	return true;
 }

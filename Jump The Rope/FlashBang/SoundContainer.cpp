@@ -60,17 +60,22 @@ void SoundContainer::setLoop_(int val)
 
 void SoundContainer::unload_()
 {
-	for(auto& el : this->items())
-	{
-		if (!isalpha(el.key()[0]))
-		{
-			// we might need to check the docs for adding a conversion
-			Sound* s = *el.value();
-		}
-	}
+	for (int i : managedSoundObjects_) delete sounds_[i];
 }
 
 void SoundContainer::createSound_(std::string const& key)
 {
+	// key will be some non-numerical character followed by the key
+	//	we want a key both with and without that key
+	int count = sounds_.size();
+	Sound* sound = new Sound();
 	
+	Sound* sound = new Sound();
+	auto cont = new SoundContainer();
+	json test;
+	(*cont)[key] = 5;
+	test[key] = 5;
+
+	auto result = cont->find(key);
+	cont->at(result);
 }
