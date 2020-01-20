@@ -84,7 +84,7 @@ protected:
 		 *		if we have something like |0-4-1| (equivalent to |0-4|) than we need to
 		 *			iterate in a for loop to add integers 0-4, step by 1, to our filenames
 		 */
-		else
+		else try
 		{
 			// aud|0-4|.wav => {aud, 0-4, .wav}; aud|a,b,c|.wav => {aud, "a,b,c", .wav}
 			std::vector<std::string> fileStrings;
@@ -97,7 +97,14 @@ protected:
 			// parse a list such as |a,b,c|, this is pretty straight forward
 			if (fileStrings[1].find(',') != std::string::npos)
 			{
+				// just parse the array, "a,b,c" => {a, b, c}
+				std::vector<std::string> listItems;
+				boost::split(listItems, fileStrings[1], boost::is_any_of(','));
 
+				// for each item {a,b,c} add "aud" + "a" + ".wav
+				for (auto item : listItems) {
+					s.Files.push_back(fileStrings[0] + item + fileStrings[2]);
+				}
 			}
 
 			// parse a range such as |0-4-1| into a for loop, much harder tbh
@@ -105,9 +112,7 @@ protected:
 			{
 				// "0-4-1" => {0, 4, 1}, from-to-step
 				std::vector<std::string> forParams;
-				boost::split(forParams, 
-					fileStrings[1], 
-					boost::is_any_of('-'));
+				boost::split(forParams, fileStrings[1], boost::is_any_of('-'));
 
 				// for (i = 0; i < 4; i += 1), add "aud" + i + ".wav"
 				for (
@@ -116,32 +121,30 @@ protected:
 						i += (forParams.size() > 2) ? std::stoi(forParams[2]) : 1
 					)
 				{
-					s.Files.push_back(
-						fileStrings[0] + 
-						std::to_string(i) + 
-						fileStrings[2]);
+					s.Files.push_back(fileStrings[0] + std::to_string(i) + fileStrings[2]);
 				}
 			}
+		}
+		catch(const std::exception & e)
+		{
+			const auto message = R"(Error parsing |...| in filename! Please double check formatting rules:
+	Range: |start-stop-step| as in "audio_|0-4|.wav" or "audio_|0-8-2|.wav"
+	List: |a,b,c| as in "audio_|a,b,c|.wav"
+
+	Received string: )";
+
+			const auto messageString = std::string(message) + f + "\n";
+			
+			printf(messageString.c_str());
+			printf("Exception: %s", e.what());
 		}
 	}
 	
 	static void parseFiles_(ISoundContainer &s, std::vector<std::string>& f)
 	{
-		for(auto el : f)
-		{
-			/*std::string s = "scott>=tiger>=mushroom";
-			std::string delimiter = ">=";
-
-			size_t pos = 0;
-			std::string token;
-			while ((pos = s.find(delimiter)) != std::string::npos) {
-				token = s.substr(0, pos);
-				std::cout << token << std::endl;
-				s.erase(0, pos + delimiter.length());
-			}
-			std::cout << s << std::endl;*/
-
-			
-		}
+		// both parseFile and parseFiles are very slow and big
+		//	we should find a way to reduce complexity or cache when complete
+		//	perhaps output into a faster, trusted json template that we can import risky
+		for (auto el : f) { parseFile_(s, el); }
 	}
 };
