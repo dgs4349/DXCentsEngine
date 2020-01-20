@@ -64,7 +64,7 @@ Scene menu = new Scene({
 // or this could be in a scene
 SoundContainer* SFX = new SoundContainer({
 	{"jump", 
-		{"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav"}, // schema parser
+		{"files", L"Assets/Audio/sfx/jump_|0-4-1|.wav"}, // schema parser
 		{"volume", 0.5f},
 		{"pan", 0.95f},
 		{"index", "sequential"}
@@ -82,7 +82,7 @@ SFX["jump"]->Play(); //goal, one offs invoked without member play?
 instead of this:
 	SoundContainer* SFX = new SoundContainer({
 		{"jump", 
-			{"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav"}, // schema parser
+			{"files", L"Assets/Audio/sfx/jump_|0-4,1|.wav"}, // schema parser
 			{"volume", 0.5f},
 			{"pan", 0.95f},
 			{"index", "sequential"}
@@ -93,7 +93,7 @@ this:
 	SoundContainer* SFX = new SoundContainer({
 		{"_jump", 
 			Group{
-				"Files", L"Assets/Audio/sfx/jump_||0-4,1||.wav", // schema parser
+				"Files", L"Assets/Audio/sfx/jump_|0-4,1|.wav", // schema parser
 				"Volume", 0.5f,
 				"Pan", 0.95f,
 				"Index", "sequential"
@@ -112,7 +112,7 @@ this:
 		{"_jump", 
 
 			group{
-				"files", L"Assets/Audio/sfx/jump_||0-4,1||.wav", // schema parser
+				"files", L"Assets/Audio/sfx/jump_|0-4,1|.wav", // schema parser
 				"volume", 0.5f,
 				"pan", 0.95f,
 				"index", "sequential"
@@ -123,7 +123,7 @@ this:
 
 
 
-new class: Group => plural sounds with identical parameters (files:"||~~||" or files:[] instead of file:"~~");
+new class: Group => plural sounds with identical parameters (files:"|~~|" or files:[] instead of file:"~~");
 				 => like a container but all sounds are identical and parsed together
 				 => either this or SoundContainer works, but Group can be parsed together and more compact declaring params, its just easier
 
@@ -139,8 +139,8 @@ indexs: sequential, reverse, random, randomother,
 wrap: true (default), false, doesn't affect random containers
 obvi we can do more but this is good for now
 
-||0-4-1||, ||0-4|| from, to
-||a, b, c||, each
+|0-4-1|, |0-4| from, to
+|a, b, c|, each
 
 file: parse string
 files: parse group
@@ -148,7 +148,7 @@ parse(files names) {
 	length > 1
 		parse each
 	length = 1
-		regex split || -> only have one, make a note of that
+		regex split | -> only have one, make a note of that
 			try regex split -
 				for(args) do parse, [0]+n+[2] of filename
 			try regex split ,
@@ -230,6 +230,30 @@ Scene game = new Scene(R"(
 				"OnComplete": Effects.Container.LoopLast(),
 			}
 		}
+
+		&bg {
+			Container {
+				items: {
+					Container {
+						file: a,
+						v: -5
+					}
+					$guesswho {
+						file: dlksjf
+
+					}
+					
+					check: is items array or object
+					doesn't have to be if object
+						- since that can just be in base Container class
+
+				}
+			}
+		}
+
+
+
+
 		$background {
 			Container {
 				{
