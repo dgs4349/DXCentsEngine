@@ -29,15 +29,37 @@ public:
 
 		if (j.find("i") != end)
 		{
-			// recurse, not an array, rest of objects can be added normally
-			if (j["i"].is_object()) from_json(j["i"], s);
-			else
-			{
-				s.createSound_()
+			/*
+			 *	Possible "i" (item) key types:
+			 *
+			 *	// named sound objects:
+			 *		containerExample1{ Container {
+			 *			items {
+			 *				$fire{ ... }
+			 *				$reload{ ... }
+			 *			}
+			 *		}}
+			 *
+			 * // arrays of anonymous sound objects (will be indexed):
+			 *		containerExample2{ Container {
+			 *			items{
+			 *				{ f: "file1.wav", v: 0.5f }
+			 *				{ f: "filesomethingelse.wav", p: -.8f, v: 5f }
+			 *			}
+			 *		}}
+			 *
+			 */
+
+			if(j["i"].is_array()) {
+				for (auto el : j["i"].get<std::vector<json>>()) s.createSoundAnon_(el);
 			}
+			else {
+				for (auto el : j["i"].items()) s.createSound_(el.key(), el.value());
+			}
+			
 		}
 
-		
+		// we'll need to parse files here but also on named sound files as well
 		if (j.find("f") != end)
 		{
 			if (j["f"].is_array())
@@ -67,8 +89,18 @@ public:
 
 protected:
 
-	virtual void createSound_(std::string const& key) = 0;
+	/*
+	 * TODO: we will have to go through and add checking keys and checking containers
+	 *	through other methods before calling createSound.
+	 *
+	 * 
+	 */
+	virtual void createSound_(std::string const& key, json const& attr) = 0;
+	virtual void createSoundAnon_(json const& attr) = 0;
 
+	virtual void createSoundContainer_(std::string const& key, json const& attr) = 0;
+	virtual void createSoundContainerAnon_(json const& attr);
+	
 	static void parseFile_(ISoundContainer &s, std::string &f)
 	{
 		// if we don't find any special characters just add it to s.Files and move on
@@ -127,7 +159,8 @@ protected:
 		}
 		catch(const std::exception & e)
 		{
-			const auto message = R"(Error parsing |...| in filename! Please double check formatting rules:
+			const auto message = R"(
+	Error parsing |...| in filename! Please double check formatting rules:
 	Range: |start-stop-step| as in "audio_|0-4|.wav" or "audio_|0-8-2|.wav"
 	List: |a,b,c| as in "audio_|a,b,c|.wav"
 
@@ -147,4 +180,5 @@ protected:
 		//	perhaps output into a faster, trusted json template that we can import risky
 		for (auto el : f) { parseFile_(s, el); }
 	}
+
 };

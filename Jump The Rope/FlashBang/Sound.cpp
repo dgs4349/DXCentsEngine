@@ -33,6 +33,8 @@ void ::Sound::Stop()
 
 void ::Sound::Load()
 {
+	// should we check for '|' characters?
+	
 	// should we keep File as a wstring?
 	const wchar_t* file_str = std::wstring(File.begin(), File.end()).c_str();
 	DirectXSoundEffect = SoundEngine::LoadSoundDX(file_str);

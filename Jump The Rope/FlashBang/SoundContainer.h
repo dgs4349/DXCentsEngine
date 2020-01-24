@@ -48,4 +48,3 @@ private:
 	std::vector<ISoundObject*> sounds_;
 	std::vector<int> managedSoundObjects_;
 };
-

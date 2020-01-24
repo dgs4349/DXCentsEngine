@@ -65,6 +65,9 @@ void SoundContainer::unload_()
 
 void SoundContainer::createSound_(std::string const& key)
 {
+	// all createBlank_ methods should begin with
+
+	
 	// key will be some non-numerical character followed by the key
 	//	we want a key both with and without that key
 	int count = sounds_.size();
