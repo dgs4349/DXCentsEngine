@@ -18,13 +18,6 @@ public:
 
 	static void from_json(const json& j, ISoundContainer& s) {
 
-		/*
-		 *	things we have to check for
-		 *		- Items lists and sub Containers
-		 *		
-		 *		
-		 * 
-		 */
 		auto end = j.end();
 
 		if (j.find("i") != end)
@@ -51,10 +44,10 @@ public:
 			 */
 
 			if(j["i"].is_array()) {
-				for (auto el : j["i"].get<std::vector<json>>()) s.createSoundAnon_(el);
+				for (auto el : j["i"].get<std::vector<json>>()) s.parseSoundObject_(el);
 			}
 			else {
-				for (auto el : j["i"].items()) s.createSound_(el.key(), el.value());
+				for (auto el : j["i"].items()) s.parseSoundObject_(el.key(), el.value());
 			}
 			
 		}
@@ -75,31 +68,42 @@ public:
 			}
 		}
 
-		// we have to check for more containers here
+		// iterate for custom items
 		for (auto& el : j.items()) {
-			if (!isalpha(el.key()[0])) {
-				if()
-				s.createSound_(el.key());
-			}
+			if (!isalpha(el.key()[0])) s.parseSoundObject_(el.key(), el.value());
 		}
-
 
 		ISoundObject::from_json(j, s);
 	}
 
 protected:
+	
+	virtual ISoundObject* createSound_(json const& j) = 0;
+	virtual ISoundObject* createSoundContainer_(json const& attr) = 0;
 
-	/*
-	 * TODO: we will have to go through and add checking keys and checking containers
-	 *	through other methods before calling createSound.
-	 *
-	 * 
-	 */
-	virtual void createSound_(std::string const& key, json const& attr) = 0;
-	virtual void createSoundAnon_(json const& attr) = 0;
+	virtual ISoundObject* createSound_(std::string const& key, json const& j) = 0;
+	virtual ISoundObject* createSoundContainer_(std::string const& key, json const& attr) = 0;
 
-	virtual void createSoundContainer_(std::string const& key, json const& attr) = 0;
-	virtual void createSoundContainerAnon_(json const& attr);
+	virtual int addSoundObject_(ISoundObject const& soundObject) = 0;
+	virtual int addSoundObject_(std::string const& key, ISoundObject const& soundObject) = 0;
+
+	void parseAddKey_(std::string const& originalKey, int soundObjectIndex)
+	{
+		((json)*this)[originalKey] = soundObjectIndex;
+		((json)*this)[originalKey.substr(1, originalKey.length())] = soundObjectIndex;
+	}
+
+	void parseSoundObject_(json const& j)
+	{
+		if (j.find("Container") != j.end()) createSoundContainer_(j["Container"]);
+		else createSound_(j);
+	}
+	
+	void parseSoundObject_(std::string const& key, json const& j)
+	{
+		if (j.find("Container") != j.end()) createSoundContainer_(key, j["Container"]);
+		else createSound_(key, j);
+	}
 	
 	static void parseFile_(ISoundContainer &s, std::string &f)
 	{

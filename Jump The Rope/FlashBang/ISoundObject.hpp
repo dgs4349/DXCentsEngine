@@ -104,8 +104,6 @@ protected:
 	float	pan_ = 0.0f;
 	int		index_ = -1;
 	int		loop_ = 0;
-
-	bool	managed_ = true;
 	
 	virtual void setVolume_(float val) = 0;
 	virtual void setTune_(float val) = 0;

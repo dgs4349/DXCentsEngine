@@ -60,31 +60,29 @@ void SoundContainer::setLoop_(int val)
 
 void SoundContainer::unload_()
 {
-	for (int i : managedSoundObjects_) delete sounds_[i];
+	for (auto el : soundObjects_) delete el;
 }
 
-void SoundContainer::createSound_(std::string const& key)
+ISoundObject* SoundContainer::createSound_(json const& j)
 {
-	// all createBlank_ methods should begin with
+}
 
-	
-	// key will be some non-numerical character followed by the key
-	//	we want a key both with and without that key
-	int count = sounds_.size();
+ISoundObject* SoundContainer::createSoundContainer_(json const& attr)
+{
+}
 
-	auto sound = new Sound();
+ISoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
+{
+}
 
-	/*
-	 * okay we need to figure out files now
-	 *	- createSound_() with tailing json
-	 *	- createSound_() without, where files are created during load
-	 *	- createSound_() wih just file such as during a list
-	 *		- or maybe do we need to add some other kind of
-	 *			collection/specifier for when we do and do not
-	 *			collect files and whatnot
-	 *	- no, files will be parsed here and passed in one way or another
-	 *	- some will have it in json, but others we will have to figure out
-	 * 
-	 */
-	
+ISoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
+{
+}
+
+int SoundContainer::addSoundObject_(ISoundObject const& soundObject)
+{
+}
+
+int SoundContainer::addSoundObject_(std::string const& key, ISoundObject const& soundObject)
+{
 }
