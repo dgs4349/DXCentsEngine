@@ -72,9 +72,6 @@
     <ClCompile Include="FlashBang\Sound.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\AudioJsonSax.cpp">
-      <Filter>FlashBang\Parsing</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundScene.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
@@ -118,9 +115,6 @@
     </ClInclude>
     <ClInclude Include="FlashBang\FlashBang.hpp">
       <Filter>FlashBang</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\AudioJsonSax.h">
-      <Filter>FlashBang\Parsing</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\ISoundObject.hpp">
       <Filter>FlashBang\Parsing</Filter>
