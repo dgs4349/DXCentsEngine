@@ -17,65 +17,23 @@ public:
 	std::vector<std::string> Files;
 
 	static void from_json(const json& j, ISoundContainer& s) {
+		
+		std::string key;
 
-		auto end = j.end();
+		for (auto i : j.items()) {
 
-		if (j.find("i") != end)
-		{
-			/*
-			 *	Possible "i" (item) key types:
-			 *
-			 *	// named sound objects:
-			 *		containerExample1{ Container {
-			 *			items {
-			 *				$fire{ ... }
-			 *				$reload{ ... }
-			 *			}
-			 *		}}
-			 *
-			 * // arrays of anonymous sound objects (will be indexed):
-			 *		containerExample2{ Container {
-			 *			items{
-			 *				{ f: "file1.wav", v: 0.5f }
-			 *				{ f: "filesomethingelse.wav", p: -.8f, v: 5f }
-			 *			}
-			 *		}}
-			 *
-			 */
+			// bit redundant, but for-index would increase complexity
+			key = i.key();
 
-			if(j["i"].is_array()) {
-				for (auto el : j["i"].get<std::vector<json>>()) s.parseSoundObject_(el);
+			if (!isalpha(i.key()[0])) {
+				s.parseSoundObject_(i.key(), i.value());
 			}
 			else {
-				for (auto el : j["i"].items()) s.parseSoundObject_(el.key(), el.value());
-			}
-			
-		}
-
-		// we'll need to parse files here but also on named sound files as well
-		if (j.find("f") != end)
-		{
-			if (j["f"].is_array())
-			{
-				auto f = j["f"].get <std::vector<std::string>>();
-				parseFiles_(s, f);
-
-			}
-			else
-			{
-				auto f = j["f"].get<std::string>();
-				parseFile_(s, f);
+				s.parseParam_(key, j);
 			}
 		}
-
-		// iterate for custom items
-		for (auto& el : j.items()) {
-			if (!isalpha(el.key()[0])) s.parseSoundObject_(el.key(), el.value());
-		}
-
-		ISoundObject::from_json(j, s);
 	}
-
+	
 protected:
 	
 	virtual ISoundObject* createSound_(json const& j) = 0;
@@ -87,7 +45,41 @@ protected:
 	virtual int addSoundObject_(ISoundObject const& soundObject) = 0;
 	virtual int addSoundObject_(std::string const& key, ISoundObject const& soundObject) = 0;
 
-	void parseAddKey_(std::string const& originalKey, int soundObjectIndex)
+	void parseParam_(std::string& key, const json& j) override
+	{
+		if (key[0] == 'i')
+		{
+			if (j[key].is_array()) {
+				// iterate through each element in ARRAY
+				for (auto el : j[key].get<std::vector<json>>()) 
+					parseSoundObject_(el);
+			}
+			else {
+				// iterate through each key-value pair in OBJECT
+				for (auto el : j[key].items()) 
+					parseSoundObject_(el.key(), el.value());
+			}
+		}
+		ISoundObject::parseParam_(key, j);
+	}
+
+	void parseFile_(std::string& fileKey, const json& j) override
+	{
+		if (j[fileKey].is_array())
+		{
+			auto files = j[fileKey].get <std::vector<std::string>>();
+
+			for (size_t i = 0; i < files.size(); i++)
+				checkSplitThenAddFileString_(files[i]);
+		}
+		else
+		{
+			auto f = j[fileKey].get<std::string>();
+			checkSplitThenAddFileString_(f);
+		}
+	}
+	
+	void parseAddSoundObjectKey_(std::string const& originalKey, int soundObjectIndex)
 	{
 		((json)*this)[originalKey] = soundObjectIndex;
 		((json)*this)[originalKey.substr(1, originalKey.length())] = soundObjectIndex;
@@ -104,24 +96,27 @@ protected:
 		if (j.find("Container") != j.end()) createSoundContainer_(key, j["Container"]);
 		else createSound_(key, j);
 	}
-	
-	static void parseFile_(ISoundContainer &s, std::string &f)
+
+	bool checkFileString_(std::string &s)
 	{
-		// if we don't find any special characters just add it to s.Files and move on
-		if(f.find('|') == std::string::npos)
-		{
-			s.Files.push_back(f);
-		}
-		
+		return s.find('|') == std::string::npos;
+	}
+
+	// atrocious name, but this needs to be clear
+	void checkSplitThenAddFileString_(std::string &f)
+	{
 		/*
-		 * if we find '|' in the file string, than we need to parse multiple strings
+		 * called after a check for '|' in the file string, we need to parse multiple strings
 		 *		if we have something like |a, b, c| in our filename, than we need to
 		 *			iterate on and switch out a, then b, then c in our filenames
 		 *		if we have something like |0-4-1| (equivalent to |0-4|) than we need to
 		 *			iterate in a for loop to add integers 0-4, step by 1, to our filenames
 		 */
-		else try
+		if(!checkFileString_(f))
 		{
+			Files.push_back(f);
+		}
+		else try {
 			// aud|0-4|.wav => {aud, 0-4, .wav}; aud|a,b,c|.wav => {aud, "a,b,c", .wav}
 			std::vector<std::string> fileStrings;
 			boost::split(fileStrings, f, boost::is_any_of('|'));
@@ -139,7 +134,7 @@ protected:
 
 				// for each item {a,b,c} add "aud" + "a" + ".wav
 				for (auto item : listItems) {
-					s.Files.push_back(fileStrings[0] + item + fileStrings[2]);
+					Files.push_back(fileStrings[0] + item + fileStrings[2]);
 				}
 			}
 
@@ -157,7 +152,7 @@ protected:
 						i += (forParams.size() > 2) ? std::stoi(forParams[2]) : 1
 					)
 				{
-					s.Files.push_back(fileStrings[0] + std::to_string(i) + fileStrings[2]);
+					Files.push_back(fileStrings[0] + std::to_string(i) + fileStrings[2]);
 				}
 			}
 		}
@@ -175,14 +170,6 @@ protected:
 			printf(messageString.c_str());
 			printf("Exception: %s", e.what());
 		}
-	}
-	
-	static void parseFiles_(ISoundContainer &s, std::vector<std::string>& f)
-	{
-		// both parseFile and parseFiles are very slow and big
-		//	we should find a way to reduce complexity or cache when complete
-		//	perhaps output into a faster, trusted json template that we can import risky
-		for (auto el : f) { parseFile_(s, el); }
 	}
 
 };

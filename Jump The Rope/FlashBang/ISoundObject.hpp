@@ -12,6 +12,7 @@ class ISoundObject
 public:
 	ISoundObject() = default;
 	ISoundObject(json& j) { from_json(j, *this); }
+	ISoundObject(std::string& s) {}
 
 	virtual ~ISoundObject(){}
 
@@ -69,17 +70,12 @@ public:
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
 
+	// this method sadly has to be snake case
 	static void from_json(const json& j, ISoundObject& s) {
-		
-		const auto end = j.end();
-		
-		if (j.find("v") != end) j["v"].get_to(s.volume_);
-		if (j.find("t") != end) j["t"].get_to(s.tune_);
-		if (j.find("p") != end) j["p"].get_to(s.pan_);
-		if (j.find("l") != end) j["l"].get_to(s.loop_);
-		
-		if (j.find("f") != end && j["f"].is_string()) {
-			j["f"].get_to(s.File);
+		std::string key;
+		for (auto i : j.items()) {
+			key = i.key();
+			s.parseParam_(key, j);
 		}
 	}
 	
@@ -87,14 +83,15 @@ public:
 
 	ISoundObject& operator= (const ISoundObject& s)
 	{
-		if (this == &s) return *this;
-
-		volume_ = s.volume_;
-		tune_ = s.tune_;
-		pan_ = s.pan_;
-		loop_ = s.loop_;
+		if (this != &s)
+		{
+			volume_ = s.volume_;
+			tune_ = s.tune_;
+			pan_ = s.pan_;
+			loop_ = s.loop_;
+		}
+		return *this;
 	}
-
 
 	ISoundObject(const ISoundObject& s) = delete;
 	
@@ -111,5 +108,26 @@ protected:
 	virtual void setIndex_(int val) = 0;
 	virtual void setLoop_(int val) = 0;
 
+	virtual void parseParam_(std::string& key, const json& j)
+	{
+		if (islower(key[0]))
+		{
+			switch (key[0])
+			{
+			case 'v': j[key].get_to(volume_); break;
+			case 't': j[key].get_to(tune_); break;
+			case 'p': j[key].get_to(pan_); break;
+			case 'l': j[key].get_to(loop_); break;
+
+			case 'f': parseFile_(key, j);  break;
+			default: break;
+			}
+		}
+	}
+
+	virtual void parseFile_(std::string& fileKey, const json& j)
+	{
+		j[fileKey].get_to(File);
+	}
 };
 
