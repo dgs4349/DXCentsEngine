@@ -60,9 +60,6 @@
     <ClCompile Include="CurrAudImp.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\Effect.cpp">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundContainer.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
@@ -100,9 +97,6 @@
     </ClInclude>
     <ClInclude Include="CurrAudImp.h">
       <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\Effect.h">
-      <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\SoundContainer.h">
       <Filter>FlashBang</Filter>
@@ -147,9 +141,6 @@
     </Filter>
     <Filter Include="FlashBang\Parsing">
       <UniqueIdentifier>{11128d3d-de07-45aa-b5c0-b98cf57a04f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="FlashBang\SoundObjects">
-      <UniqueIdentifier>{0347a4f4-6990-4778-9044-e24180cb9103}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
