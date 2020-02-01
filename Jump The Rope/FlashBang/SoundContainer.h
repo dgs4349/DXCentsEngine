@@ -10,18 +10,19 @@ using namespace FlashBang;
 class SoundContainer : public ISoundContainer
 {
 public:
-
-	// todo:
-	/*'
-	 * This should probs be in Sound or SoundObject but nonetheless
-	 *
-	 * Sax parsing doesn't have a json object creator, which is stupid. But, it can be useful
-	 *	construct on json: So our key-command conversions can just be a function to iterator through json objects to convert
-	 *	construct on string or input: We can use a sax interface to "fix" a string and then convert a json object
-	 */
+	~SoundContainer() {}
 	
-	SoundContainer();
-	~SoundContainer();
+	static SoundContainer* Create(json& definingJson)
+	{
+		SoundContainer* s = new SoundContainer();
+		ISoundContainer::from_json(definingJson, *s);
+		return s;
+	}
+	static SoundContainer* Create(std::string& definingString)
+	{
+		json j = definingString;
+		return Create(j);
+	}
 	
 	void Play() override;
 	void Pause() override;
@@ -39,7 +40,7 @@ public:
 			const int index = ((json)*this)[s].get<int>();
 			return soundObjects_[index];
 		}
-		else return nullptr;
+		return nullptr;
 	}
 
 	ISoundObject* operator[] (int i)
@@ -66,6 +67,7 @@ protected:
 	int addSoundObject_(std::string const& key, ISoundObject const& soundObject) override;
 	
 private:
+	SoundContainer() = delete;
 	
 	std::vector<ISoundObject*> soundObjects_;
 };

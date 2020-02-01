@@ -10,12 +10,8 @@ using namespace FlashBang;
 class ISoundObject
 {
 public:
-	ISoundObject() = default;
-	ISoundObject(json& j) { from_json(j, *this); }
-	ISoundObject(std::string& s) {}
-
-	virtual ~ISoundObject(){}
-
+	~ISoundObject(){}
+	
 	std::string File = nullptr;
 
 	// todo fix these recent updates in other imlpementations
@@ -120,6 +116,13 @@ protected:
 			case 'l': j[key].get_to(loop_); break;
 
 			case 'f': parseFile_(key, j);  break;
+
+			case 'e':
+
+				
+				
+				break;
+				
 			default: break;
 			}
 		}
@@ -129,5 +132,8 @@ protected:
 	{
 		j[fileKey].get_to(File);
 	}
+
+private:
+	ISoundObject() = delete;
 };
 

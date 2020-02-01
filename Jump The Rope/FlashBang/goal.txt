@@ -191,12 +191,19 @@ Scene game = new Scene(R"(
 				L"Assets/Audio/audio_background_loop.wav"
 			}
 			"volume": 0.35f,
+
+
+			// effects will for now need to be made externally
 			"effects": {
 				new Effect(
 					Effects.Volume(-0.0f, 0.75f), 
 					Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
 				),
+				"$name": {"v", -0.0f, 0.75f},
+				"name2": {"t", 1.0f, 10.0f},
 			}
+
+
 			"OnComplete": Effects.Container.LoopLast(),
 			
 		}

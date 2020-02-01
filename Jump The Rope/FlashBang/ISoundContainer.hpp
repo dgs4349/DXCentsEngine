@@ -11,8 +11,8 @@ using namespace FlashBang;
 class ISoundContainer : protected ISoundObject, public json
 {
 public:
-	ISoundContainer(){}
-	~ISoundContainer();
+	
+	~ISoundContainer() {}
 
 	std::vector<std::string> Files;
 
@@ -171,5 +171,8 @@ protected:
 			printf("Exception: %s", e.what());
 		}
 	}
+
+private:
+	ISoundContainer() = delete;
 
 };

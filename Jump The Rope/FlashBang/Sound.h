@@ -11,9 +11,19 @@ using namespace FlashBang;
 class Sound : ISoundObject
 {
 public:
-	Sound();
-	~Sound();
 
+	static Sound* Create(json& definingJson)
+	{
+		Sound* s = new Sound();
+		ISoundObject::from_json(definingJson, *s);
+		return s;
+	}
+	static Sound* Create(std::string& definingString)
+	{
+		json j = definingString;
+		return Create(j);
+	}
+	
 	void Play() override;
 	void Pause() override;
 	void Resume() override;
@@ -33,6 +43,8 @@ protected:
 	void setLoop_(int val) override;
 
 private:
+	Sound();
+	~Sound();
 
 	void unload_();
 

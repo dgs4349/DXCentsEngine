@@ -12,3 +12,5 @@ ISoundContainer:
 	- i
 		- items
 	- Container (full word, cap)
+	- Effect
+		- or e
