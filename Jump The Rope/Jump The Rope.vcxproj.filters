@@ -125,6 +125,9 @@
     <ClInclude Include="FlashBang\ISoundContainer.hpp">
       <Filter>FlashBang\Parsing</Filter>
     </ClInclude>
+    <ClInclude Include="FlashBang\Effect.hpp">
+      <Filter>FlashBang\Parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">

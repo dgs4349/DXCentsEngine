@@ -169,6 +169,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
   <ItemGroup>
     <ClInclude Include="CurrAudImp.h" />
     <ClInclude Include="example.h" />
+    <ClInclude Include="FlashBang\Effect.hpp" />
     <ClInclude Include="FlashBang\FlashBang.hpp" />
     <ClInclude Include="FlashBang\ISoundContainer.hpp" />
     <ClInclude Include="FlashBang\ISoundObject.hpp" />
