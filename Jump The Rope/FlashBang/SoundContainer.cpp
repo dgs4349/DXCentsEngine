@@ -38,23 +38,23 @@ void SoundContainer::Unload()
 	unload_();
 }
 
-void SoundContainer::setVolume_(float val)
+void SoundContainer::handleVolume_(float val)
 {
 }
 
-void SoundContainer::setTune_(float val)
+void SoundContainer::handleTune_(float val)
 {
 }
 
-void SoundContainer::setPan_(float val)
+void SoundContainer::handlePan_(float val)
 {
 }
 
-void SoundContainer::setIndex_(int val)
+void SoundContainer::handleIndex_(int val)
 {
 }
 
-void SoundContainer::setLoop_(int val)
+void SoundContainer::handleLoop_(int val)
 {
 }
 

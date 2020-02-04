@@ -49,11 +49,11 @@ public:
 	}
 	
 protected:
-	void setVolume_(float val) override;
-	void setTune_(float val) override;
-	void setPan_(float val) override;
-	void setIndex_(int val) override;
-	void setLoop_(int val) override;
+	void handleVolume_(float val) override;
+	void handleTune_(float val) override;
+	void handlePan_(float val) override;
+	void handleIndex_(int val) override;
+	void handleLoop_(int val) override;
 
 	void unload_();
 

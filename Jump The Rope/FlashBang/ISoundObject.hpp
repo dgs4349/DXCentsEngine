@@ -10,86 +10,81 @@ using namespace FlashBang;
 class ISoundObject
 {
 public:
-	~ISoundObject(){}
-	
-	std::string File = nullptr;
+	ISoundObject() = delete;
+	~ISoundObject() = default;
 
-	// todo fix these recent updates in other imlpementations
+	void operator() () { Play(); }
+
+	ISoundObject(const ISoundObject& s) = delete;
+
+	virtual ISoundObject& operator=(const json& j) = 0;
+	virtual ISoundObject& operator=(const std::string& s) = 0;
+
+	std::string File = nullptr;
+	
+	// this method sadly has to be snake case
+	static void from_json(const json& j, ISoundObject& s);
+	virtual ISoundObject* CopyParams(const ISoundObject& s);
+
+	
+	virtual void Load() = 0;
+	virtual void Unload() = 0;
+
+	virtual void Queue() = 0;
+	virtual void Play() = 0;
+	virtual void Pause() = 0;
+	virtual void Resume() = 0;
+	virtual void Finish() = 0;
+	virtual void Stop() = 0;
+
+	// getters and setters may be evil, but setting params will need additional
+	//		logic in derived classes
+	// this way unfortunately makes the most intuitive sense while still
+	//		preventing accidental user-caused misbehavior
+	
 	virtual float Volume() { return volume_; }
-	virtual float Volume(float val)
-	{
-		setVolume_(val);
-		volume_ = val;
+	virtual float Volume(float val) {
+		volume_ = handleVolume_(val);
 		return volume_;
 	}
 
 	virtual float Tune() { return tune_; }
 	virtual float Tune(float val)
 	{
-	    setTune_(val);
-	    tune_ = val;
+	    tune_ = handleTune_(val);
 		return tune_;
 	}
 	
 	virtual float Pan() { return pan_; }
 	virtual float Pan(float val)
 	{
-	    setPan_(val);
-	    pan_ = val;
+		pan_ = handlePan_(val);
 		return pan_;
 	}
 
-	/*
-	 * _index: the index
-	 */
 	virtual int Index() { return index_; }
+protected:
 	virtual int Index(int val)
 	{
-	    setIndex_(val);
-	    index_ = val;
+		// index should only be set by containers, but will not have any additional logic
+		index_ = val;
 		return index_;
 	}
-
+public:
+	
 	virtual int Loop() { return loop_; }
 	virtual int Loop(int val)
 	{
-	    setLoop_(val);
-	    loop_ = val;
+	    loop_ = handleLoop_(val);
 		return loop_;
 	}
 
-	virtual void Play() = 0;
-	virtual void Pause() = 0;
-	virtual void Resume() = 0;
-	virtual void Stop() = 0;
-
-	virtual void Load() = 0;
-	virtual void Unload() = 0;
-
-	// this method sadly has to be snake case
-	static void from_json(const json& j, ISoundObject& s) {
-		std::string key;
-		for (auto i : j.items()) {
-			key = i.key();
-			s.parseParam_(key, j);
-		}
-	}
-	
-	void operator() () { Play(); }
-
-	ISoundObject& operator= (const ISoundObject& s)
+	virtual SOUND_STATE State() { return state_; }
+	virtual SOUND_STATE State(SOUND_STATE val)
 	{
-		if (this != &s)
-		{
-			volume_ = s.volume_;
-			tune_ = s.tune_;
-			pan_ = s.pan_;
-			loop_ = s.loop_;
-		}
-		return *this;
+		state_ = handleState_(val);
+		return state_;
 	}
-
-	ISoundObject(const ISoundObject& s) = delete;
 	
 protected:
 	float	volume_ = 0.0f;
@@ -97,43 +92,19 @@ protected:
 	float	pan_ = 0.0f;
 	int		index_ = -1;
 	int		loop_ = 0;
+
+	unsigned int currentLoop_ = 0;
+
+	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
 	
-	virtual void setVolume_(float val) = 0;
-	virtual void setTune_(float val) = 0;
-	virtual void setPan_(float val) = 0;
-	virtual void setIndex_(int val) = 0;
-	virtual void setLoop_(int val) = 0;
+	virtual float handleVolume_(float val) = 0;
+	virtual float handleTune_(float val) = 0;
+	virtual float handlePan_(float val) = 0;
+	virtual int handleLoop_(int val) = 0;
+	virtual SOUND_STATE handleState_(SOUND_STATE state) = 0;
 
-	virtual void parseParam_(std::string& key, const json& j)
-	{
-		if (islower(key[0]))
-		{
-			switch (key[0])
-			{
-			case 'v': j[key].get_to(volume_); break;
-			case 't': j[key].get_to(tune_); break;
-			case 'p': j[key].get_to(pan_); break;
-			case 'l': j[key].get_to(loop_); break;
-
-			case 'f': parseFile_(key, j);  break;
-
-			case 'e':
-
-				
-				
-				break;
-				
-			default: break;
-			}
-		}
-	}
-
-	virtual void parseFile_(std::string& fileKey, const json& j)
-	{
-		j[fileKey].get_to(File);
-	}
-
-private:
-	ISoundObject() = delete;
+	// overridden in ISoundContainer
+	virtual void parseParam_(std::string& key, const json& j);
+	virtual void parseFile_(std::string& fileKey, const json& j);
 };
 

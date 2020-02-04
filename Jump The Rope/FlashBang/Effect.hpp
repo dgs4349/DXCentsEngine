@@ -3,9 +3,6 @@
 #include "FlashBang.hpp"
 using namespace FlashBang;
 
-// todo expand
-enum COMMON_EFFECTS { TIME };
-
 class Effect
 {
 public:
@@ -53,10 +50,14 @@ public:
 	}
 	
 	void Update(float dt) {
-
+		ActiveTime += dt;
+		Update();
 	}
 
-	void Start() { active_ = true; }
+	void Start()
+	{
+		active_ = true;
+	}
 	
 	void Stop()
 	{
@@ -64,19 +65,27 @@ public:
 		ActiveTime = 0.0f;
 	}
 	
-	void Connect(Connection connection) { connection_ = connection; }
-	void Connect(float* pointerToControllingValue, float controllingValueMin, float controllingValueMax)
+	Effect* Connect(Connection connection)
+	{
+		connection_ = connection;
+		return this;
+	}
+	
+	Effect* Connect(float* pointerToControllingValue, float controllingValueMin, float controllingValueMax)
 	{
 		connection_ = { pointerToControllingValue, controllingValueMin, controllingValueMax };
+		return this;
 	}
-	void Connect(COMMON_EFFECTS effect, float min, float max)
+	
+	Effect* Connect(COMMON_EFFECTS effect, float from, float to)
 	{
 		switch(effect)
 		{
-		case TIME:
-			
+		case COMMON_EFFECTS::TIME:
+			Connect({ &ActiveTime, from, to });
 			break;
 		}
+		return this;
 	}
 
 	/*
@@ -106,14 +115,15 @@ public:
 	/*void LFO();
 	enum LFO_TYPES{};*/
 
+
 private:
 
 	float value_ = 0.0f;
 	float previousControlValue_ = 0.0f;
-
-	static float noop_(float val) { return val; }
 	
 	bool active_;
 
 	Connection connection_ = { nullptr, 0.0f, 1.0f };
+
+	static float noop_(float val) { return val; }
 };
