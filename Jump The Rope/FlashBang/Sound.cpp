@@ -7,6 +7,16 @@ using namespace FlashBang;
 	unload_();
 }
 
+ISoundObject& Sound::operator=(const json& j)
+{
+	// TODO: insert return statement here
+}
+
+ISoundObject& Sound::operator=(const std::string& s)
+{
+	// TODO: insert return statement here
+}
+
 void ::Sound::Play()
 {
 	DirectXSoundEffectInstance->Play();
@@ -20,6 +30,14 @@ void ::Sound::Pause()
 void ::Sound::Resume()
 {
 	DirectXSoundEffectInstance->Resume();
+}
+
+void Sound::Finish()
+{
+}
+
+void Sound::Stop()
+{
 }
 
 void ::Sound::Stop()
@@ -45,24 +63,81 @@ void ::Sound::Load()
 	handleLoop_(loop_);
 }
 
-void Sound::handleVolume_(float val)
+void Sound::Queue()
+{
+	if (queuer_ == nullptr) {
+		throw std::exception("Can't Queue()! Sound does not belong to any SoundContainer!!");
+	}
+}
+
+float Sound::handleVolume_(float val)
 {
 	DirectXSoundEffectInstance->SetVolume(val);
+	return val;
 }
 
-void Sound::handleTune_(float val)
+float Sound::handleTune_(float val)
 {
 	DirectXSoundEffectInstance->SetPan(val);
 }
 
-void Sound::handlePan_(float val)
+float Sound::handlePan_(float val)
 {
 	DirectXSoundEffectInstance->SetPan(val);
 }
 
-void Sound::handleLoop_(int val){}
+int Sound::handleLoop_(int val){
+	return val;
+}
 
-void Sound::handleIndex_(int val){}
+SOUND_STATE Sound::handleState_(SOUND_STATE state)
+{
+	return state;
+}
+
+void Sound::Update(float dt)
+{
+}
+
+void Sound::Load()
+{
+}
+
+ISoundObject* Sound::Queue(bool finish = false)
+{
+	return nullptr;
+}
+
+ISoundObject* Sound::Queue(ISoundObject* previous, bool finish = false)
+{
+	return nullptr;
+}
+
+ISoundObject* Sound::After(bool finish = false)
+{
+	return nullptr;
+}
+
+ISoundObject* Sound::After(ISoundObject* next, bool finish = false)
+{
+	return nullptr;
+}
+
+void Sound::Play()
+{
+}
+
+void Sound::Pause()
+{
+}
+
+void Sound::Resume()
+{
+}
+
+void Sound::Finish()
+{
+}
 
 void Sound::unload_() 
 {

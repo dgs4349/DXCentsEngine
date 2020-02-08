@@ -13,7 +13,7 @@ namespace FlashBang {
 	enum class COMMON_EFFECTS { TIME };
 
 	
-	enum class SOUND_STATE { UNLOADED, IDLE, QUEUED, PAUSED, PLAYING };
+	enum class SOUND_STATE { UNLOADED, IDLE, QUEUED, PAUSED, PLAYING, COMPLETE };
 
 
 }

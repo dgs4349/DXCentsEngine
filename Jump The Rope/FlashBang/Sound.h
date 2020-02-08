@@ -2,6 +2,7 @@
 
 #include "FlashBang.hpp"
 #include "ISoundObject.hpp"
+#include "ISoundContainer.hpp"
 #include "SoundEngine.h"
 
 #include <Audio.h>
@@ -16,16 +17,24 @@ public:
 	
 	ISoundObject& operator=(const json& j) override;
 	ISoundObject& operator=(const std::string& s) override;
-	void Load() override;
-	void Queue() override;
-	void Play() override;
-	void Pause() override;
-	void Resume() override;
-	void Finish() override;
-	void Stop() override;
-	
+
+
+	virtual void Load() override;
 	void Unload() override{ unload_(); }
 
+
+	// Inherited via ISoundObject
+	virtual void Update(float dt) override;
+
+	virtual ISoundObject* Queue(bool finish = false) override;
+	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) override;
+	virtual ISoundObject* After(bool finish = false) override;
+	virtual ISoundObject* After(ISoundObject* next, bool finish = false) override;
+	virtual void Play() override;
+	virtual void Pause() override;
+	virtual void Resume() override;
+	virtual void Finish() override;
+	virtual void Stop() override;
 
 	std::unique_ptr<DirectX::SoundEffect> DirectXSoundEffect;
 	std::unique_ptr<DirectX::SoundEffectInstance> DirectXSoundEffectInstance;
@@ -40,4 +49,5 @@ protected:
 	float handlePan_(float val) override;
 	int handleLoop_(int val) override;
 	SOUND_STATE handleState_(SOUND_STATE state) override;
+
 };

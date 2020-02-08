@@ -53,7 +53,10 @@ public:
 		ActiveTime += dt;
 		Update();
 	}
-
+	
+	bool Active() { return active_; }
+	bool Active(bool val) { active_ = val; return active_; }
+	
 	void Start()
 	{
 		active_ = true;

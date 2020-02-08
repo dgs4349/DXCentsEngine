@@ -1,6 +1,8 @@
 #pragma once
 
 #include "FlashBang.hpp"
+#include "Effect.hpp"
+
 #include <nlohmann/json.hpp>
 
 using nlohmann::json;
@@ -11,7 +13,12 @@ class ISoundObject
 {
 public:
 	ISoundObject() = delete;
-	~ISoundObject() = default;
+
+	~ISoundObject() {
+		for (auto it = Effects.begin(); it != Effects.end(); it++) {
+			delete it->second;
+		}
+	}
 
 	void operator() () { Play(); }
 
@@ -21,6 +28,7 @@ public:
 	virtual ISoundObject& operator=(const std::string& s) = 0;
 
 	std::string File = nullptr;
+	std::map<std::string, Effect*> Effects;
 	
 	// this method sadly has to be snake case
 	static void from_json(const json& j, ISoundObject& s);
@@ -30,7 +38,14 @@ public:
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
 
-	virtual void Queue() = 0;
+	// could do a small optimization with needsUpdate_, but we'd need special SOUND_STATE logic
+	virtual void Update(float dt) = 0;
+
+	virtual ISoundObject* Queue(bool finish = false) = 0;
+	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) = 0;
+	virtual ISoundObject* After(bool finish = false) = 0;
+	virtual ISoundObject* After(ISoundObject* next, bool finish = false) = 0;
+
 	virtual void Play() = 0;
 	virtual void Pause() = 0;
 	virtual void Resume() = 0;
@@ -71,6 +86,21 @@ protected:
 		return index_;
 	}
 public:
+
+	virtual ISoundObject* Queuer() { return queuer_; }
+protected:
+	virtual ISoundObject* Queuer(ISoundObject* val) {
+		queuer_ = val;
+		return queuer_;
+	}
+public:
+
+	virtual ISoundObject* Afteree() { return afteree_; }
+protected:
+	virtual ISoundObject* Afteree(ISoundObject* val) {
+		afteree_ = val;
+		return afteree_;
+	}
 	
 	virtual int Loop() { return loop_; }
 	virtual int Loop(int val)
@@ -92,6 +122,9 @@ protected:
 	float	pan_ = 0.0f;
 	int		index_ = -1;
 	int		loop_ = 0;
+
+	ISoundObject* queuer_ = nullptr;
+	ISoundObject* afteree_ = nullptr;
 
 	unsigned int currentLoop_ = 0;
 

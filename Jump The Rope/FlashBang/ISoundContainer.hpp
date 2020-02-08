@@ -30,6 +30,10 @@ public:
 
 	virtual int Next() = 0;
 
+	/*
+	* Queue behavior, can queue like soundobject, but queueNext will automatically queue the next element
+	* this is different from PlayBackBehavior which will handle other stuff
+	*/
 	virtual void Play(int index) = 0;
 	virtual void PlayNext() = 0;
 	virtual void Queue(int index) = 0;
