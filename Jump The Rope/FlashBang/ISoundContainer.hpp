@@ -28,6 +28,12 @@ public:
 
 	static void from_json(const json& j, ISoundContainer& s);
 
+	virtual int AddSoundObject(ISoundObject const& soundObject) = 0;
+	virtual int AddSoundObject(std::string const& key, ISoundObject const& soundObject) = 0;
+
+	virtual int AddSoundObjects(std::vector<ISoundObject*> const& soundObjects) = 0;
+	virtual int AddSoundObjects(std::map<std::string, ISoundObject*> const& keysoundObjects) = 0;
+
 	virtual int Next() = 0;
 
 	/*
@@ -55,9 +61,6 @@ protected:
 
 	virtual ISoundObject* createSound_(std::string const& key, json const& j) = 0;
 	virtual ISoundObject* createSoundContainer_(std::string const& key, json const& attr) = 0;
-
-	virtual int addSoundObject_(ISoundObject const& soundObject) = 0;
-	virtual int addSoundObject_(std::string const& key, ISoundObject const& soundObject) = 0;
 
 	void parseParam_(std::string& key, const json& j) override;
 	void parseFile_(std::string& fileKey, const json& j) override;

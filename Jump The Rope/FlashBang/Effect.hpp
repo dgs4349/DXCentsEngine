@@ -7,6 +7,24 @@ class Effect
 {
 public:
 
+	/*
+		TODO:
+			- Custom typing, for int and vector support
+			- LFO and other non-pointer connected types
+			- Custom external mapping functions
+				- Curved/Sloped values for vertical mixing with indeces
+	*/
+
+
+	struct Connection {
+
+		float* PointerToControl; float ControlMin; float ControlMax;
+
+		Connection(float* pointerToControl, float controlMin, float controlMax) {
+			PointerToControl = pointerToControl; ControlMin = controlMin; ControlMax = controlMax;
+		}
+	};
+
 	float ValueMin;
 	float ValueMax;
 	float (*ValueFunctionPointer)(float val) = nullptr;
@@ -16,80 +34,77 @@ public:
 	float Value() { return value_; }
 	float Value(float v) { value_ = v; return value_; }
 
-	struct Connection { float* PointerToControl; float ControlMin; float ControlMax; };
 	
 	Effect() = default;
 	
-	Effect(float valueMin, float valueMax, bool active = true)
+	Effect(float valueMin, float valueMax)
 	{
 		ValueMin = valueMin;
 		ValueMax = valueMax;
 		ValueFunctionPointer = noop_;
-		
-		active_ = active;
 	}
 	
-	Effect(float (*PointerToValueSetFunc)(float val), float valueMin, float valueMax, bool active = true)
+	Effect(float (*PointerToValueSetFunc)(float val), float valueMin, float valueMax)
 	{
 		ValueMin = valueMin;
 		ValueMax = valueMax;
 		ValueFunctionPointer = PointerToValueSetFunc;
-		
-		active_ = active;
+	}
+
+	Effect(float (*PointerToValueSetFunc)(float val), float valueMin, float valueMax, Connection connection)
+	{
+		ValueMin = valueMin;
+		ValueMax = valueMax;
+		ValueFunctionPointer = PointerToValueSetFunc;
+
+		Connect(connection);
 	}
 
 	~Effect() = default;
 
-	void Update()
+	Effect* Connect(Connection connection, bool start = true)
 	{
-		if(active_ && *connection_.PointerToControl != previousControlValue_)
+		connection_ = connection;
+
+		active_ = start;
+		return this;
+	}
+
+	Effect* Connect(float* pointerToControllingValue, float controllingValueMin, 
+		float controllingValueMax, bool start = true)
+	{
+		connection_ = { pointerToControllingValue, controllingValueMin, controllingValueMax };
+		active_ = start;
+		return this;
+	}
+
+	Effect* Connect(COMMON_EFFECTS effect, float from, float to, bool start = true)
+	{
+		switch (effect)
+		{
+		case COMMON_EFFECTS::TIME:
+			Connect({ &ActiveTime, from, to });
+			break;
+		}
+		active_ = start;
+		return this;
+	}
+
+	void Update(float dt) {
+		ActiveTime += dt;
+
+		if (active_ && *connection_.PointerToControl != previousControlValue_)
 		{
 			value_ = (*ValueFunctionPointer)(GetMappedValue());
 			previousControlValue_ = *connection_.PointerToControl;
 		}
 	}
 	
-	void Update(float dt) {
-		ActiveTime += dt;
-		Update();
-	}
-	
 	bool Active() { return active_; }
 	bool Active(bool val) { active_ = val; return active_; }
 	
-	void Start()
-	{
-		active_ = true;
-	}
-	
-	void Stop()
-	{
-		active_ = false;
-		ActiveTime = 0.0f;
-	}
-	
-	Effect* Connect(Connection connection)
-	{
-		connection_ = connection;
-		return this;
-	}
-	
-	Effect* Connect(float* pointerToControllingValue, float controllingValueMin, float controllingValueMax)
-	{
-		connection_ = { pointerToControllingValue, controllingValueMin, controllingValueMax };
-		return this;
-	}
-	
-	Effect* Connect(COMMON_EFFECTS effect, float from, float to)
-	{
-		switch(effect)
-		{
-		case COMMON_EFFECTS::TIME:
-			Connect({ &ActiveTime, from, to });
-			break;
-		}
-		return this;
-	}
+	void Start() { active_ = true; }
+	void Stop() { active_ = false; ActiveTime = 0.0f;}
 
 	/*
 	 * forces value within it's original range, then converts to a new range
@@ -118,13 +133,13 @@ public:
 	/*void LFO();
 	enum LFO_TYPES{};*/
 
-
 private:
 
 	float value_ = 0.0f;
 	float previousControlValue_ = 0.0f;
 	
-	bool active_;
+	// default is inactive until a connection is made
+	bool active_ = false;
 
 	Connection connection_ = { nullptr, 0.0f, 1.0f };
 

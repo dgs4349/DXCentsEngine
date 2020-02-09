@@ -36,10 +36,6 @@ void Sound::Finish()
 {
 }
 
-void Sound::Stop()
-{
-}
-
 void ::Sound::Stop()
 {
 	DirectXSoundEffectInstance->Stop();
@@ -61,13 +57,6 @@ void ::Sound::Load()
 	handleTune_(tune_);
 	handlePan_(pan_);
 	handleLoop_(loop_);
-}
-
-void Sound::Queue()
-{
-	if (queuer_ == nullptr) {
-		throw std::exception("Can't Queue()! Sound does not belong to any SoundContainer!!");
-	}
 }
 
 float Sound::handleVolume_(float val)
@@ -95,48 +84,44 @@ SOUND_STATE Sound::handleState_(SOUND_STATE state)
 	return state;
 }
 
-void Sound::Update(float dt)
+void Sound::updateSound_(float dt)
 {
 }
 
-void Sound::Load()
+void Sound::updateEffects_(float dt)
 {
+	for (auto it = Effects.begin(); it != Effects.end(); ++it) it->second->Update(dt);
 }
 
 ISoundObject* Sound::Queue(bool finish = false)
 {
-	return nullptr;
+	if (queuer_ == nullptr) {
+		throw std::exception("Cannot implicitly call Queue(): no 'previous' ISoundObject provided to queue this Sound");
+	}
+	else queuer_->After(this, finish);
+	return queuer_;
 }
 
 ISoundObject* Sound::Queue(ISoundObject* previous, bool finish = false)
 {
-	return nullptr;
+	queuer_ = previous;
+	queuer_->After(this, finish);
+	return queuer_;
 }
 
 ISoundObject* Sound::After(bool finish = false)
 {
-	return nullptr;
+	if (afteree_ == nullptr) {
+		throw std::exception("Cannot implicitly call After(): no 'next' ISoundObject provided to call.");
+	}
+	else if (finish) State(SOUND_STATE::FINISH);
+	return afteree_;
 }
 
 ISoundObject* Sound::After(ISoundObject* next, bool finish = false)
 {
-	return nullptr;
-}
-
-void Sound::Play()
-{
-}
-
-void Sound::Pause()
-{
-}
-
-void Sound::Resume()
-{
-}
-
-void Sound::Finish()
-{
+	afteree_ = next;
+	return After(finish);
 }
 
 void Sound::unload_() 

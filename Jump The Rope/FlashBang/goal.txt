@@ -39,10 +39,7 @@ Scene game = new Scene(R"(
 			}
 			"volume": 0.35f,
 			"effects": {
-				new Effect(
-					Effects.Volume(-0.0f, 0.75f), 
-					Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
-				),
+				backgroundVolume: {'v': { 0.5f, 1.5f }}
 			}
 			"OnComplete": Effects.Container.LoopLast(),
 		}),

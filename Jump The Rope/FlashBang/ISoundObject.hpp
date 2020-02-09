@@ -9,6 +9,11 @@ using nlohmann::json;
 
 using namespace FlashBang;
 
+/*
+	Basic interface for declaration
+		Handles all parsing and parameter logic
+		Forces abstract calls to handle audio and state logic
+*/
 class ISoundObject
 {
 public:
@@ -32,6 +37,20 @@ public:
 	
 	// this method sadly has to be snake case
 	static void from_json(const json& j, ISoundObject& s);
+	
+	typedef float (*ParamSetterFunc)(float val);
+
+	// todo: handle non char keys, such as Position and the like
+	static ParamSetterFunc GetParamSetFunc(const char& k, ISoundObject& s) {
+		switch (k) {
+			case 'v': return *s.Volume;
+			case 't': return  *s.Tune;
+			case 'p': return *s.Pan;
+
+			default: return nullptr;
+		}
+	}
+
 	virtual ISoundObject* CopyParams(const ISoundObject& s);
 
 	
@@ -39,12 +58,10 @@ public:
 	virtual void Unload() = 0;
 
 	// could do a small optimization with needsUpdate_, but we'd need special SOUND_STATE logic
-	virtual void Update(float dt) = 0;
-
-	virtual ISoundObject* Queue(bool finish = false) = 0;
-	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) = 0;
-	virtual ISoundObject* After(bool finish = false) = 0;
-	virtual ISoundObject* After(ISoundObject* next, bool finish = false) = 0;
+	void Update(float dt) {
+		updateSound_;
+		updateEffects_;
+	}
 
 	virtual void Play() = 0;
 	virtual void Pause() = 0;
@@ -52,34 +69,63 @@ public:
 	virtual void Finish() = 0;
 	virtual void Stop() = 0;
 
+	virtual ISoundObject* Queue(bool finish = false) = 0;
+	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) = 0;
+	virtual ISoundObject* After(bool finish = false) = 0;
+	virtual ISoundObject* After(ISoundObject* next, bool finish = false) = 0;
+
+	Effect* FindEffect(std::string& key) {
+		auto it = Effects.find(key);
+		if (it != Effects.end()) {
+			return it->second;
+		}
+		return nullptr;
+	}
+
+	void AddEffect(std::string key, Effect* effect) {
+		Effects.insert({ key, effect });
+	}
+
+	void AddEffects(std::map<std::string, Effect*> const& effects) {
+		for (auto it = effects.begin(); it != effects.end(); ++it) {
+			AddEffect(it->first, it->second);
+		}
+	}
+
+	bool DeleteEffect(std::string& key) {
+		Effect* e = FindEffect(key);
+		if (e != nullptr) delete e;
+		Effects.erase(key);
+	}
+
 	// getters and setters may be evil, but setting params will need additional
 	//		logic in derived classes
 	// this way unfortunately makes the most intuitive sense while still
 	//		preventing accidental user-caused misbehavior
 	
-	virtual float Volume() { return volume_; }
-	virtual float Volume(float val) {
+	float Volume() { return volume_; }
+	float Volume(float val) {
 		volume_ = handleVolume_(val);
 		return volume_;
 	}
 
-	virtual float Tune() { return tune_; }
-	virtual float Tune(float val)
+	float Tune() { return tune_; }
+	float Tune(float val)
 	{
 	    tune_ = handleTune_(val);
 		return tune_;
 	}
 	
-	virtual float Pan() { return pan_; }
-	virtual float Pan(float val)
+	float Pan() { return pan_; }
+	float Pan(float val)
 	{
 		pan_ = handlePan_(val);
 		return pan_;
 	}
 
-	virtual int Index() { return index_; }
+	int Index() { return index_; }
 protected:
-	virtual int Index(int val)
+	int Index(int val)
 	{
 		// index should only be set by containers, but will not have any additional logic
 		index_ = val;
@@ -87,30 +133,31 @@ protected:
 	}
 public:
 
-	virtual ISoundObject* Queuer() { return queuer_; }
+	ISoundObject* Queuer() { return queuer_; }
 protected:
-	virtual ISoundObject* Queuer(ISoundObject* val) {
-		queuer_ = val;
+	ISoundObject* Queuer(ISoundObject* val) {
+		queuer_ = Queue(val);
 		return queuer_;
 	}
 public:
 
-	virtual ISoundObject* Afteree() { return afteree_; }
+	ISoundObject* Afteree() { return afteree_; }
 protected:
-	virtual ISoundObject* Afteree(ISoundObject* val) {
-		afteree_ = val;
+	ISoundObject* Afteree(ISoundObject* val) {
+		afteree_ = After(val);
 		return afteree_;
 	}
 	
-	virtual int Loop() { return loop_; }
-	virtual int Loop(int val)
+	int Loop() { return loop_; }
+	int Loop(int val, bool resetCurrentLoop = false)
 	{
 	    loop_ = handleLoop_(val);
+		if (resetCurrentLoop) currentLoop_ = 0;
 		return loop_;
 	}
 
-	virtual SOUND_STATE State() { return state_; }
-	virtual SOUND_STATE State(SOUND_STATE val)
+	SOUND_STATE State() { return state_; }
+	SOUND_STATE State(SOUND_STATE val)
 	{
 		state_ = handleState_(val);
 		return state_;
@@ -136,8 +183,13 @@ protected:
 	virtual int handleLoop_(int val) = 0;
 	virtual SOUND_STATE handleState_(SOUND_STATE state) = 0;
 
+	virtual void updateSound_(float dt) = 0;
+	virtual void updateEffects_(float dt) = 0;
+
 	// overridden in ISoundContainer
-	virtual void parseParam_(std::string& key, const json& j);
-	virtual void parseFile_(std::string& fileKey, const json& j);
+	void parseParam_(std::string& key, const json& j);
+	void parseFile_(std::string& fileKey, const json& j);
+	void parseEffects_(std::string& effectsKey, const json& j);
+
 };
 

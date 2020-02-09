@@ -33,12 +33,7 @@ void ISoundObject::parseParam_(std::string& key, const json& j)
 		case 'l': j[key].get_to(loop_); break;
 
 		case 'f': parseFile_(key, j);  break;
-
-		case 'e':
-
-
-
-			break;
+		case 'e': parseEffects_(key, j);break;
 
 		default: break;
 		}
@@ -48,4 +43,23 @@ void ISoundObject::parseParam_(std::string& key, const json& j)
 void ISoundObject::parseFile_(std::string& fileKey, const json& j)
 {
 	j[fileKey].get_to(File);
+}
+
+void ISoundObject::parseEffects_(std::string& effectsKey, const json& j)
+{
+	// effect json syntax: "name": { "vol": { float min, float max } }
+	for (auto effect : j[effectsKey].items()) {
+
+		std::string EffectName = effect.key();
+
+		auto effectArgs = effect.value().items()[0]; // "vol": { float min, float max }
+
+		ParamSetterFunc func = GetParamSetFunc(effectArgs.key()[0], *this);
+
+		AddEffect(
+			EffectName,
+			new Effect(
+				func, effectArgs.value()[0], effectArgs.value()[1]
+			));
+	}
 }

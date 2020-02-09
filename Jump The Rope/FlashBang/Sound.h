@@ -18,13 +18,8 @@ public:
 	ISoundObject& operator=(const json& j) override;
 	ISoundObject& operator=(const std::string& s) override;
 
-
 	virtual void Load() override;
 	void Unload() override{ unload_(); }
-
-
-	// Inherited via ISoundObject
-	virtual void Update(float dt) override;
 
 	virtual ISoundObject* Queue(bool finish = false) override;
 	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) override;
@@ -49,5 +44,9 @@ protected:
 	float handlePan_(float val) override;
 	int handleLoop_(int val) override;
 	SOUND_STATE handleState_(SOUND_STATE state) override;
+
+
+	virtual void updateSound_(float dt) override;
+	virtual void updateEffects_(float dt) override;
 
 };
