@@ -37,7 +37,7 @@ float Attenuate(float3 position, float range, float3 worldPos)
 	float dist = distance(position, worldPos);
 
 	// Ranged-based attenuation
-	float att = saturate(1.0f - (dist * dist / (range * range)));
+	float att = saturate(1.f - (dist * dist / (range * range)));
 
 	// Soft falloff
 	return att * att;
@@ -76,7 +76,7 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 	float3 toLight = normalize(light.position - worldPos);
 	float3 toCam = normalize(camPos - worldPos);
 
-	float centerAngle = max(dot(toLight, light.direction), 0.0f);
+	float centerAngle = max(dot(toLight, light.direction), 0.f);
 	float spotAmount = pow(centerAngle, light.angle);
 
 	float atten = Attenuate(light.position, light.range, worldPos);

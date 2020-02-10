@@ -64,7 +64,7 @@ void OldSound::Update(float deltaTime, float totalTime)
 		break;
 	}
 
-	if (fadeStartTime == 0.0f) {
+	if (fadeStartTime == 0.f) {
 
 		fadeStartTime = totalTime;
 		fadeEndTime += fadeStartTime;
@@ -78,7 +78,7 @@ void OldSound::Update(float deltaTime, float totalTime)
 
 void OldSound::Start(float totalTime) {
 	startTime = totalTime;
-	endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.0f);
+	endTime = startTime + (soundEffect->GetSampleDurationMS() / 1000.f);
 	state = Playing;
 }
 
@@ -195,7 +195,7 @@ void OldSound::SetRTPCs()
 
 void OldSound::Fade(float from, float to, float timeMillis)
 {
-	fadeStartTime = 0.0f;
+	fadeStartTime = 0.f;
 	fadeTo = to;
 	fadeFrom = from;
 	fadeEndTime = timeMillis;

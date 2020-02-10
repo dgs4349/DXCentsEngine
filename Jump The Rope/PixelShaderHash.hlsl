@@ -40,7 +40,7 @@ float Attenuate(float3 position, float range, float3 worldPos)
 	float dist = distance(position, worldPos);
 
 	// Ranged-based attenuation
-	float att = saturate(1.0f - (dist * dist / (range * range)));
+	float att = saturate(1.f - (dist * dist / (range * range)));
 
 	// Soft falloff
 	return att * att;
@@ -79,7 +79,7 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 	float3 toLight = normalize(light.position - worldPos);
 	float3 toCam = normalize(camPos - worldPos);
 
-	float centerAngle = max(dot(toLight, light.direction), 0.0f);
+	float centerAngle = max(dot(toLight, light.direction), 0.f);
 	float spotAmount = pow(centerAngle, light.angle);
 
 	float atten = Attenuate(light.position, light.range, worldPos);
@@ -93,10 +93,10 @@ float3 CalcSpotLight(SpotLight light, float3 normal, float3 worldPos, float3 cam
 float3 hashing(float2 uv, float intensity) {
 	//these get flipped just because the way the textures were created was opposite to how the code reads them in
 	//SampleBias is used to get a level of mipmap more detailed than the default mip it spits out
-	float3 hash2 = hashTexture1.SampleBias(hashSampler, uv, -1.0f).rgb;
-	float3 hash1 = hashTexture2.SampleBias(hashSampler, uv, -1.0f).rgb;
+	float3 hash2 = hashTexture1.SampleBias(hashSampler, uv, -1.f).rgb;
+	float3 hash1 = hashTexture2.SampleBias(hashSampler, uv, -1.f).rgb;
 
-	float3 overbright = max(0, intensity - 1.0f); //how much over the limit of 1 the intensity is. Will have much less hashing
+	float3 overbright = max(0, intensity - 1.f); //how much over the limit of 1 the intensity is. Will have much less hashing
 
 	//each hash texture represents an intensity of exactly a multiple of 1/6
 	
@@ -121,7 +121,7 @@ float3 hashing(float2 uv, float intensity) {
 	//converts intensity into an integer 0-6
 	int intensityIndex = (int)floor(intensity * 6.0f);
 	//which color to pick depending on which segment the intensity is in
-	float colors[] = {hash1.x, hash1.y, hash1.z, hash2.x, hash2.y, hash2.z, 1.0f};
+	float colors[] = {hash1.x, hash1.y, hash1.z, hash2.x, hash2.y, hash2.z, 1.f};
 	//if index is over 6 pick 6
 	intensityIndex = min(6, intensityIndex);
 	
@@ -185,7 +185,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	//intensity = 1.0 - intensity;
 	
 	//return float4(intensity, intensity, intensity, 1);
-	//return float4(hashing(input.uv * 16.0f, intensity), 1.0f);
+	//return float4(hashing(input.uv * 16.0f, intensity), 1.f);
 	surfaceColor.rgb *= hashing(input.uv * 6.0f, intensity); //the final float is just a modifier to make the scene brighter or darker
 
 	float3 gamma = float3(pow(abs(finalLightColor * surfaceColor.rgb), (1.0 / 2.2)));

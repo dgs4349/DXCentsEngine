@@ -128,7 +128,7 @@ void Game::Init()
 	CreateBasicGeometry();
 
 	camera->transform->Position(7.0f, 2.0f, -13.0f);
-	camera->transform->Rotate(0.0f, -30.0f, 0.0f);
+	camera->transform->Rotate(0.f, -30.f, 0.f);
 	camera->SetScreenSize(width, height);
 
 	audImp->Init();
@@ -149,8 +149,8 @@ void Game::Init()
 	lights.spotLightCount = 1;
 
 	/*ambientLight = { Color(0.5f) };
-	directionalLight = { Color(0.5f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) };
-	directionalLight2 = { Color(0.0f, 0.0f, 0.5f), XMFLOAT3(-1.0f, 0.0f, 0.0f) };*/
+	directionalLight = { Color(0.5f, 0.f, 0.f), XMFLOAT3(1.f, 0.f, 0.f) };
+	directionalLight2 = { Color(0.f, 0.f, 0.5f), XMFLOAT3(-1.f, 0.f, 0.f) };*/
 
 
 
@@ -624,85 +624,85 @@ void Game::CreateBasicGeometry()
 	torch->transform->Position(-8.0f, 0.3f, 8.0f);
 
 	// Left Player
-	player1->transform->Position(-1.0f, 0.0f, 0.0f);
-	player1->transform->Scale(1.0f, 1.0f, 1.0f);
+	player1->transform->Position(-1.f, 0.f, 0.f);
+	player1->transform->Scale(1.f, 1.f, 1.f);
 
 	// Right Player
-	player2->transform->Position(1.0f, 0.0f, 0.0f);
-	player2->transform->Scale(1.0f, 1.0f, 1.0f);
+	player2->transform->Position(1.f, 0.f, 0.f);
+	player2->transform->Scale(1.f, 1.f, 1.f);
 
 	// Rope
-	rope->transform->Position(0.0f, 0.5f, 0.0f);
+	rope->transform->Position(0.f, 0.5f, 0.f);
 	rope->transform->Scale(2.0f, 2.0f, 2.0f);
 	rope->transform->EulerRotation(0, 0, 0);
 	// Ground
-	ground->transform->Position(0.0f, -1.0f, 0.0f);
-	ground->transform->Scale(1.0f, 1.0f, 1.0f);
+	ground->transform->Position(0.f, -1.f, 0.f);
+	ground->transform->Scale(1.f, 1.f, 1.f);
 
 	// Props
-	tree1->transform->Position(-11.67f, -1.0f, 12.8f);
-	tree1->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree1->transform->Position(-11.67f, -1.f, 12.8f);
+	tree1->transform->Scale(1.f, 1.f, 1.f);
 
-	tree2->transform->Position(-14.14f, -1.0f, 5.9f);
-	tree2->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree2->transform->Position(-14.14f, -1.f, 5.9f);
+	tree2->transform->Scale(1.f, 1.f, 1.f);
 
-	tree3->transform->Position(-13.47f, -1.0f, -2.5f);
-	tree3->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree3->transform->Position(-13.47f, -1.f, -2.5f);
+	tree3->transform->Scale(1.f, 1.f, 1.f);
 
-	tree4->transform->Position(-4.2f, -1.0f, 13.0f);
-	tree4->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree4->transform->Position(-4.2f, -1.f, 13.0f);
+	tree4->transform->Scale(1.f, 1.f, 1.f);
 
-	tree5->transform->Position(-9.5f, -1.0f, 20.76f);
-	tree5->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree5->transform->Position(-9.5f, -1.f, 20.76f);
+	tree5->transform->Scale(1.f, 1.f, 1.f);
 
-	tree6->transform->Position(-20.5f, -1.0f, -9.4f);
-	tree6->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree6->transform->Position(-20.5f, -1.f, -9.4f);
+	tree6->transform->Scale(1.f, 1.f, 1.f);
 
-	tree7->transform->Position(-12.82f, -1.0f, -13.430f);
-	tree7->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree7->transform->Position(-12.82f, -1.f, -13.430f);
+	tree7->transform->Scale(1.f, 1.f, 1.f);
 
-	tree8->transform->Position(5.0f, -1.0f, 15.0f);
-	tree8->transform->Scale(1.0f, 1.0f, 1.0f);
+	tree8->transform->Position(5.0f, -1.f, 15.0f);
+	tree8->transform->Scale(1.f, 1.f, 1.f);
 
-	cross->transform->Position(-10.54f, -1.0f, 9.48f);
-	cross->transform->Scale(1.0f, 1.0f, 1.0f);
+	cross->transform->Position(-10.54f, -1.f, 9.48f);
+	cross->transform->Scale(1.f, 1.f, 1.f);
 	cross->transform->Rotate(0.0, -24.5, 0.0);
 
-	grave1->transform->Position(-7.0f, -1.0f, 10.50f);
-	grave1->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave1->transform->Position(-7.0f, -1.f, 10.50f);
+	grave1->transform->Scale(1.f, 1.f, 1.f);
 	grave1->transform->Rotate(0.0, -5.0, 0.0);
 
-	grave2->transform->Position(-3.0f, -1.0f, 10.50f);
-	grave2->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave2->transform->Position(-3.0f, -1.f, 10.50f);
+	grave2->transform->Scale(1.f, 1.f, 1.f);
 	grave2->transform->Rotate(0.0, 5.0, 0.0);
 
-	grave3->transform->Position(1.0f, -1.0f, 10.50f);
-	grave3->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave3->transform->Position(1.f, -1.f, 10.50f);
+	grave3->transform->Scale(1.f, 1.f, 1.f);
 	grave3->transform->Rotate(0.0, 5.0, 0.0);
 
-	grave4->transform->Position(-10.0f, -1.0f, 4.00f);
-	grave4->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave4->transform->Position(-10.f, -1.f, 4.00f);
+	grave4->transform->Scale(1.f, 1.f, 1.f);
 	grave4->transform->Rotate(0.0, -95.0, 0.0);
 
-	grave5->transform->Position(-10.0f, -1.0f, 0.00f);
-	grave5->transform->Scale(1.0f, 1.0f, 1.0f);
+	grave5->transform->Position(-10.f, -1.f, 0.00f);
+	grave5->transform->Scale(1.f, 1.f, 1.f);
 	grave5->transform->Rotate(0.0, -85.0, 0.0);
 
 	// Skeletons
-	skel1->transform->Position(5.6f, -1.0f, 0.0f);
-	skel1->transform->EulerRotation(0, 90.0f, 0);
+	skel1->transform->Position(5.6f, -1.f, 0.f);
+	skel1->transform->EulerRotation(0, 90.f, 0);
 
-	skel2->transform->Position(-5.6f, -1.0f, 0.0f);
-	skel2->transform->EulerRotation(0, -90.0f, 0);
+	skel2->transform->Position(-5.6f, -1.f, 0.f);
+	skel2->transform->EulerRotation(0, -90.f, 0);
 
-	skel1Arm->transform->Position(5.6f, 0.54f, 0.0f);
-	skel1Arm->transform->EulerRotation(0, 90.0f, 0);
+	skel1Arm->transform->Position(5.6f, 0.54f, 0.f);
+	skel1Arm->transform->EulerRotation(0, 90.f, 0);
 
-	skel2Arm->transform->Position(-5.6f, 0.54f, 0.0f);
-	skel2Arm->transform->EulerRotation(0, -90.0f, 0);
+	skel2Arm->transform->Position(-5.6f, 0.54f, 0.f);
+	skel2Arm->transform->EulerRotation(0, -90.f, 0);
 
 	fog->transform->Scale(35.0f, .5f, 35.0f);
-	fog->transform->Position(0.0f, -1.0f, 0.0f);
+	fog->transform->Position(0.f, -1.f, 0.f);
 }
 
 // --------------------------------------------------------
@@ -854,7 +854,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	// Animated the uv offset of the materials
 	materials[11]->uvOffset.x = totalTime * .1f;
-	materials[11]->uvOffset.y = cos(totalTime) / 20.0f;
+	materials[11]->uvOffset.y = cos(totalTime) / 20.f;
 
 
 	camera->Update(deltaTime);
@@ -863,7 +863,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 
 	// animate the torches light
-	lights.pointLights[0].color = XMFLOAT3(1.0f, 0.3f, 0.1f);
+	lights.pointLights[0].color = XMFLOAT3(1.f, 0.3f, 0.1f);
 	lights.pointLights[0].intensity = sin(totalTime * 10.54f) * sin(totalTime * 3.78f) * sin(totalTime * 2.487f) * sin(totalTime * 0.879f) * 3 + 4;
 
 
@@ -887,9 +887,9 @@ void Game::Draw(float deltaTime, float totalTime)
 
 
 	// Background color (Cornflower Blue in this case) for clearing
-	//const float color[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
-	//const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
-	const float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//const float color[4] = { 0.1f, 0.1f, 0.1f, 0.f };
+	//const float color[4] = { 0.4f, 0.6f, 0.75f, 0.f };
+	const float color[4] = { 0.f, 0.f, 0.f, 0.f };
 
 	// Clear the render target and depth buffer (erases what's on the screen)
 	//  - Do this ONCE PER FRAME
@@ -898,7 +898,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->ClearDepthStencilView(
 		depthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		1.0f,
+		1.f,
 		0);
 
 
@@ -935,7 +935,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->ClearDepthStencilView(
 		depthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		1.0f,
+		1.f,
 		0);
 	context->OMSetRenderTargets(1, &depthRTV, depthStencilView);
 	// BASE RENDER TO ppRTV /////////////////////////////////////
@@ -959,8 +959,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	bloomPS->SetShaderResourceView("Pixels", ppSRV);
 	bloomPS->SetSamplerState("Sampler", sampler);
 
-	bloomPS->SetFloat("pixelWidth", 1.0f / width );
-	bloomPS->SetFloat("pixelHeight", 1.0f / height  );
+	bloomPS->SetFloat("pixelWidth", 1.f / width );
+	bloomPS->SetFloat("pixelHeight", 1.f / height  );
 	bloomPS->SetInt("blurAmount", 5);
 	bloomPS->CopyAllBufferData();
 
@@ -973,10 +973,10 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->PSSetShaderResources(0, 16, nullSRVs);
 
 	// TODO -> render the bloomRTV back to itself vith the gaussian blur shaders
-	BlurRender(bloomRTV, bloomSRV, 3.0f, 1.0f);
+	BlurRender(bloomRTV, bloomSRV, 3.0f, 1.f);
 
 	// apply to the default also, so we can have dof
-	BlurRender(ppRTV, ppSRV, 1.0f, 2.0f);
+	BlurRender(ppRTV, ppSRV, 1.f, 2.0f);
 
 	// Set the target back to the back buffer to render to screen
 	context->OMSetRenderTargets(1, &backBufferRTV, 0);
@@ -990,8 +990,8 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	// pass in all of our data
 	ppPS->SetSamplerState("Sampler", sampler);
-	ppPS->SetFloat("pixelWidth", 1.0f / width);
-	ppPS->SetFloat("pixelHeight", 1.0f / height);
+	ppPS->SetFloat("pixelWidth", 1.f / width);
+	ppPS->SetFloat("pixelHeight", 1.f / height);
 	ppPS->SetInt("blurAmount", 25);
 	ppPS->CopyAllBufferData();
 
@@ -1056,7 +1056,7 @@ void Game::BlurRender(ID3D11RenderTargetView * RTV, ID3D11ShaderResourceView* SR
 	UINT offset = 0;
 	ID3D11ShaderResourceView* nullSRVs[16] = {};
 	ID3D11Buffer* nothing = 0;
-	const float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	const float color[4] = { 0.f, 0.f, 0.f, 0.f };
 	// Horizontal //////////////////////////////////
 
 	context->ClearRenderTargetView(blurRTV, color);
@@ -1164,7 +1164,7 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	// Add any custom code here...
 	if (buttonState & 0x0001)
 	{
-		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.1f, (float)(x - prevMousePos.x) * 0.1f, 0.0f);
+		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.1f, (float)(x - prevMousePos.x) * 0.1f, 0.f);
 	}
 
 	// Save the previous mouse position, so we have it for the future

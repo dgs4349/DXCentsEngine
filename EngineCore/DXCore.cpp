@@ -49,7 +49,7 @@ DXCore::DXCore(
 
 	// Initialize fields
 	fpsFrameCount = 0;
-	fpsTimeElapsed = 0.0f;
+	fpsTimeElapsed = 0.f;
 	
 	device = 0;
 	context = 0;
@@ -260,8 +260,8 @@ HRESULT DXCore::InitDirectX()
 	viewport.TopLeftY	= 0;
 	viewport.Width		= (float)width;
 	viewport.Height		= (float)height;
-	viewport.MinDepth	= 0.0f;
-	viewport.MaxDepth	= 1.0f;
+	viewport.MinDepth	= 0.f;
+	viewport.MaxDepth	= 1.f;
 	context->RSSetViewports(1, &viewport);
 
 	// Return the "everything is ok" HRESULT value
@@ -329,8 +329,8 @@ void DXCore::OnResize()
 	viewport.TopLeftY = 0;
 	viewport.Width = (float)width;
 	viewport.Height = (float)height;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
+	viewport.MinDepth = 0.f;
+	viewport.MaxDepth = 1.f;
 	context->RSSetViewports(1, &viewport);
 }
 
@@ -408,7 +408,7 @@ void DXCore::UpdateTimer()
 	// Calculate delta time and clamp to zero
 	//  - Could go negative if CPU goes into power save mode 
 	//    or the process itself gets moved to another core
-	deltaTime = max((float)((currentTime - previousTime) * perfCounterSeconds), 0.0f);
+	deltaTime = max((float)((currentTime - previousTime) * perfCounterSeconds), 0.f);
 
 	// Calculate the total time from start to now
 	totalTime = (float)((currentTime - startTime) * perfCounterSeconds);
@@ -431,11 +431,11 @@ void DXCore::UpdateTitleBarStats()
 
 	// Only calc FPS and update title bar once per second
 	float timeDiff = totalTime - fpsTimeElapsed;
-	if (timeDiff < 1.0f)
+	if (timeDiff < 1.f)
 		return;
 
 	// How long did each frame take?  (Approx)
-	float mspf = 1000.0f / (float)fpsFrameCount;
+	float mspf = 1000.f / (float)fpsFrameCount;
 
 	// Quick and dirty title bar text (mostly for debugging)
 	std::ostringstream output;
@@ -462,7 +462,7 @@ void DXCore::UpdateTitleBarStats()
 	// Actually update the title bar and reset fps data
 	SetWindowText(hWnd, output.str().c_str());
 	fpsFrameCount = 0;
-	fpsTimeElapsed += 1.0f;
+	fpsTimeElapsed += 1.f;
 }
 
 // --------------------------------------------------------

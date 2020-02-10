@@ -29,7 +29,7 @@ public:
 	float ValueMax;
 	float (*ValueFunctionPointer)(float val) = nullptr;
 
-	float ActiveTime = 0.0f;
+	float ActiveTime = 0.f;
 	
 	float Value() { return value_; }
 	float Value(float v) { value_ = v; return value_; }
@@ -104,7 +104,7 @@ public:
 	bool Active(bool val) { active_ = val; return active_; }
 	
 	void Start() { active_ = true; }
-	void Stop() { active_ = false; ActiveTime = 0.0f;}
+	void Stop() { active_ = false; ActiveTime = 0.f;}
 
 	/*
 	 * forces value within it's original range, then converts to a new range
@@ -135,13 +135,13 @@ public:
 
 private:
 
-	float value_ = 0.0f;
-	float previousControlValue_ = 0.0f;
+	float value_ = 0.f;
+	float previousControlValue_ = 0.f;
 	
 	// default is inactive until a connection is made
 	bool active_ = false;
 
-	Connection connection_ = { nullptr, 0.0f, 1.0f };
+	Connection connection_ = { nullptr, 0.f, 1.f };
 
 	static float noop_(float val) { return val; }
 };

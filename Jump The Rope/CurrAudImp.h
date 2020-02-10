@@ -11,7 +11,7 @@ public:
 	CurrAudImp();
 	~CurrAudImp();
 
-	float menuFadeLength = 1.0f;
+	float menuFadeLength = 1.f;
 
 	void Init();
 

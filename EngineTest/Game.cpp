@@ -77,7 +77,7 @@ void Game::Init()
 	LoadModels();
 	CreateBasicGeometry();
 
-	camera->transform->Position(0.0f, 0.0f, -10.0f);
+	camera->transform->Position(0.f, 0.f, -10.f);
 	camera->SetScreenSize(width, height);
 
 	lights.ambientLights[0] = { Color(0.5f), 1 };
@@ -173,11 +173,11 @@ void Game::CreateBasicGeometry()
 	gameObjects.push_back(new GameObject("Test", meshes[4], materials[2]));
 	gameObjects.push_back(new GameObject("Test", meshes[5], materials[3]));
 
-	gameObjects[1]->transform->Position(2.0f, 0.0f, 0.0f);
-	gameObjects[2]->transform->Position(4.0f, 0.0f, 0.0f);
-	gameObjects[3]->transform->Position(6.0f, 0.0f, 0.0f);
-	gameObjects[4]->transform->Position(8.0f, 0.0f, 0.0f);
-	gameObjects[5]->transform->Position(10.0f, 0.0f, 0.0f);
+	gameObjects[1]->transform->Position(2.0f, 0.f, 0.f);
+	gameObjects[2]->transform->Position(4.0f, 0.f, 0.f);
+	gameObjects[3]->transform->Position(6.0f, 0.f, 0.f);
+	gameObjects[4]->transform->Position(8.0f, 0.f, 0.f);
+	gameObjects[5]->transform->Position(10.f, 0.f, 0.f);
 }
 
 
@@ -210,7 +210,7 @@ void Game::Update(float deltaTime, float totalTime)
 void Game::Draw(float deltaTime, float totalTime)
 {
 	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
+	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.f };
 
 	// Clear the render target and depth buffer (erases what's on the screen)
 	//  - Do this ONCE PER FRAME
@@ -219,7 +219,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->ClearDepthStencilView(
 		depthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		1.0f,
+		1.f,
 		0);
 
 	// Set buffers in the input assembler
@@ -296,7 +296,7 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 	// Add any custom code here...
 	if (buttonState & 0x0001)
 	{
-		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.1f, (float)(x - prevMousePos.x) * 0.1f, 0.0f);
+		camera->transform->Rotate((float)(y - prevMousePos.y) * 0.1f, (float)(x - prevMousePos.x) * 0.1f, 0.f);
 	}
 
 	// Save the previous mouse position, so we have it for the future

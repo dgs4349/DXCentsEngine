@@ -17,7 +17,7 @@ using namespace FlashBang;
 class ISoundObject
 {
 public:
-	ISoundObject() = delete;
+	ISoundObject() = default;
 
 	~ISoundObject() {
 		for (auto it = Effects.begin(); it != Effects.end(); it++) {
@@ -28,7 +28,7 @@ public:
 	void operator() () { Play(); }
 
 	ISoundObject(const ISoundObject& s) = delete;
-
+	
 	virtual ISoundObject& operator=(const json& j) = 0;
 	virtual ISoundObject& operator=(const std::string& s) = 0;
 
@@ -52,7 +52,6 @@ public:
 	}
 
 	virtual ISoundObject* CopyParams(const ISoundObject& s);
-
 	
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
@@ -74,7 +73,10 @@ public:
 	virtual ISoundObject* After(bool finish = false) = 0;
 	virtual ISoundObject* After(ISoundObject* next, bool finish = false) = 0;
 
-	Effect* FindEffect(std::string& key) {
+	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
+	unsigned int CurrentLoop() { return currentLoop_; }
+
+	Effect* FindEffect(std::string const& key) {
 		auto it = Effects.find(key);
 		if (it != Effects.end()) {
 			return it->second;
@@ -92,10 +94,24 @@ public:
 		}
 	}
 
-	bool DeleteEffect(std::string& key) {
+	bool DeleteEffect(std::string const& key) {
 		Effect* e = FindEffect(key);
 		if (e != nullptr) delete e;
 		Effects.erase(key);
+	}
+
+	ISoundObject* ConnectEffect(std::string const& effectKey, Effect::Connection connection) {
+		auto effect = FindEffect(effectKey);
+		if (effect != nullptr) effect->Connect(connection);
+		return this;
+	}
+
+	ISoundObject* ConnectEffects(std::map<std::string, Effect::Connection> const& connections) {
+		for (auto it = connections.begin(); it != connections.end(); it++) {
+			auto effect = FindEffect(it->first);
+			if (effect != nullptr) effect->Connect(it->second);
+		}
+		return this;
 	}
 
 	// getters and setters may be evil, but setting params will need additional
@@ -164,16 +180,16 @@ protected:
 	}
 	
 protected:
-	float	volume_ = 0.0f;
-	float	tune_ = 0.0f;
-	float	pan_ = 0.0f;
+	float	volume_ = 0.f;
+	float	tune_ = 0.f;
+	float	pan_ = 0.f;
 	int		index_ = -1;
-	int		loop_ = 0;
+	int loop_ = 0;
 
 	ISoundObject* queuer_ = nullptr;
 	ISoundObject* afteree_ = nullptr;
 
-	unsigned int currentLoop_ = 0;
+	int currentLoop_ = 0;
 
 	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
 	
@@ -182,6 +198,8 @@ protected:
 	virtual float handlePan_(float val) = 0;
 	virtual int handleLoop_(int val) = 0;
 	virtual SOUND_STATE handleState_(SOUND_STATE state) = 0;
+
+
 
 	virtual void updateSound_(float dt) = 0;
 	virtual void updateEffects_(float dt) = 0;

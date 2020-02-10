@@ -45,17 +45,17 @@ private:
 
 	bool dirty;
 
-	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 eulerAngle = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT4 rotation = { 0.0f, 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+	DirectX::XMFLOAT3 position = { 0.f, 0.f, 0.f };
+	DirectX::XMFLOAT3 eulerAngle = { 0.f, 0.f, 0.f };
+	DirectX::XMFLOAT4 rotation = { 0.f, 0.f, 0.f, 0.f };
+	DirectX::XMFLOAT3 scale = { 1.f, 1.f, 1.f };
 
-	DirectX::XMFLOAT3 forward = { 0.0f, 0.0f, 1.0f };
-	DirectX::XMFLOAT3 backward = { 0.0f, 0.0f, -1.0f };
-	DirectX::XMFLOAT3 up = { 0.0f, 1.0f, 0.0f };
-	DirectX::XMFLOAT3 down = { 0.0f, -1.0f, 0.0f };
-	DirectX::XMFLOAT3 left = { -1.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 right = { 1.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 forward = { 0.f, 0.f, 1.f };
+	DirectX::XMFLOAT3 backward = { 0.f, 0.f, -1.f };
+	DirectX::XMFLOAT3 up = { 0.f, 1.f, 0.f };
+	DirectX::XMFLOAT3 down = { 0.f, -1.f, 0.f };
+	DirectX::XMFLOAT3 left = { -1.f, 0.f, 0.f };
+	DirectX::XMFLOAT3 right = { 1.f, 0.f, 0.f };
 
 	DirectX::XMFLOAT4X4 worldMatrix;
 

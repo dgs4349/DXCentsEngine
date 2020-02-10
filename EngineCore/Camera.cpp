@@ -16,8 +16,8 @@ Camera::~Camera()
 
 void Camera::Update(float deltaTime)
 {
-	XMVECTOR move = { 0.0f, 0.0f, 0.0f };
-	XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
+	XMVECTOR move = { 0.f, 0.f, 0.f };
+	XMFLOAT3 movement = { 0.f, 0.f, 0.f };
 
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
@@ -123,7 +123,7 @@ void Camera::OnResize()
 		0.25f * 3.1415926535f,
 		(float)screenWidth / screenHeight,
 		0.1f,
-		100.0f);
+		100.f);
 	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
 }
 
@@ -134,6 +134,6 @@ void Camera::UpdateProjectionMatrix()
 		0.25f * 3.1415926535f,
 		(float)screenWidth / screenHeight,
 		0.1f,
-		100.0f);
+		100.f);
 	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
 }

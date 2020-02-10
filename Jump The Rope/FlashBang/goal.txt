@@ -23,7 +23,7 @@ jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_0.wav"));
 jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_1.wav"));
 jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_2.wav"));
 jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_3.wav"));
-for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.0f, 0.95f);
+for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.f, 0.95f);
 
 
 //////////////// new initialize /////////////////
@@ -193,11 +193,11 @@ Scene game = new Scene(R"(
 			// effects will for now need to be made externally
 			"effects": {
 				new Effect(
-					Effects.Volume(-0.0f, 0.75f), 
+					Effects.Volume(-0.f, 0.75f), 
 					Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
 				),
-				"$name": {"v", -0.0f, 0.75f},
-				"name2": {"t", 1.0f, 10.0f},
+				"$name": {"v", -0.f, 0.75f},
+				"name2": {"t", 1.f, 10.f},
 			}
 
 
@@ -227,7 +227,7 @@ Scene game = new Scene(R"(
 				"volume": 0.35f,
 				"effects": {
 					new Effect(
-						Effects.Volume(-0.0f, 0.75f), 
+						Effects.Volume(-0.f, 0.75f), 
 						Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
 					),
 				}
@@ -265,7 +265,7 @@ Scene game = new Scene(R"(
 				"volume": 0.35f,
 				"effects": {
 					new Effect(
-						Effects.Volume(-0.0f, 0.75f), 
+						Effects.Volume(-0.f, 0.75f), 
 						Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
 					),
 				}
@@ -289,7 +289,7 @@ Scene game = new Scene(R"(
 				"volume": 0.35f,
 				"effects": {
 					new Effect(
-						Effects.Volume(-0.0f, 0.75f), 
+						Effects.Volume(-0.f, 0.75f), 
 						Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
 					),
 				}
@@ -308,7 +308,7 @@ Scene game = new Scene(R"(
 			"volume": 0.35f,
 			"effects": {
 				new Effect(
-					Effects.Volume(-0.0f, 0.75f), 
+					Effects.Volume(-0.f, 0.75f), 
 					Connect(&ropeSpeed, startRopeSpeed, speedIncreaseMax)
 				),
 			}

@@ -75,17 +75,17 @@ VertexToPixel main(VertexShaderInput input)
 	//
 	// The result is essentially the position (XY) of the vertex on our 2D 
 	// screen and the distance (Z) from the camera (the "depth" of the pixel)
-	output.position = mul(float4(input.position, 1.0f), worldViewProj);
+	output.position = mul(float4(input.position, 1.f), worldViewProj);
 
 	// Pass the color through 
 	// - The values will be interpolated per-pixel by the rasterizer
 	// - We don't need to alter it here, but we do need to send it to the pixel shader
-	output.color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+	output.color = float4(1.f, 0.f, 0.f, 1.f);
 
 	output.normal = mul(input.normal, (float3x3)world);
 	output.tangent = normalize(mul(input.tangent, (float3x3)world));
 	output.uv = input.uv;
-	output.worldPos = mul(float4(input.position, 1.0f), world).xyz;
+	output.worldPos = mul(float4(input.position, 1.f), world).xyz;
 
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)

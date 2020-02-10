@@ -118,19 +118,19 @@ Mesh::Mesh(const char* filePath, ID3D11Device* context) : Object("Mesh")
 			// 3D modeling packages use the bottom left as (0,0)
 
 			// Flip the UV's since they're probably "upside down"
-			v1.uv.y = 1.0f - v1.uv.y;
-			v2.uv.y = 1.0f - v2.uv.y;
-			v3.uv.y = 1.0f - v3.uv.y;
+			v1.uv.y = 1.f - v1.uv.y;
+			v2.uv.y = 1.f - v2.uv.y;
+			v3.uv.y = 1.f - v3.uv.y;
 
 			// Flip Z (LH vs. RH)
-			v1.position.z *= -1.0f;
-			v2.position.z *= -1.0f;
-			v3.position.z *= -1.0f;
+			v1.position.z *= -1.f;
+			v2.position.z *= -1.f;
+			v3.position.z *= -1.f;
 
 			// Flip normal Z
-			v1.normal.z *= -1.0f;
-			v2.normal.z *= -1.0f;
-			v3.normal.z *= -1.0f;
+			v1.normal.z *= -1.f;
+			v2.normal.z *= -1.f;
+			v3.normal.z *= -1.f;
 
 			// Add the verts to the vector (flipping the winding order)
 			verts.push_back(v1);
@@ -152,9 +152,9 @@ Mesh::Mesh(const char* filePath, ID3D11Device* context) : Object("Mesh")
 				v4.normal = normals[i[11] - 1];
 
 				// Flip the UV, Z pos and normal
-				v4.uv.y = 1.0f - v4.uv.y;
-				v4.position.z *= -1.0f;
-				v4.normal.z *= -1.0f;
+				v4.uv.y = 1.f - v4.uv.y;
+				v4.position.z *= -1.f;
+				v4.normal.z *= -1.f;
 
 				// Add a whole triangle (flipping the winding order)
 				verts.push_back(v1);

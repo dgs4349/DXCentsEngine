@@ -38,7 +38,7 @@ VertexToPixel main(VertexShaderInput input)
 
 	// Calculate output position
 	matrix viewProj = mul(viewNoTranslation, projection);
-	output.position = mul(float4(input.position, 1.0f), viewProj);
+	output.position = mul(float4(input.position, 1.f), viewProj);
 
 	// Push the z value as far away as possible,
 	// while still being in the view frustum

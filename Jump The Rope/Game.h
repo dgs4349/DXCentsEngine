@@ -54,18 +54,18 @@ private:
 
 	Lights lights;
 
-	float startRopeSpeed = 100.0f;
+	float startRopeSpeed = 100.f;
 	float ropeSpeed;
 	float speedIncrease = 4.0f;
-	float speedIncreaseMax = 800.0f;
+	float speedIncreaseMax = 800.f;
 	float floorHeight = 0.0;
 	float gravity = 6.5f;
 	float jumpHeight = 4.0f;
-	float ropeWidth = 10.0f;
+	float ropeWidth = 10.f;
 	float ropeHeight = 0.5f;
 	float timer;
-	float readyLength = 1.0f;
-	float endScreenLength = 1.0f;
+	float readyLength = 1.f;
+	float endScreenLength = 1.f;
 	float animSpeed = 0.2f; // the speed of the animation in seconds
 	float animTimer = animSpeed; // the time it takes for the hash animation to move to the next frame
 	int animFrame = 0; // the current frame of the animation

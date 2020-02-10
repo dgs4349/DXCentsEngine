@@ -65,16 +65,16 @@ public:
 
 	void SetLoop(bool loop);
 
-	void Volume(float vol = 1.0f);
-	void Pitch(float pitch = 0.0f);
-	void Pan(float pan = 0.0f);
+	void Volume(float vol = 1.f);
+	void Pitch(float pitch = 0.f);
+	void Pan(float pan = 0.f);
 
 	OldSound* Effect(PARAMS param, float min, float max, Connection connect);
 
 	Connection Connect(float* gameVar, float varMin, float varMax);
 
 	void Stop(bool immediate = true);
-	void Set(float volume=1.0f, float pitch=0.0f, float pan=0.0f, bool setLinked=true);
+	void Set(float volume=1.f, float pitch=0.f, float pan=0.f, bool setLinked=true);
 	void SetRTPCs();
 
 	// TODO replace with Effect Class to hold various Effects, including Effect.Fade for instance
@@ -107,7 +107,7 @@ private:
 	bool Loop = false;
 	bool SetLoopDelayed = false;
 
-	float fadeStartTime = -1.0f;
+	float fadeStartTime = -1.f;
 	float fadeTo;
 	float fadeFrom;
 	float fadeEndTime;

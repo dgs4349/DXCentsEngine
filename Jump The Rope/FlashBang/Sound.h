@@ -12,14 +12,17 @@ using namespace FlashBang;
 class Sound : ISoundObject
 {
 public:
-	Sound() = delete;
 	~Sound();
+	Sound() = delete;
+
+	Sound(const json& j);
+	Sound(const std::string& s);
 	
 	ISoundObject& operator=(const json& j) override;
 	ISoundObject& operator=(const std::string& s) override;
 
 	virtual void Load() override;
-	void Unload() override{ unload_(); }
+	void Unload() override { unload_(); }
 
 	virtual ISoundObject* Queue(bool finish = false) override;
 	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) override;
@@ -35,8 +38,10 @@ public:
 	std::unique_ptr<DirectX::SoundEffectInstance> DirectXSoundEffectInstance;
 	
 private:
-
 	void unload_();
+
+	float duration_ = 0.f;
+	float elapsedTime_ = 0.f;
 
 protected:
 	float handleVolume_(float val) override;
@@ -48,5 +53,4 @@ protected:
 
 	virtual void updateSound_(float dt) override;
 	virtual void updateEffects_(float dt) override;
-
 };

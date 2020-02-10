@@ -35,7 +35,7 @@ void CurrAudImp::Init()
 	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_1.wav"));
 	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_2.wav"));
 	jumpSfx.push_back(soundEngine->CreateSound(L"Assets/Audio/sfx/jump_3.wav"));
-	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.0f, 0.95f);
+	for (int i = 0; i < jumpSfx.size(); i++) jumpSfx[i]->Set(0.5f, 0.f, 0.95f);
 }
 
 void CurrAudImp::Update(float deltaTime, float totalTime)
@@ -70,7 +70,7 @@ void CurrAudImp::SwitchScene(SCENE scene)
 		if (!menuFading) {
 			// TODO: this can be changed to an RTPC of the menu buttons
 
-			menuIntro->Fade(menuVolume, 0.0f, menuFadeLength);
+			menuIntro->Fade(menuVolume, 0.f, menuFadeLength);
 			//menuIntro->Stop(true);
 			menuFading = true;
 		}
@@ -82,13 +82,13 @@ void CurrAudImp::SwitchScene(SCENE scene)
 	case TO_MENU:
 		bgIntro->Stop(true);
 		//menuIntro->Play();
-		menuIntro->Fade(0.0f, menuVolume, menuFadeLength);
+		menuIntro->Fade(0.f, menuVolume, menuFadeLength);
 		jumpCount = 0;
 		break;
 	case MENU:
 		if (menuFading) {
 			//soundEngine->ReplaceFade(menuFadeOut, menuFadeIn);
-			menuIntro->Fade(0.0f, menuVolume, menuFadeLength);
+			menuIntro->Fade(0.f, menuVolume, menuFadeLength);
 			//menuIntro->Play();
 			menuFading = false;
 		}

@@ -33,7 +33,7 @@ float Attenuate(PointLight light, float3 worldPos)
 	float dist = distance(light.position, worldPos);
 
 	// Ranged-based attenuation
-	float att = saturate(1.0f - (dist * dist / (light.range * light.range)));
+	float att = saturate(1.f - (dist * dist / (light.range * light.range)));
 
 	// Soft falloff
 	return att * att;

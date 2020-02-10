@@ -36,7 +36,7 @@ void SoundEngine::Release()
 void SoundEngine::Update()
 {
 	// this will be called if SoundEngine is running from its own loop
-	Update(0.0f);
+	Update(0.f);
 }
 
 void SoundEngine::Update(float deltaTime)

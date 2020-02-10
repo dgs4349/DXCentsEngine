@@ -20,13 +20,13 @@ Texture2D Pixels		: register(t0);
 Texture2D Depth			: register(t1);
 SamplerState Sampler	: register(s0);
 
-static const float KernelOffsets[5] = { 0.0f, 1.3846153846f, 3.2307692308f, 5.538461539f,8.307692308f };
+static const float KernelOffsets[5] = { 0.f, 1.3846153846f, 3.2307692308f, 5.538461539f,8.307692308f };
 static const float BlurWeights[5] = { 0.06136f, 0.24477f, 0.38774f, 0.24477f, 0.06136f };
 
 // Entry point for this pixel shader
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	float3 textureColor = float3(1.0f, 0.0f, 0.0f);
+	float3 textureColor = float3(1.f, 0.f, 0.f);
 	float2 uv = input.uv;
 
 	float depth = Depth.Sample(Sampler, input.uv).x;
@@ -35,7 +35,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	for (int i = 1; i < 5; i++)
 	{
-		float2 normalizedOffset = float2(KernelOffsets[i] * blurAmount * (distance(depth, 0.65) * dofAmount), 0.0f) / pixelWidth;
+		float2 normalizedOffset = float2(KernelOffsets[i] * blurAmount * (distance(depth, 0.65) * dofAmount), 0.f) / pixelWidth;
 		textureColor += Pixels.Sample(Sampler, uv + normalizedOffset).xyz * BlurWeights[i];
 		textureColor += Pixels.Sample(Sampler, uv - normalizedOffset).xyz * BlurWeights[i];
 	}

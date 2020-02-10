@@ -35,7 +35,7 @@ Emitter::Emitter(
 	this->startSize = startSize;
 	this->endSize = endSize;
 	this->particlesPerSecond = particlesPerSecond;
-	this->secondsPerParticle = 1.0f / particlesPerSecond;
+	this->secondsPerParticle = 1.f / particlesPerSecond;
 
 	this->velocityRandomRange = velocityRandomRange;
 	this->positionRandomRange = positionRandomRange;

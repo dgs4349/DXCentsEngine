@@ -4,18 +4,18 @@ using namespace DirectX;
 
 Transform::Transform() : Component("Transform")
 {
-	position = { 0.0f, 0.0f, 0.0f };
-	eulerAngle = { 0.0f, 0.0f, 0.0f };
-	rotation = { 0.0f, 0.0f, 0.0f, 0.0f };
-	scale = { 1.0f, 1.0f, 1.0f };
+	position = { 0.f, 0.f, 0.f };
+	eulerAngle = { 0.f, 0.f, 0.f };
+	rotation = { 0.f, 0.f, 0.f, 0.f };
+	scale = { 1.f, 1.f, 1.f };
 	XMStoreFloat4x4(&worldMatrix, XMMatrixIdentity());
 
-	forward = { 0.0f, 0.0f, 1.0f };
-	backward = { 0.0f, 0.0f, -1.0f };
-	up = { 0.0f, 1.0f, 0.0f };
-	down = { 0.0f, -1.0f, 0.0f };
-	left = { -1.0f, 0.0f, 0.0f };
-	right = { 1.0f, 0.0f, 0.0f };
+	forward = { 0.f, 0.f, 1.f };
+	backward = { 0.f, 0.f, -1.f };
+	up = { 0.f, 1.f, 0.f };
+	down = { 0.f, -1.f, 0.f };
+	left = { -1.f, 0.f, 0.f };
+	right = { 1.f, 0.f, 0.f };
 	dirty = true;
 }
 
@@ -53,7 +53,7 @@ XMFLOAT4 Transform::Rotation() const
 
 XMFLOAT3 Transform::EulerAngles()
 {
-	eulerAngle = { fmodf(eulerAngle.x, 360.0f), fmodf(eulerAngle.y, 360.0f), fmodf(eulerAngle.z, 360.0f) };
+	eulerAngle = { fmodf(eulerAngle.x, 360.f), fmodf(eulerAngle.y, 360.f), fmodf(eulerAngle.z, 360.f) };
 
 	return eulerAngle;
 }
@@ -183,20 +183,20 @@ void Transform::UpdateDirectionalVectors()
 	XMMATRIX mat = XMLoadFloat4x4(&worldMatrix);
 	XMMATRIX rotationMat = XMMatrixRotationQuaternion(XMLoadFloat4(&rotation));
 
-	XMVECTOR forwardVec = { 0.0f, 0.0f, 1.0f };
+	XMVECTOR forwardVec = { 0.f, 0.f, 1.f };
 	XMVECTOR forwardTransform = XMVector4Transform(forwardVec, rotationMat);
 	XMStoreFloat3(&forward, forwardTransform);
-	XMStoreFloat3(&backward, XMVectorScale(forwardTransform, -1.0f));
+	XMStoreFloat3(&backward, XMVectorScale(forwardTransform, -1.f));
 
-	XMVECTOR upVec = { 0.0f, 1.0f, 0.0f };
+	XMVECTOR upVec = { 0.f, 1.f, 0.f };
 	XMVECTOR upTransform = XMVector4Transform(upVec, rotationMat);
 	XMStoreFloat3(&up, upTransform);
-	XMStoreFloat3(&down, XMVectorScale(upTransform, -1.0f));
+	XMStoreFloat3(&down, XMVectorScale(upTransform, -1.f));
 
-	XMVECTOR rightVec = { 1.0f, 0.0f, 0.0f };
+	XMVECTOR rightVec = { 1.f, 0.f, 0.f };
 	XMVECTOR rightTransform = XMVector4Transform(rightVec, rotationMat);
 	XMStoreFloat3(&right, rightTransform);
-	XMStoreFloat3(&left, XMVectorScale(rightTransform, -1.0f));
+	XMStoreFloat3(&left, XMVectorScale(rightTransform, -1.f));
 }
 
 
