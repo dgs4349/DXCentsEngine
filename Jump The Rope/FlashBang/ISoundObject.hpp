@@ -17,7 +17,11 @@ using namespace FlashBang;
 class ISoundObject
 {
 public:
+
+	/////////////////////// Operators ///////////////////////
+
 	ISoundObject() = default;
+	ISoundObject(const ISoundObject & s) = delete;
 
 	~ISoundObject() {
 		for (auto it = Effects.begin(); it != Effects.end(); it++) {
@@ -25,12 +29,13 @@ public:
 		}
 	}
 
-	void operator() () { Play(); }
-
-	ISoundObject(const ISoundObject& s) = delete;
-	
 	virtual ISoundObject& operator=(const json& j) = 0;
 	virtual ISoundObject& operator=(const std::string& s) = 0;
+	void operator() () { Play(); }
+
+
+
+	/////////////////////// Parsing ///////////////////////
 
 	std::string File = nullptr;
 	std::map<std::string, Effect*> Effects;
@@ -38,29 +43,20 @@ public:
 	// this method sadly has to be snake case
 	static void from_json(const json& j, ISoundObject& s);
 	
-	typedef float (*ParamSetterFunc)(float val);
-
 	// todo: handle non char keys, such as Position and the like
-	static ParamSetterFunc GetParamSetFunc(const char& k, ISoundObject& s) {
-		switch (k) {
-			case 'v': return *s.Volume;
-			case 't': return  *s.Tune;
-			case 'p': return *s.Pan;
-
-			default: return nullptr;
-		}
-	}
+	typedef float (*ParamSetterFunc)(float val);
+	static ParamSetterFunc GetParamSetFunc(EFFECT_PARAMETER p, ISoundObject& s);
 
 	virtual ISoundObject* CopyParams(const ISoundObject& s);
-	
+
+
+	/////////////////////// Sound Methods ///////////////////////
+
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
 
 	// could do a small optimization with needsUpdate_, but we'd need special SOUND_STATE logic
-	void Update(float dt) {
-		updateSound_;
-		updateEffects_;
-	}
+	void Update(float dt);
 
 	virtual void Play() = 0;
 	virtual void Pause() = 0;
@@ -68,51 +64,29 @@ public:
 	virtual void Finish() = 0;
 	virtual void Stop() = 0;
 
+	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
+	unsigned int CurrentLoop() { return currentLoop_; }
+
 	virtual ISoundObject* Queue(bool finish = false) = 0;
 	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) = 0;
 	virtual ISoundObject* After(bool finish = false) = 0;
 	virtual ISoundObject* After(ISoundObject* next, bool finish = false) = 0;
 
-	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
-	unsigned int CurrentLoop() { return currentLoop_; }
 
-	Effect* FindEffect(std::string const& key) {
-		auto it = Effects.find(key);
-		if (it != Effects.end()) {
-			return it->second;
-		}
-		return nullptr;
-	}
 
-	void AddEffect(std::string key, Effect* effect) {
-		Effects.insert({ key, effect });
-	}
+	/////////////////////// Effect Methods ///////////////////////
 
-	void AddEffects(std::map<std::string, Effect*> const& effects) {
-		for (auto it = effects.begin(); it != effects.end(); ++it) {
-			AddEffect(it->first, it->second);
-		}
-	}
+	Effect* FindEffect(std::string const& key);
+	void AddEffect(std::string key, Effect* effect);
+	void AddEffects(std::map<std::string, Effect*> const& effects);
+	bool DeleteEffect(std::string const& key);
 
-	bool DeleteEffect(std::string const& key) {
-		Effect* e = FindEffect(key);
-		if (e != nullptr) delete e;
-		Effects.erase(key);
-	}
+	ISoundObject* ConnectEffect(std::string const& effectKey, Effect::Connection connection);
+	ISoundObject* ConnectEffects(std::map<std::string, Effect::Connection> const& connections);
 
-	ISoundObject* ConnectEffect(std::string const& effectKey, Effect::Connection connection) {
-		auto effect = FindEffect(effectKey);
-		if (effect != nullptr) effect->Connect(connection);
-		return this;
-	}
 
-	ISoundObject* ConnectEffects(std::map<std::string, Effect::Connection> const& connections) {
-		for (auto it = connections.begin(); it != connections.end(); it++) {
-			auto effect = FindEffect(it->first);
-			if (effect != nullptr) effect->Connect(it->second);
-		}
-		return this;
-	}
+
+	/////////////////////// Param Getters/Setters ///////////////////////
 
 	// getters and setters may be evil, but setting params will need additional
 	//		logic in derived classes
@@ -139,37 +113,25 @@ public:
 		return pan_;
 	}
 
-	int Index() { return index_; }
-protected:
-	int Index(int val)
+	int Loop() { return loop_; }
+	int Loop(int val, bool resetCurrentLoop = false)
 	{
-		// index should only be set by containers, but will not have any additional logic
-		index_ = val;
-		return index_;
+		loop_ = handleLoop_(val);
+		if (resetCurrentLoop) currentLoop_ = 0;
+		return loop_;
 	}
-public:
+
 
 	ISoundObject* Queuer() { return queuer_; }
-protected:
 	ISoundObject* Queuer(ISoundObject* val) {
 		queuer_ = Queue(val);
 		return queuer_;
 	}
-public:
 
 	ISoundObject* Afteree() { return afteree_; }
-protected:
 	ISoundObject* Afteree(ISoundObject* val) {
 		afteree_ = After(val);
 		return afteree_;
-	}
-	
-	int Loop() { return loop_; }
-	int Loop(int val, bool resetCurrentLoop = false)
-	{
-	    loop_ = handleLoop_(val);
-		if (resetCurrentLoop) currentLoop_ = 0;
-		return loop_;
 	}
 
 	SOUND_STATE State() { return state_; }
@@ -178,35 +140,39 @@ protected:
 		state_ = handleState_(val);
 		return state_;
 	}
-	
+
+
+	/////////////////////// Protected Members ///////////////////////
+
 protected:
 	float	volume_ = 0.f;
 	float	tune_ = 0.f;
 	float	pan_ = 0.f;
-	int		index_ = -1;
-	int loop_ = 0;
+	int		loop_ = 0;
+	int		currentLoop_ = 0;
+
+	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
 
 	ISoundObject* queuer_ = nullptr;
 	ISoundObject* afteree_ = nullptr;
-
-	int currentLoop_ = 0;
-
-	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
 	
+	virtual void handlePlay_() = 0;
+	virtual void handlePause() = 0;
+	virtual void handleResume() = 0;
+	virtual void handleFinish() = 0;
+	virtual void handleStop() = 0;
+
 	virtual float handleVolume_(float val) = 0;
 	virtual float handleTune_(float val) = 0;
 	virtual float handlePan_(float val) = 0;
 	virtual int handleLoop_(int val) = 0;
 	virtual SOUND_STATE handleState_(SOUND_STATE state) = 0;
 
-
-
-	virtual void updateSound_(float dt) = 0;
 	virtual void updateEffects_(float dt) = 0;
 
 	// overridden in ISoundContainer
-	void parseParam_(std::string& key, const json& j);
-	void parseFile_(std::string& fileKey, const json& j);
+	virtual void parseParam_(std::string& key, const json& j);
+	virtual void parseFile_(std::string& fileKey, const json& j);
 	void parseEffects_(std::string& effectsKey, const json& j);
 
 };

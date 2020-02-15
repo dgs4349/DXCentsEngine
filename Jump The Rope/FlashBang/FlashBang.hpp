@@ -13,11 +13,21 @@ namespace FlashBang {
 	class SoundScene;
 */
 
-	enum class COMMON_EFFECTS { TIME };
+    // yes this one's plural, it just makes more sense in this instance
+	enum class COMMON_EFFECTS : char { TIME='T' };
+
+    // basic parameters are lowercase to match common arg rules
+    enum class EFFECT_PARAMETER : char { VOLUME='v', TUNE='t', PAN='p' };
+
+    // this is an int class, which is useful with state_ < READY
 	enum class SOUND_STATE { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING };
 
+    // char for parsing
+    enum class SOUNDCONTAINER_TYPE : char { PLAYLIST= 'P', INDIVIDUAL= 'I' };
+    enum class SOUNDCONTAINER_PLAYBACK: char { IN_ORDER='I', RANDOM='R', RANDOM_EACH='E' };
 
-	/* // investigate including these
+
+	/* investigate including these
 	
     static const XAUDIO2FX_REVERB_I3DL2_PARAMETERS gReverbPresets[] =
     {

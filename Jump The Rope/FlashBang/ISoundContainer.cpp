@@ -9,11 +9,22 @@ void ISoundContainer::from_json(const json& j, ISoundContainer& s) {
 		// bit redundant, but for-index would increase complexity
 		key = i.key();
 
-		if (!isalpha(i.key()[0])) {
-			s.parseSoundObject_(i.key(), i.value());
+		if (!isalpha(key[0])) {
+			s.parseSoundObject_(key, i.value());
 		}
 		else {
-			s.parseParam_(key, j);
+			switch ((SOUNDCONTAINER_ARG) key[0]) {
+
+			case SOUNDCONTAINER_ARG::TYPE: //type
+				s.type_ = (SOUNDCONTAINER_TYPE)(i.value().get<std::string>()[0]);
+				break;
+			case SOUNDCONTAINER_ARG::PLAYBACK:
+				s.playback_ = (SOUNDCONTAINER_PLAYBACK)(i.value().get<std::string>()[0]);
+				break;
+			default:
+				s.parseParam_(key, j);
+				break;
+			}
 		}
 	}
 }

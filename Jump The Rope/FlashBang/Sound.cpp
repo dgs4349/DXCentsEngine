@@ -21,14 +21,14 @@ Sound::Sound(const std::string& s) {
 
 ISoundObject& Sound::operator=(const json& j)
 {
-	Sound* s = new Sound(j);
-	return  *s;
+	Sound* sound = new Sound(j);
+	return  *sound;
 }
 
 ISoundObject& Sound::operator=(const std::string& s)
 {
-	Sound* s = new Sound(s);
-	return s;
+	Sound* sound = new Sound(s);
+	return *sound;
 }
 
 
