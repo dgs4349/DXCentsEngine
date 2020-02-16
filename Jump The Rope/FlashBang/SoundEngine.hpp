@@ -40,8 +40,6 @@ public:
 	 *
 	 *		does this have a real advantage? Guess it would maintain a sort of cache so vector won't reshuffle as much
 	 * */
-	void AddGlobalSoundObject(SoundObject* object);
-	void AddGlobalSoundContainer(ISoundContainer* container);
 
 	DirectX::AudioEngine* DirectXAudioEngine;
 private:
@@ -50,8 +48,6 @@ private:
 
 	std::unique_ptr<DirectX::AudioEngine> directXAudioEnginePointer;
 	bool isSilent_ = false;
-
-	private SoundScene globalScene_;
 
 	
 	static SoundEngine* instance_;

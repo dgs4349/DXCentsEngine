@@ -40,26 +40,34 @@ public:
 	virtual void AddSoundObjects(std::vector<SoundObject*> const& soundObjects) = 0;
 	virtual void AddSoundObjects(std::map<std::string, SoundObject*> const& keysoundObjects) = 0;
 
-	virtual int Next() = 0;
-	virtual int Current() = 0;
+	virtual SoundObject* Current() = 0;
+	virtual SoundObject* Next() = 0;
 
-	virtual SoundObject* CurrentlyPlaying() = 0;
+	virtual int CurrentIndex() = 0;
+	virtual int NextIndex() = 0;
 
-	/*
-	* Queue behavior, can queue like soundobject, but queueNext will automatically queue the next element
-	* this is different from PlayBackBehavior which will handle other stuff
-	*/
-	virtual void Play(int index) = 0;
-	virtual void PlayNext() = 0;
-	virtual void Queue(int index) = 0;
-	virtual void QueueNext() = 0;
+	virtual void PlayChild( int index, bool stopCurrent=false ) = 0;
+	virtual void PlayChild( std::string& key, bool stopCurrent=false ) = 0;
+	virtual void PlayNextChild( bool stopCurrent=false ) = 0;
+
+	virtual void QueueChild( int index, bool finishCurrent=true ) = 0;
+	virtual void QueueChild(std::string& key, bool finishCurrent = true ) = 0;
+	virtual void QueueNextChild(bool finishCurrent=true ) = 0;
+
+	virtual void StopThenJump(int newPosition, bool makeSkipPermenant = false) = 0;
+	virtual void QueueJump(int newPosition, bool finish = true, bool makeSkipPermenant = false) = 0;
 
 	virtual int SwapIndex(int oldIndex, int newIndex) = 0;
 	virtual int ShiftIndex(int oldIndex, int newIndex) = 0;
 
+	bool DefaultOrderOnComplete() { return resetOrderOnComplete_; }
+	bool DefaultOrderOnComplete(bool val) { 
+		resetOrderOnComplete_ = val; 
+		return resetOrderOnComplete_; 
+	}
+
+	bool Reverse() { return reverse_; }
 	bool Reverse(bool val = true) { reverse_ = val; return reverse_; }
-	bool Reversed() { return reverse_; } // makes more sense thant Reverse()
-	bool Reverse() { return Reversed(); } // but included to be consistent with other getters
 
 	// immutable type, no real reason to change type after the fact
 	SOUNDCONTAINER_TYPE Type() { return type_; }
@@ -76,8 +84,10 @@ protected:
 	// todo, repeat enums to clear up parsing logic
 	enum class SOUNDCONTAINER_ARG : char { TYPE='T', PLAYBACK= 'P'};
 
-	bool reverse_ = false;
 	int current_ = 0;
+
+	bool reverse_ = false;
+	bool resetOrderOnComplete_ = true;
 
 	SOUNDCONTAINER_TYPE type_ = SOUNDCONTAINER_TYPE::INDIVIDUAL;
 	SOUNDCONTAINER_PLAYBACK playback_ = SOUNDCONTAINER_PLAYBACK::IN_ORDER;

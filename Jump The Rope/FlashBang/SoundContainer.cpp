@@ -1,34 +1,6 @@
-#include "SoundContainer.h"
+#include "SoundContainer.hpp"
 
 using namespace FlashBang;
-
-
-void SoundContainer::Finish()
-{
-	if (soundObjects_[current_]->Playing()) soundObjects_[current_]->Finish();
-}
-
-SoundObject* SoundContainer::Queue(bool finish = false)
-{
-	// queue some shit
-	return nullptr;
-}
-
-SoundObject* SoundContainer::Queue(SoundObject* previous, bool finish = false)
-{
-	return nullptr;
-}
-
-SoundObject* SoundContainer::After(bool finish = false)
-{
-	return nullptr;
-}
-
-SoundObject* SoundContainer::After(SoundObject* next, bool finish = false)
-{
-	if (soundObjects_[current_]->Playing()) soundObjects_[current_]->After(next, finish);
-	// else?
-}
 
 float SoundContainer::handleVolume_(float val)
 {
@@ -54,45 +26,6 @@ int SoundContainer::handleLoop_(int val)
 	return val;
 }
 
-SOUND_STATE SoundContainer::handleState_(SOUND_STATE state)
-{
-	return state;
-}
-
-void SoundContainer::updateSound_(float dt)
-{
-	if (state_ < SOUND_STATE::READY) return;
-
-	switch (state_) {
-
-	case SOUND_STATE::READY:
-
-		
-
-
-
-		// update the sound effect
-		soundObjects_[current_]->Update(dt);
-
-		// sound effect should queue the next sound automatically on end
-		// but we need to update our logic here to keep track
-		if (!soundObjects_[current_]->Playing()) {
-
-			reverse_ ? ++currentQueueOrderIndex_ : --currentQueueOrderIndex_;
-
-			if (abs(currentQueueOrderIndex_) >= queueOrder_.size()) {
-				loop_++;
-				if (currentLoop_ == loop_) {
-
-				}
-			}
-
-			current_ = currentQueueOrderIndex_;
-		}
-	}
-
-}
-
 void SoundContainer::updateEffects_(float dt)
 {
 	for (auto it = Effects.begin(); it != Effects.end(); ++it) {
@@ -103,6 +36,14 @@ void SoundContainer::updateEffects_(float dt)
 SOUNDCONTAINER_PLAYBACK SoundContainer::handlePlayback_(SOUNDCONTAINER_PLAYBACK val)
 {
 	return SOUNDCONTAINER_PLAYBACK();
+}
+
+SoundContainer::SoundContainer(const json& j)
+{
+}
+
+SoundContainer::SoundContainer(const std::string& s)
+{
 }
 
 ISoundContainer& SoundContainer::operator=(const json& j)
@@ -254,6 +195,83 @@ SoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
 }
 
 SoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
+{
+}
+
+void SoundContainer::handlePlay_()
+{
+}
+
+void SoundContainer::handlePause_()
+{
+}
+
+void SoundContainer::handleResume_()
+{
+}
+
+void SoundContainer::handleFinish_()
+{
+}
+
+void SoundContainer::handleStop_()
+{
+}
+
+float SoundContainer::getDuration_()
+{
+	return 0.0f;
+}
+
+SoundObject* SoundContainer::Current()
+{
+	return nullptr;
+}
+
+SoundObject* SoundContainer::Next()
+{
+	return nullptr;
+}
+
+int SoundContainer::CurrentIndex()
+{
+	return 0;
+}
+
+int SoundContainer::NextIndex()
+{
+	return 0;
+}
+
+void SoundContainer::PlayChild(int index, bool stopCurrent = false)
+{
+}
+
+void SoundContainer::PlayChild(std::string& key, bool stopCurrent = false)
+{
+}
+
+void SoundContainer::PlayNextChild(bool stopCurrent = false)
+{
+}
+
+void SoundContainer::QueueChild(int index, bool finishCurrent = true)
+{
+}
+
+void SoundContainer::QueueChild(std::string& key, bool finishCurrent = true)
+{
+}
+
+void SoundContainer::QueueNextChild(bool finishCurrent = true)
+{
+}
+
+void SoundContainer::StopThenJump(int newPosition, bool makeSkipPermenant = false)
+{
+}
+
+void SoundContainer::QueueJump(int newPosition, bool finish = true, bool makeSkipPermenant = false)
 {
 }
 

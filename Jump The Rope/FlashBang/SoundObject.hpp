@@ -73,6 +73,8 @@ public:
 	void Finish() { State(SOUND_STATE::FINISHING); handleFinish_(); }
 	void Stop() { State(SOUND_STATE::IDLE); handleStop_(); }
 
+	void (*OnStateChange)(SOUND_STATE state) = nullptr;
+
 	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
 	unsigned int CurrentLoop() { return currentLoop_; }
 
@@ -90,8 +92,6 @@ public:
 
 	SoundObject* ConnectEffect(std::string const& effectKey, Effect::Connection connection);
 	SoundObject* ConnectEffects(std::map<std::string, Effect::Connection> const& connections);
-
-
 
 	/////////////////////// Param Getters/Setters ///////////////////////
 
@@ -142,7 +142,13 @@ public:
 	}
 
 	SOUND_STATE State() { return state_; }
-	virtual SOUND_STATE State(SOUND_STATE val) { state_ = val; return state_; };
+	virtual SOUND_STATE State(SOUND_STATE val) { 
+		state_ = val; 
+		if (OnStateChange != nullptr) {
+			OnStateChange(state_);
+		}
+		return state_; 
+	};
 
 
 	/////////////////////// Protected Members ///////////////////////

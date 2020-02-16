@@ -4,15 +4,6 @@
 
 namespace FlashBang {
 
-    // no forwards necessary right now, but can be included here
-	/*class SoundEngine;
-
-	class Sound;
-	class SoundGroup;
-	class SoundContainer;
-	class SoundScene;
-*/
-
     // yes this one's plural, it just makes more sense in this instance
 	enum class COMMON_EFFECTS : char { TIME='T' };
 
@@ -24,8 +15,17 @@ namespace FlashBang {
 
     // char for parsing
     enum class SOUNDCONTAINER_TYPE : char { PLAYLIST= 'P', INDIVIDUAL= 'I' };
-    enum class SOUNDCONTAINER_PLAYBACK: char { IN_ORDER='I', RANDOM='R', RANDOM_EACH='E' };
+    enum class SOUNDCONTAINER_PLAYBACK : char { IN_ORDER='I', RANDOM='R', RANDOM_EACH='E' };
 
+
+    // forward declarations for lifecycle
+    class SoundObject {
+    public: 
+    };
+
+    void* CreateLifeCycleContainer(std::map<SOUND_STATE, void*> const& relevantLifeCycleHooks, ) {
+
+    }
 
 	/* investigate including these
 	

@@ -72,9 +72,6 @@
     <ClCompile Include="FlashBang\SoundEngine.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\Sound.cpp">
-      <Filter>FlashBang\Core Elements</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundContainer.cpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClCompile>
@@ -116,23 +113,23 @@
     <ClInclude Include="FlashBang\OldSoundEngine.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\SoundEngine.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
     <ClInclude Include="FlashBang\ISoundContainer.hpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\Sound.h">
-      <Filter>FlashBang\Core Elements</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\SoundContainer.h">
-      <Filter>FlashBang\Core Elements</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\Effect.hpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\SoundObject.hpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\Sound.hpp">
+      <Filter>FlashBang\Core Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\SoundContainer.hpp">
+      <Filter>FlashBang\Core Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\SoundEngine.hpp">
+      <Filter>FlashBang</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

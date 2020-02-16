@@ -2,7 +2,7 @@
 
 #include "FlashBang.hpp"
 #include "ISoundContainer.hpp"
-#include "Sound.h"
+#include "Sound.hpp"
 
 using namespace FlashBang;
 
@@ -24,28 +24,24 @@ public:
 	virtual ISoundContainer& operator=(const json& j) override;
 	virtual ISoundContainer& operator=(const std::string& s) override;
 	
-	void Play() override;
-	void Pause() override;
-	void Resume() override;
-	void Stop() override;
 	void Load() override;
 	void Unload() override;
 
-	virtual void Play(int index) override;
-	virtual void PlayNext() override;
-	virtual void Queue(int index) override;
-	virtual void QueueNext() override;
+	virtual SoundObject* Current() override;
+	virtual SoundObject* Next() override;
+	virtual int CurrentIndex() override;
+	virtual int NextIndex() override;
 
-	virtual SoundObject* Queue(bool finish = false) override;
-	virtual SoundObject* Queue(SoundObject* previous, bool finish = false) override;
-	virtual SoundObject* After(bool finish = false) override;
-	virtual SoundObject* After(SoundObject* next, bool finish = false) override;
-	virtual void Finish() override;
+	virtual void PlayChild(int index, bool stopCurrent = false) override;
+	virtual void PlayChild(std::string& key, bool stopCurrent = false) override;
+	virtual void PlayNextChild(bool stopCurrent = false) override;
 
-	virtual int Next() override;
-	virtual int Current() override;
+	virtual void QueueChild(int index, bool finishCurrent = true) override;
+	virtual void QueueChild(std::string& key, bool finishCurrent = true) override;
+	virtual void QueueNextChild(bool finishCurrent = true) override;
 
-	virtual SoundObject* CurrentlyPlaying() override;
+	virtual void StopThenJump(int newPosition, bool makeSkipPermenant = false) override;
+	virtual void QueueJump(int newPosition, bool finish = true, bool makeSkipPermenant = false) override;
 
 	virtual int SwapIndex(int oldIndex, int newIndex) override;
 	virtual int ShiftIndex(int oldIndex, int newIndex) override;
@@ -76,7 +72,6 @@ protected:
 	float handleTune_(float val) override;
 	float handlePan_(float val) override;
 	int handleLoop_(int val) override;
-	virtual SOUND_STATE handleState_(SOUND_STATE state) override;
 	virtual SOUNDCONTAINER_PLAYBACK handlePlayback_(SOUNDCONTAINER_PLAYBACK val) override;
 
 	void unload_();
@@ -95,6 +90,12 @@ private:
 	int currentQueueOrderIndex_ = 0;
 	std::vector<int> queueOrder_;
 
-	virtual void updateSound_(float dt) override;
-	virtual void updateEffects_(float dt) override;
+	virtual void handlePlay_() override;
+	virtual void handlePause_() override;
+	virtual void handleResume_() override;
+	virtual void handleFinish_() override;
+	virtual void handleStop_() override;
+
+	virtual float getDuration_() override;
+
 };
