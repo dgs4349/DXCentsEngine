@@ -10,27 +10,29 @@ using nlohmann::json;
 using namespace FlashBang;
 
 /*
-	Basic interface for declaration
-		Handles all parsing and parameter logic
-		Forces abstract calls to handle audio and state logic
+	Handles parsing
+	Handles basic update logic
+
+	Creates basic behavior for derrived classes
+	is NOT in charge of playback, that is for derrived classes
 */
-class ISoundObject
+class SoundObject
 {
 public:
 
 	/////////////////////// Operators ///////////////////////
 
-	ISoundObject() = default;
-	ISoundObject(const ISoundObject & s) = delete;
+	SoundObject() = default;
+	SoundObject(const SoundObject & s) = delete;
 
-	~ISoundObject() {
+	~SoundObject() {
 		for (auto it = Effects.begin(); it != Effects.end(); it++) {
 			delete it->second;
 		}
 	}
 
-	virtual ISoundObject& operator=(const json& j) = 0;
-	virtual ISoundObject& operator=(const std::string& s) = 0;
+	virtual SoundObject& operator=(const json& j) = 0;
+	virtual SoundObject& operator=(const std::string& s) = 0;
 	void operator() () { Play(); }
 
 
@@ -41,14 +43,21 @@ public:
 	std::map<std::string, Effect*> Effects;
 	
 	// this method sadly has to be snake case
-	static void from_json(const json& j, ISoundObject& s);
+	static void from_json(const json& j, SoundObject& s);
 	
 	// todo: handle non char keys, such as Position and the like
 	typedef float (*ParamSetterFunc)(float val);
-	static ParamSetterFunc GetParamSetFunc(EFFECT_PARAMETER p, ISoundObject& s);
+	static ParamSetterFunc GetParamSetFunc(EFFECT_PARAMETER p, SoundObject& s);
 
-	virtual ISoundObject* CopyParams(const ISoundObject& s);
+	virtual SoundObject* CopyParams(const SoundObject& s);
 
+	virtual void SetParams() {
+		Volume(volume_);
+		Pan(pan_);
+		Tune(tune_);
+		Loop(loop_);
+		duration_ = getDuration_();
+	}
 
 	/////////////////////// Sound Methods ///////////////////////
 
@@ -58,21 +67,19 @@ public:
 	// could do a small optimization with needsUpdate_, but we'd need special SOUND_STATE logic
 	void Update(float dt);
 
-	virtual void Play() = 0;
-	virtual void Pause() = 0;
-	virtual void Resume() = 0;
-	virtual void Finish() = 0;
-	virtual void Stop() = 0;
+	void Play();
+	void Pause() { State(SOUND_STATE::PAUSED); handlePause_(); }
+	void Resume() { State(SOUND_STATE::PLAYING); handleResume_(); }
+	void Finish() { State(SOUND_STATE::FINISHING); handleFinish_(); }
+	void Stop() { State(SOUND_STATE::IDLE); handleStop_(); }
 
 	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
 	unsigned int CurrentLoop() { return currentLoop_; }
 
-	virtual ISoundObject* Queue(bool finish = false) = 0;
-	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) = 0;
-	virtual ISoundObject* After(bool finish = false) = 0;
-	virtual ISoundObject* After(ISoundObject* next, bool finish = false) = 0;
-
-
+	SoundObject* Queue(bool finish = false);
+	SoundObject* Queue(SoundObject* previous, bool finish = false);
+	SoundObject* After(bool finish = false);
+	SoundObject* After(SoundObject* next, bool finish = false);
 
 	/////////////////////// Effect Methods ///////////////////////
 
@@ -81,8 +88,8 @@ public:
 	void AddEffects(std::map<std::string, Effect*> const& effects);
 	bool DeleteEffect(std::string const& key);
 
-	ISoundObject* ConnectEffect(std::string const& effectKey, Effect::Connection connection);
-	ISoundObject* ConnectEffects(std::map<std::string, Effect::Connection> const& connections);
+	SoundObject* ConnectEffect(std::string const& effectKey, Effect::Connection connection);
+	SoundObject* ConnectEffects(std::map<std::string, Effect::Connection> const& connections);
 
 
 
@@ -122,24 +129,20 @@ public:
 	}
 
 
-	ISoundObject* Queuer() { return queuer_; }
-	ISoundObject* Queuer(ISoundObject* val) {
+	SoundObject* Queuer() { return queuer_; }
+	SoundObject* Queuer(SoundObject* val) {
 		queuer_ = Queue(val);
 		return queuer_;
 	}
 
-	ISoundObject* Afteree() { return afteree_; }
-	ISoundObject* Afteree(ISoundObject* val) {
+	SoundObject* Afteree() { return afteree_; }
+	SoundObject* Afteree(SoundObject* val) {
 		afteree_ = After(val);
 		return afteree_;
 	}
 
 	SOUND_STATE State() { return state_; }
-	SOUND_STATE State(SOUND_STATE val)
-	{
-		state_ = handleState_(val);
-		return state_;
-	}
+	virtual SOUND_STATE State(SOUND_STATE val) { state_ = val; return state_; };
 
 
 	/////////////////////// Protected Members ///////////////////////
@@ -149,26 +152,30 @@ protected:
 	float	tune_ = 0.f;
 	float	pan_ = 0.f;
 	int		loop_ = 0;
-	int		currentLoop_ = 0;
+	
+	int	currentLoop_ = 0;
+	float duration_ = 0.f;
+	float elapsedTime_ = 0.f;
 
 	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
 
-	ISoundObject* queuer_ = nullptr;
-	ISoundObject* afteree_ = nullptr;
+	SoundObject* queuer_ = nullptr;
+	SoundObject* afteree_ = nullptr;
 	
 	virtual void handlePlay_() = 0;
-	virtual void handlePause() = 0;
-	virtual void handleResume() = 0;
-	virtual void handleFinish() = 0;
-	virtual void handleStop() = 0;
+	virtual void handlePause_() = 0;
+	virtual void handleResume_() = 0;
+	virtual void handleFinish_() = 0;
+	virtual void handleStop_() = 0;
+
+	virtual float getDuration_() = 0;
+	void updateEffects_(float dt);
 
 	virtual float handleVolume_(float val) = 0;
 	virtual float handleTune_(float val) = 0;
 	virtual float handlePan_(float val) = 0;
-	virtual int handleLoop_(int val) = 0;
-	virtual SOUND_STATE handleState_(SOUND_STATE state) = 0;
 
-	virtual void updateEffects_(float dt) = 0;
+	virtual int handleLoop_(int val) { return val < 0 ? INT_MAX : val; };
 
 	// overridden in ISoundContainer
 	virtual void parseParam_(std::string& key, const json& j);

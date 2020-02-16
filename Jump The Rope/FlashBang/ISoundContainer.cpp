@@ -44,7 +44,7 @@ void ISoundContainer::parseParam_(std::string& key, const json& j)
 				parseSoundObject_(el.key(), el.value());
 		}
 	}
-	ISoundObject::parseParam_(key, j);
+	SoundObject::parseParam_(key, j);
 }
 
 void ISoundContainer::parseFile_(std::string& fileKey, const json& j)

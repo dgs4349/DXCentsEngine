@@ -81,7 +81,7 @@
     <ClCompile Include="FlashBang\ISoundContainer.cpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\ISoundObject.cpp">
+    <ClCompile Include="FlashBang\SoundObject.cpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
     </ClCompile>
   </ItemGroup>
@@ -110,9 +110,6 @@
     <ClInclude Include="FlashBang\FlashBang.hpp">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\ISoundObject.hpp">
-      <Filter>FlashBang\Parsing Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="FlashBang\SoundScene.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
@@ -133,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="FlashBang\Effect.hpp">
       <Filter>FlashBang\Core Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\SoundObject.hpp">
+      <Filter>FlashBang\Parsing Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

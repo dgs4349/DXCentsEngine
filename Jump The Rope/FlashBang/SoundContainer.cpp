@@ -8,23 +8,23 @@ void SoundContainer::Finish()
 	if (soundObjects_[current_]->Playing()) soundObjects_[current_]->Finish();
 }
 
-ISoundObject* SoundContainer::Queue(bool finish = false)
+SoundObject* SoundContainer::Queue(bool finish = false)
 {
 	// queue some shit
 	return nullptr;
 }
 
-ISoundObject* SoundContainer::Queue(ISoundObject* previous, bool finish = false)
+SoundObject* SoundContainer::Queue(SoundObject* previous, bool finish = false)
 {
 	return nullptr;
 }
 
-ISoundObject* SoundContainer::After(bool finish = false)
+SoundObject* SoundContainer::After(bool finish = false)
 {
 	return nullptr;
 }
 
-ISoundObject* SoundContainer::After(ISoundObject* next, bool finish = false)
+SoundObject* SoundContainer::After(SoundObject* next, bool finish = false)
 {
 	if (soundObjects_[current_]->Playing()) soundObjects_[current_]->After(next, finish);
 	// else?
@@ -120,13 +120,13 @@ ISoundContainer& SoundContainer::operator=(const std::string& s)
 	return soundContainer;
 }
 
-int SoundContainer::AddSoundObject(ISoundObject& soundObject)
+int SoundContainer::AddSoundObject(SoundObject& soundObject)
 {
 	soundObjects_.push_back(&soundObject);
 	return soundObjects_.size() - 1;
 }
 
-int SoundContainer::AddSoundObject(std::string const& key, ISoundObject& soundObject)
+int SoundContainer::AddSoundObject(std::string const& key, SoundObject& soundObject)
 {
 	soundObjects_.push_back(&soundObject);
 	auto i = soundObjects_.size() - 1;
@@ -134,14 +134,14 @@ int SoundContainer::AddSoundObject(std::string const& key, ISoundObject& soundOb
 	return i;
 }
 
-void SoundContainer::AddSoundObjects(std::vector<ISoundObject*> const& soundObjects)
+void SoundContainer::AddSoundObjects(std::vector<SoundObject*> const& soundObjects)
 {
 	for (auto sound : soundObjects) {
 
 	}
 }
 
-void SoundContainer::AddSoundObjects(std::map<std::string, ISoundObject*> const& keysoundObjects)
+void SoundContainer::AddSoundObjects(std::map<std::string, SoundObject*> const& keysoundObjects)
 {
 	return 0;
 }
@@ -157,7 +157,7 @@ int SoundContainer::Current()
 	return current_;
 }
 
-ISoundObject* SoundContainer::CurrentlyPlaying()
+SoundObject* SoundContainer::CurrentlyPlaying()
 {
 	return soundObjects_[current_];
 }
@@ -240,20 +240,20 @@ void SoundContainer::unload_()
 	for (auto el : soundObjects_) el->Unload();
 }
 
-ISoundObject* SoundContainer::createSound_(json const& j)
+SoundObject* SoundContainer::createSound_(json const& j)
 {
 	// also have to handle indeces and what have you
 }
 
-ISoundObject* SoundContainer::createSoundContainer_(json const& attr)
+SoundObject* SoundContainer::createSoundContainer_(json const& attr)
 {
 }
 
-ISoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
+SoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
 {
 }
 
-ISoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
+SoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
 {
 }
 

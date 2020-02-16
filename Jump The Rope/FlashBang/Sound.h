@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FlashBang.hpp"
-#include "ISoundObject.hpp"
+#include "SoundObject.hpp"
 #include "ISoundContainer.hpp"
 #include "SoundEngine.h"
 
@@ -9,48 +9,85 @@
 
 using namespace FlashBang;
 
-class Sound : ISoundObject
+class Sound : SoundObject
 {
 public:
-	~Sound();
-	Sound() = delete;
+	~Sound() { unload_(); }
 
-	Sound(const json& j);
-	Sound(const std::string& s);
-	
-	ISoundObject& operator=(const json& j) override;
-	ISoundObject& operator=(const std::string& s) override;
+	Sound(const json& j) {
+		from_json(j, *this);
+	}
+	Sound(const std::string& s) {
+		json j = s;
+		from_json(j, *this);
+	}
 
-	virtual void Load() override;
-	void Unload() override { unload_(); }
-
-	virtual ISoundObject* Queue(bool finish = false) override;
-	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) override;
-	virtual ISoundObject* After(bool finish = false) override;
-	virtual ISoundObject* After(ISoundObject* next, bool finish = false) override;
-	virtual void Play() override;
-	virtual void Pause() override;
-	virtual void Resume() override;
-	virtual void Finish() override;
-	virtual void Stop() override;
+	SoundObject& operator=(const json& j) override {
+		Sound* sound = new Sound(j);
+		return  *sound;
+	}
+	SoundObject& operator=(const std::string& s) override {
+		Sound* sound = new Sound(s);
+		return *sound;
+	}
 
 	std::unique_ptr<DirectX::SoundEffect> DirectXSoundEffect;
 	std::unique_ptr<DirectX::SoundEffectInstance> DirectXSoundEffectInstance;
-	
-private:
-	void unload_();
 
-	float duration_ = 0.f;
-	float elapsedTime_ = 0.f;
+	void Unload() override { unload_(); }
+
+	virtual void Load() override {
+		// should we check for '|' characters?
+
+		// should we keep File as a wstring?
+		const wchar_t* file_str = std::wstring(File.begin(), File.end()).c_str();
+		DirectXSoundEffect = SoundEngine::LoadSoundDX(file_str);
+
+		// note: we can add flags here such as NoPitch or ReverbUseFilters
+		DirectXSoundEffectInstance = DirectXSoundEffect->CreateInstance();
+
+		SetParams();
+		State(SOUND_STATE::IDLE);
+	}
+
+private:
+	Sound() = default;
+	void unload_() {
+		if (DirectXSoundEffectInstance->GetState() != DirectX::STOPPED) {
+			DirectXSoundEffectInstance->Stop(true);
+		}
+		DirectXSoundEffectInstance.release();
+		DirectXSoundEffect.release();
+		State(SOUND_STATE::UNLOADED);
+	}
 
 protected:
-	float handleVolume_(float val) override;
-	float handleTune_(float val) override;
-	float handlePan_(float val) override;
-	int handleLoop_(int val) override;
-	SOUND_STATE handleState_(SOUND_STATE state) override;
+	float handleVolume_(float val) override { 
+		DirectXSoundEffectInstance->SetVolume(val); 
+		return val; 
+	}
+	float handlePan_(float val)	override {
+		DirectXSoundEffectInstance->SetPan(val);
+		return val;
+	}
 
+	float handleTune_(float val) override {
+		DirectXSoundEffectInstance->SetPitch(val); 
+		duration_ = getDuration_();
+		return val;
+	}
 
-	virtual void updateSound_(float dt) override;
-	virtual void updateEffects_(float dt) override;
+	virtual float getDuration_() {
+		// if no tune (pitch) effects applied, sample duration is uneffected;
+		if (tune_ == 0.f) return DirectXSoundEffect->GetSampleDuration();
+
+		// tune pitches up to 1 octave(duration*2) or down one octave (duration * 0.5)
+		return DirectXSoundEffect->GetSampleDuration() * pow(2, tune_);
+	}
+
+	virtual void handlePlay_()		override { DirectXSoundEffectInstance->Play(loop_ != 0); }
+	virtual void handlePause_()		override { DirectXSoundEffectInstance->Pause(); }
+	virtual void handleResume_()	override { DirectXSoundEffectInstance->Resume(); }
+	virtual void handleFinish_()	override { DirectXSoundEffectInstance->Stop(false); }
+	virtual void handleStop_()		override { DirectXSoundEffectInstance->Stop(true); }
 };

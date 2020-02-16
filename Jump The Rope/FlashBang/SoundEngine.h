@@ -40,7 +40,7 @@ public:
 	 *
 	 *		does this have a real advantage? Guess it would maintain a sort of cache so vector won't reshuffle as much
 	 * */
-	void AddGlobalSoundObject(ISoundObject* object);
+	void AddGlobalSoundObject(SoundObject* object);
 	void AddGlobalSoundContainer(ISoundContainer* container);
 
 	DirectX::AudioEngine* DirectXAudioEngine;

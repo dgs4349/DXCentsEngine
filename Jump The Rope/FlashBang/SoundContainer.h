@@ -18,7 +18,7 @@ public:
 		for (auto el : soundObjects_) {
 			delete el;
 		}
-		ISoundObject::~ISoundObject();
+		SoundObject::~SoundObject();
 	}
 
 	virtual ISoundContainer& operator=(const json& j) override;
@@ -36,22 +36,22 @@ public:
 	virtual void Queue(int index) override;
 	virtual void QueueNext() override;
 
-	virtual ISoundObject* Queue(bool finish = false) override;
-	virtual ISoundObject* Queue(ISoundObject* previous, bool finish = false) override;
-	virtual ISoundObject* After(bool finish = false) override;
-	virtual ISoundObject* After(ISoundObject* next, bool finish = false) override;
+	virtual SoundObject* Queue(bool finish = false) override;
+	virtual SoundObject* Queue(SoundObject* previous, bool finish = false) override;
+	virtual SoundObject* After(bool finish = false) override;
+	virtual SoundObject* After(SoundObject* next, bool finish = false) override;
 	virtual void Finish() override;
 
 	virtual int Next() override;
 	virtual int Current() override;
 
-	virtual ISoundObject* CurrentlyPlaying() override;
+	virtual SoundObject* CurrentlyPlaying() override;
 
 	virtual int SwapIndex(int oldIndex, int newIndex) override;
 	virtual int ShiftIndex(int oldIndex, int newIndex) override;
 
 	// should we watch who's being played?
-	ISoundObject* operator[] (std::string const& s)
+	SoundObject* operator[] (std::string const& s)
 	{
 		if (find(s) != end())
 		{
@@ -61,15 +61,15 @@ public:
 		return nullptr;
 	}
 
-	ISoundObject* operator[] (int i)
+	SoundObject* operator[] (int i)
 	{
 		return soundObjects_[i];
 	}
 	
-	virtual int AddSoundObject(ISoundObject& soundObject) override;
-	virtual int AddSoundObject(std::string const& key, ISoundObject& soundObject) override;
-	virtual void AddSoundObjects(std::vector<ISoundObject*> const& soundObjects) override;
-	virtual void AddSoundObjects(std::map<std::string, ISoundObject*> const& keysoundObjects) override;
+	virtual int AddSoundObject(SoundObject& soundObject) override;
+	virtual int AddSoundObject(std::string const& key, SoundObject& soundObject) override;
+	virtual void AddSoundObjects(std::vector<SoundObject*> const& soundObjects) override;
+	virtual void AddSoundObjects(std::map<std::string, SoundObject*> const& keysoundObjects) override;
 
 protected:
 	float handleVolume_(float val) override;
@@ -81,15 +81,15 @@ protected:
 
 	void unload_();
 
-	ISoundObject* createSound_(json const& j) override;
-	ISoundObject* createSoundContainer_(json const& attr) override;
-	ISoundObject* createSound_(std::string const& key, json const& j) override;
-	ISoundObject* createSoundContainer_(std::string const& key, json const& attr) override;
+	SoundObject* createSound_(json const& j) override;
+	SoundObject* createSoundContainer_(json const& attr) override;
+	SoundObject* createSound_(std::string const& key, json const& j) override;
+	SoundObject* createSoundContainer_(std::string const& key, json const& attr) override;
 
 	
 private:
 
-	std::vector<ISoundObject*> soundObjects_;
+	std::vector<SoundObject*> soundObjects_;
 
 	// tracking queue order for non-in order
 	int currentQueueOrderIndex_ = 0;

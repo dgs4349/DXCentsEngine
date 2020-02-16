@@ -3,12 +3,18 @@
 #include "nlohmann/json.hpp"
 #include <boost/algorithm/string.hpp>
 
-#include "ISoundObject.hpp"
+#include "SoundObject.hpp"
 
 
 using namespace FlashBang;
 
-class ISoundContainer : protected ISoundObject, public json
+/*
+	ISoundContainer
+	- handles parsing
+	- abstracts basic behaviors
+*/
+
+class ISoundContainer : protected SoundObject, public json
 {
 public:
 
@@ -18,8 +24,8 @@ public:
 	virtual ISoundContainer& operator=(const json& j) = 0;
 	virtual ISoundContainer& operator=(const std::string& s) = 0;
 	
-	virtual ISoundObject* operator[] (std::string const& s) = 0;
-	virtual ISoundObject* operator[] (int i) = 0;
+	virtual SoundObject* operator[] (std::string const& s) = 0;
+	virtual SoundObject* operator[] (int i) = 0;
 
 	// todo: deleting sounds at an index or string could be useful
 	// void operator delete(void*);
@@ -28,16 +34,16 @@ public:
 
 	static void from_json(const json& j, ISoundContainer& s);
 
-	virtual int AddSoundObject(ISoundObject& soundObject) = 0;
-	virtual int AddSoundObject(std::string const& key, ISoundObject& soundObject) = 0;
+	virtual int AddSoundObject(SoundObject& soundObject) = 0;
+	virtual int AddSoundObject(std::string const& key, SoundObject& soundObject) = 0;
 
-	virtual void AddSoundObjects(std::vector<ISoundObject*> const& soundObjects) = 0;
-	virtual void AddSoundObjects(std::map<std::string, ISoundObject*> const& keysoundObjects) = 0;
+	virtual void AddSoundObjects(std::vector<SoundObject*> const& soundObjects) = 0;
+	virtual void AddSoundObjects(std::map<std::string, SoundObject*> const& keysoundObjects) = 0;
 
 	virtual int Next() = 0;
 	virtual int Current() = 0;
 
-	virtual ISoundObject* CurrentlyPlaying() = 0;
+	virtual SoundObject* CurrentlyPlaying() = 0;
 
 	/*
 	* Queue behavior, can queue like soundobject, but queueNext will automatically queue the next element
@@ -78,11 +84,11 @@ protected:
 
 	virtual SOUNDCONTAINER_PLAYBACK handlePlayback_(SOUNDCONTAINER_PLAYBACK val) = 0;
 
-	virtual ISoundObject* createSound_(json const& j) = 0;
-	virtual ISoundObject* createSoundContainer_(json const& attr) = 0;
+	virtual SoundObject* createSound_(json const& j) = 0;
+	virtual SoundObject* createSoundContainer_(json const& attr) = 0;
 
-	virtual ISoundObject* createSound_(std::string const& key, json const& j) = 0;
-	virtual ISoundObject* createSoundContainer_(std::string const& key, json const& attr) = 0;
+	virtual SoundObject* createSound_(std::string const& key, json const& j) = 0;
+	virtual SoundObject* createSoundContainer_(std::string const& key, json const& attr) = 0;
 
 	void parseParam_(std::string& key, const json& j) override;
 	void parseFile_(std::string& fileKey, const json& j) override;

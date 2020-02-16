@@ -82,7 +82,7 @@ void OldSoundEngine::Resume()
 	audioEngineDX->Resume();
 }
 
-void OldSoundEngine::AddSoundObject(ISoundObject * object)
+void OldSoundEngine::AddSoundObject(SoundObject * object)
 {
 }
 

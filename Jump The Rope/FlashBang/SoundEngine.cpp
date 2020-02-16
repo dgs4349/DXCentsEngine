@@ -83,7 +83,7 @@ void SoundEngine::Resume()
 	DirectXAudioEngine->Resume();
 }
 
-void SoundEngine::AddSoundObject(ISoundObject* object)
+void SoundEngine::AddSoundObject(SoundObject* object)
 {
 }
 
@@ -93,7 +93,7 @@ void SoundEngine::AddSoundContainer(ISoundContainer* container)
 
 SoundEngine::SoundEngine()
 {
-	sounds_ = std::multiset<int, ISoundObject*>();
+	sounds_ = std::multiset<int, SoundObject*>();
 	Init();
 }
 
