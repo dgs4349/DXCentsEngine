@@ -3,12 +3,8 @@
 #include <Audio.h>
 
 #include "FlashBang.hpp"
-#include "SoundEngine.h"
-#include "SoundScene.h"
 
-using namespace FlashBang;
-
-class SoundEngine
+class FlashBang::SoundEngine
 {
 public:
 	static SoundEngine* Get();
@@ -46,6 +42,7 @@ private:
 	SoundEngine();
 	~SoundEngine();
 
+	// rename to add _
 	std::unique_ptr<DirectX::AudioEngine> directXAudioEnginePointer;
 	bool isSilent_ = false;
 

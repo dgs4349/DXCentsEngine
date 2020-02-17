@@ -36,15 +36,49 @@ public:
 	void operator() () { Play(); }
 
 
+	/////////////////////// Lifecycle (StateChange) Hooks ////////////////////
+
+	// all hooks basically connect to this one void pointer called on state change
+	void (*OnStateChange)(SOUND_STATE state) = nullptr;
+	
+	// methods called statically to expand on functionality
+	struct StateChangeHook { 
+		SOUND_STATE State; 
+		void (*Callback)(); 
+
+		void OnStateChangeHook(SOUND_STATE state) {
+			if (State == state) Callback();
+		}
+	};
+
+	struct StateChangeHookContainer {
+		std::map<SOUND_STATE, void*()> Hooks;
+		
+		void OnStateChangeHook(SOUND_STATE state) {
+			auto it = Hooks.find(state);
+			if (it != Hooks.end()) {
+				*(it->second)();
+			}
+		}
+	};
+
+	void ConnectStateChangeHook(StateChangeHook hook) { 
+		OnStateChange = *hook.OnStateChangeHook; 
+	}
+
+	void ConnectStateChangeHookContainer(StateChangeHookContainer hooks) { 
+		OnStateChange = *hooks.OnStateChangeHook; 
+	}
+
 
 	/////////////////////// Parsing ///////////////////////
 
 	std::string File = nullptr;
 	std::map<std::string, Effect*> Effects;
 	
-	// this method sadly has to be snake case
+	// this method sadly has to be snake case and I don't like snake case :c
 	static void from_json(const json& j, SoundObject& s);
-	
+
 	// todo: handle non char keys, such as Position and the like
 	typedef float (*ParamSetterFunc)(float val);
 	static ParamSetterFunc GetParamSetFunc(EFFECT_PARAMETER p, SoundObject& s);
@@ -72,8 +106,6 @@ public:
 	void Resume() { State(SOUND_STATE::PLAYING); handleResume_(); }
 	void Finish() { State(SOUND_STATE::FINISHING); handleFinish_(); }
 	void Stop() { State(SOUND_STATE::IDLE); handleStop_(); }
-
-	void (*OnStateChange)(SOUND_STATE state) = nullptr;
 
 	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
 	unsigned int CurrentLoop() { return currentLoop_; }

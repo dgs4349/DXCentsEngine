@@ -3,13 +3,11 @@
 #include "FlashBang.hpp"
 #include "SoundObject.hpp"
 #include "ISoundContainer.hpp"
-#include "SoundEngine.h"
+#include "SoundEngine.hpp"
 
 #include <Audio.h>
 
-using namespace FlashBang;
-
-class Sound : SoundObject
+class FlashBang::Sound : SoundObject
 {
 public:
 	~Sound() { unload_(); }

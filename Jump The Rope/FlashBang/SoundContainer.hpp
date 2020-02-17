@@ -4,10 +4,8 @@
 #include "ISoundContainer.hpp"
 #include "Sound.hpp"
 
-using namespace FlashBang;
 
-
-class SoundContainer : public ISoundContainer
+class FlashBang::SoundContainer : public ISoundContainer
 {
 public:
 	SoundContainer() = delete;

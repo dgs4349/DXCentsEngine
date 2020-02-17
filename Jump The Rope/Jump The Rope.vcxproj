@@ -157,7 +157,6 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClCompile Include="FlashBang\ISoundContainer.cpp" />
     <ClCompile Include="FlashBang\SoundObject.cpp" />
     <ClCompile Include="FlashBang\SoundEngine.cpp" />
-    <ClCompile Include="FlashBang\SoundScene.cpp" />
     <ClCompile Include="FlashBang\OldSound.cpp" />
     <ClCompile Include="FlashBang\SoundContainer.cpp" />
     <ClCompile Include="FlashBang\OldSoundEngine.cpp" />
@@ -175,7 +174,6 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClInclude Include="FlashBang\ISoundContainer.hpp" />
     <ClInclude Include="FlashBang\SoundObject.hpp" />
     <ClInclude Include="FlashBang\SoundEngine.hpp" />
-    <ClInclude Include="FlashBang\SoundScene.h" />
     <ClInclude Include="FlashBang\OldSound.h" />
     <ClInclude Include="FlashBang\Sound.hpp" />
     <ClInclude Include="FlashBang\SoundContainer.hpp" />

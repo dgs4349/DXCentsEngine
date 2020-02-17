@@ -63,9 +63,6 @@
     <ClCompile Include="FlashBang\OldSound.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\SoundScene.cpp">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\OldSoundEngine.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
@@ -105,9 +102,6 @@
       <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\FlashBang.hpp">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\SoundScene.h">
       <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\OldSoundEngine.h">
