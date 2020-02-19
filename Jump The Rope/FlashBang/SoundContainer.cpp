@@ -1,6 +1,12 @@
 #include "SoundContainer.hpp"
+#include <random>
 
 using namespace FlashBang;
+
+SoundContainer::SoundContainer()
+{
+	srand(time(NULL));
+}
 
 SoundContainer::SoundContainer(const json& j)
 {
@@ -23,8 +29,8 @@ ISoundContainer& SoundContainer::operator=(const json& j)
 
 ISoundContainer& SoundContainer::operator=(const std::string& s)
 {
-	ISoundContainer& soundContainer = new SoundContainer(s);
-	return soundContainer;
+	ISoundContainer* soundContainer = new SoundContainer(s);
+	return *soundContainer;
 }
 
 void SoundContainer::Load()
@@ -32,6 +38,7 @@ void SoundContainer::Load()
 	for (auto el : soundObjects_) {
 		el->Load();
 	}
+	Reset();
 }
 
 void SoundContainer::Unload()
@@ -39,6 +46,37 @@ void SoundContainer::Unload()
 	for (auto el : soundObjects_) el->Unload();
 }
 
+void SoundContainer::Reset()
+{
+	currentQueueOrderIndex_ = reverse_ ? soundObjects_.size() - 1 : 0;
+	queueOrder_ = std::vector<int>(soundObjects_.size());
+	switch (playback_) {
+	case SOUNDCONTAINER_PLAYBACK::IN_ORDER:
+		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
+		break;
+	case SOUNDCONTAINER_PLAYBACK::RANDOM_EACH:
+		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
+		std::shuffle(
+			std::begin(queueOrder_), 
+			std::end(queueOrder_), 
+			std::default_random_engine());
+		break;
+	case SOUNDCONTAINER_PLAYBACK::RANDOM:
+		std::generate(
+			std::begin(queueOrder_), 
+			std::end(queueOrder_), 
+			randomIndex_
+			);
+		break;
+	case SOUNDCONTAINER_PLAYBACK::RANDOM_OTHER:
+		std::generate(
+			std::begin(queueOrder_),
+			std::end(queueOrder_),
+			randomOther_
+		);
+	}
+	orderSet_ = true;
+}
 
 SoundObject* SoundContainer::Current()
 {
@@ -47,7 +85,7 @@ SoundObject* SoundContainer::Current()
 
 SoundObject* SoundContainer::Next()
 {
-	return soundObjects_[current_]->Queue();
+	return soundObjects_[current_]->Queued();
 }
 
 SoundObject* SoundContainer::At(int index)
@@ -73,9 +111,8 @@ int SoundContainer::CurrentIndex()
 
 int SoundContainer::NextIndex()
 {
-	return queueOrder_[(currentQueueOrderIndex_ + 1) % queueOrder_.size()];
+	return queueOrder_[(currentQueueOrderIndex_ + (reverse_? 1 : -1)) % queueOrder_.size()];
 }
-
 
 void SoundContainer::PlayChild(int index, bool stopCurrent = false)
 {
@@ -108,11 +145,11 @@ void SoundContainer::QueueChild(std::string const& key, bool finishCurrent = tru
 	QueueChild(Index(key), finishCurrent);
 }
 
-
 int SoundContainer::AddSoundObject(SoundObject* soundObject)
 {
 	soundObject->ConnectStateChangeHook(onCompleteHook);
 	soundObjects_.push_back(soundObject);
+	orderSet_ = false;
 	return soundObjects_.size() - 1;
 }
 
@@ -122,27 +159,34 @@ int SoundContainer::AddSoundObject(std::string const& key, SoundObject* soundObj
 	soundObjects_.push_back(soundObject);
 	int i = soundObjects_.size() - 1;
 	parseAddSoundObjectKey_(key, i);
+	orderSet_ = false;
 	return i;
 }
 
 void SoundContainer::AddSoundObjects(std::vector<SoundObject*> const& soundObjects)
 {
-	for (auto soundObject : soundObjects) AddSoundObject(*soundObject);
+	for (auto soundObject : soundObjects) AddSoundObject(soundObject);
 }
 
 void SoundContainer::AddSoundObjects(std::map<std::string, SoundObject*> const& soundObjectsMap)
 {
 	for (auto it = soundObjectsMap.begin(); it != soundObjectsMap.end(); ++it) {
-		AddSoundObject(it->first, *it->second);
+		AddSoundObject(it->first, it->second);
 	}
 }
-
 void SoundContainer::updateCurrentIndex()
 {
 	currentQueueOrderIndex_ =
 		reverse_ ? currentQueueOrderIndex_-- : currentQueueOrderIndex_++;
-	currentQueueOrderIndex_ %= currentQueueOrderIndex_, queueOrder_.size();
-	current_ = queueOrder_[currentQueueOrderIndex_];
+
+	if (playback_ == SOUNDCONTAINER_PLAYBACK::IN_ORDER) {
+		currentQueueOrderIndex_ %= queueOrder_.size();
+	}
+	else if (currentQueueOrderIndex_ < 0 || currentQueueOrderIndex_ >= queueOrder_.size()) {
+		currentQueueOrderIndex_ = 0;
+		Reset();
+	}
+	else current_ = queueOrder_[currentQueueOrderIndex_];
 }
 
 SoundObject* SoundContainer::createSound_(json const& j)
@@ -154,31 +198,24 @@ SoundObject* SoundContainer::createSound_(json const& j)
 
 SoundObject* SoundContainer::createSoundContainer_(json const& attr)
 {
-	SoundContainer soundContainer = attr;
+	SoundContainer* soundContainer = new SoundContainer(attr);
 	AddSoundObject(soundContainer);
-	return &soundContainer;
+	return soundContainer;
 }
 
 SoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
 {
+	Sound sound = j;
+	AddSoundObject(key, &sound);
+	return &sound;
 }
 
 SoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
 {
+	SoundContainer* soundContainer = new SoundContainer(attr);
+	AddSoundObject(key, soundContainer);
+	return soundContainer;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 float SoundContainer::handleVolume_(float val)
 {
@@ -188,7 +225,13 @@ float SoundContainer::handleVolume_(float val)
 
 float SoundContainer::handleTune_(float val)
 {
-	soundObjects_[current_]->Tune(val);
+	// tune (pitch) will change duration
+	//	since these tune properties *should* be global
+	//	we can recalculate the total duration of the container
+	//	by calculating the effect here
+
+	duration_ = 
+
 	return val;
 }
 
@@ -237,26 +280,6 @@ void SoundContainer::PlayNext()
 	Next();
 }
 
-void SoundContainer::After(int index)
-{
-}
-
-void SoundContainer::QueueNext()
-{
-	soundObjects_[current_]->Queue(soundObjects_[current_++]);
-}
-
-int SoundContainer::SwapIndex(int oldIndex, int newIndex)
-{
-	// fix
-	soundObjects_.swap(oldIndex, newIndex);
-	return newIndex;
-}
-
-int SoundContainer::ShiftIndex(int oldIndex, int newIndex)
-{
-	return 0;
-}
 
 void SoundContainer::Play()
 {
@@ -283,6 +306,7 @@ void SoundContainer::Stop()
 
 void SoundContainer::handlePlay_()
 {
+	if (!orderSet_) Reset();
 }
 
 void SoundContainer::handlePause_()
@@ -308,3 +332,4 @@ float SoundContainer::getDuration_()
 	for (auto soundObject : soundObjects_) total += soundObject->Duration();
 	return total;
 }
+

@@ -20,8 +20,7 @@ namespace FlashBang {
 
     // char for parsing
     enum class SOUNDCONTAINER_TYPE : char { PLAYLIST= 'P', INDIVIDUAL= 'I' };
-    enum class SOUNDCONTAINER_PLAYBACK : char { IN_ORDER='I', RANDOM='R', RANDOM_EACH='E' };
-
+    enum class SOUNDCONTAINER_PLAYBACK : char { IN_ORDER='I', RANDOM='R', RANDOM_EACH='E', RANDOM_OTHER='O' };
 
 	/* investigate including these
 	

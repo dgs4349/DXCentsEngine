@@ -99,35 +99,11 @@ void SoundObject::Play()
 	}
 }
 
-SoundObject* SoundObject::After(bool finish)
-{
-	if (afteree_ == nullptr) {
-		throw std::exception("Cannot implicitly call After(): no 'previous' ISoundObject provided to queue this Sound");
-	}
-	else afteree_->Queue(this, finish);
-	return afteree_;
-}
-
-SoundObject* SoundObject::After(SoundObject* previous, bool finish)
-{
-	afteree_ = previous;
-	afteree_->Queue(this, finish);
-	return afteree_;
-}
-
-SoundObject* SoundObject::Queue(bool finish)
-{
-	if (queued_ == nullptr) {
-		throw std::exception("Cannot implicitly call Queue(): no 'next' ISoundObject provided to call.");
-	}
-	else if (finish) State(SOUND_STATE::FINISHING);
-	return queued_;
-}
-
 SoundObject* SoundObject::Queue(SoundObject* next, bool finish)
 {
 	queued_ = next;
-	return Queue(finish);
+	if (finish) Finish();
+	return queued_;
 }
 
 

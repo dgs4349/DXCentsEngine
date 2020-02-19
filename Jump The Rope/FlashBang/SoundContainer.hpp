@@ -25,6 +25,7 @@ public:
 	
 	void Load() override;
 	void Unload() override;
+	virtual void Reset() override;
 
 	virtual SoundObject* Current() override;
 	virtual SoundObject* Next() override;
@@ -42,15 +43,17 @@ public:
 	virtual void QueueChild(int index, bool finishCurrent = true) override;
 	virtual void QueueChild(std::string const& key, bool finishCurrent = true) override;
 
-	virtual int AddSoundObject(SoundObject* soundObject) = 0;
-	virtual int AddSoundObject(std::string const& key, SoundObject* soundObject) = 0;
+	virtual int AddSoundObject(SoundObject* soundObject) override;
+	virtual int AddSoundObject(std::string const& key, SoundObject* soundObject) override;
 	virtual void AddSoundObjects(std::vector<SoundObject*> const& soundObjects) override;
 	virtual void AddSoundObjects(std::map<std::string, SoundObject*> const& soundObjectsMap) override;
 
 private:
-	SoundContainer() = default;
+	SoundContainer();
 
 	std::vector<SoundObject*> soundObjects_;
+
+	// might still need a queueNext function for interacting with the sounds
 
 	// tracking queue order for non-in order
 	int currentQueueOrderIndex_ = 0;
@@ -60,6 +63,17 @@ private:
 
 	SoundObject::StateChangeHook onCompleteHook =
 		StateChangeHook(SOUND_STATE::COMPLETE, this->updateCurrentIndex);
+
+	int randomIndex_() {
+		return rand() % queueOrder_.size();
+	}
+
+	int randomOther_() {
+		static int prev = -1;
+		int r = randomIndex_();
+		prev = (r == prev) ? r++ : r;
+		return prev;
+	}
 	
 protected:
 	float handleVolume_(float val) override;

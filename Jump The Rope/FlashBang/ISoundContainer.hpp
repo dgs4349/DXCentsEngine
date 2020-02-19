@@ -70,6 +70,8 @@ public:
 		return playback_;
 	}
 
+	virtual void Reset() = 0;
+
 protected:
 
 	ISoundContainer() = default;
@@ -79,6 +81,7 @@ protected:
 
 	int current_ = 0;
 	bool reverse_ = false;
+	bool orderSet_ = false;
 
 	SOUNDCONTAINER_TYPE type_ = SOUNDCONTAINER_TYPE::INDIVIDUAL;
 	SOUNDCONTAINER_PLAYBACK playback_ = SOUNDCONTAINER_PLAYBACK::IN_ORDER;
@@ -108,4 +111,6 @@ private:
 	// SoundContainer should NEVER be compared as a SoundObject
 	virtual bool operator!=(const SoundObject& other) override { return false; }
 	virtual bool operator==(const SoundObject& other) override { return false; }
+
+
 };

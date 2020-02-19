@@ -122,10 +122,8 @@ public:
 	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
 	unsigned int CurrentLoop() { return currentLoop_; }
 
-	SoundObject* After(bool finish = false);
-	SoundObject* After(SoundObject* previous, bool finish = false);
-	SoundObject* Queue(bool finish = false);
 	SoundObject* Queue(SoundObject* next, bool finish = false);
+	SoundObject* Queued() { return queued_; }
 
 	/////////////////////// Effect Methods ///////////////////////
 
@@ -172,19 +170,6 @@ public:
 		return loop_;
 	}
 
-
-	SoundObject* Afteree() { return afteree_; }
-	SoundObject* Afteree(SoundObject* val) {
-		afteree_ = After(val);
-		return afteree_;
-	}
-
-	SoundObject* Queued() { return queued_; }
-	SoundObject* Queued(SoundObject* val) {
-		queued_ = Queue(val);
-		return queued_;
-	}
-
 	SOUND_STATE State() { return state_; }
 	virtual SOUND_STATE State(SOUND_STATE val) { 
 		state_ = val; 
@@ -214,7 +199,6 @@ protected:
 
 	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
 
-	SoundObject* afteree_ = nullptr;
 	SoundObject* queued_ = nullptr;
 	
 	virtual void handlePlay_() = 0;
