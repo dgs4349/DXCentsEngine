@@ -7,7 +7,7 @@
 
 #include <Audio.h>
 
-class FlashBang::Sound : SoundObject
+class FlashBang::Sound : public SoundObject
 {
 public:
 	~Sound() { unload_(); }

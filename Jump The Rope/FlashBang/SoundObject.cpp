@@ -178,8 +178,8 @@ void SoundObject::Update(float dt) {
 
 		if (elapsedTime_ > duration_) {
 
-			State(SOUND_STATE::IDLE);
-			// auto unload here?
+			// one from of COMPLETE state for cleanup logic
+			State(SOUND_STATE::COMPLETE);
 
 			if (afteree_ != nullptr) {
 				afteree_->CopyParams(*this);
@@ -188,10 +188,13 @@ void SoundObject::Update(float dt) {
 				afteree_->Play();
 			}
 		}
+		break;
 
+	// if complete on previous frame reset to IDLE
+	case SOUND_STATE::COMPLETE:
+		State(SOUND_STATE::IDLE);
 		break;
 	}
-
 }
 
 /////////////////////// Effect Methods ///////////////////////

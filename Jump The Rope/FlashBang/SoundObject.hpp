@@ -22,9 +22,6 @@ public:
 
 	/////////////////////// Operators ///////////////////////
 
-	SoundObject() = default;
-	SoundObject(const SoundObject & s) = delete;
-
 	~SoundObject() {
 		for (auto it = Effects.begin(); it != Effects.end(); it++) {
 			delete it->second;
@@ -35,6 +32,13 @@ public:
 	virtual SoundObject& operator=(const std::string& s) = 0;
 	void operator() () { Play(); }
 
+	// if the File attributes are the same, we can probably assume they are equal, or are
+	//	the same "sound" even if they are not the same instance of SoundObject, which is useful
+
+	// != operator will be faster in this instance
+	virtual bool operator!=(const SoundObject& other) { return File.compare(other.File) != 0; }
+	virtual bool operator==(const SoundObject& other) { return !(*this != other); }
+
 
 	/////////////////////// Lifecycle (StateChange) Hooks ////////////////////
 
@@ -42,18 +46,26 @@ public:
 	void (*OnStateChange)(SOUND_STATE state) = nullptr;
 	
 	// methods called statically to expand on functionality
-	struct StateChangeHook { 
-		SOUND_STATE State; 
-		void (*Callback)(); 
+	struct StateChangeHook {
 
+		SOUND_STATE State;
+		void (*Callback)();
+
+		StateChangeHook(SOUND_STATE state, void(*callback)()) {
+			State = state;
+			Callback = callback;
+		}
 		void OnStateChangeHook(SOUND_STATE state) {
 			if (State == state) Callback();
 		}
 	};
 
 	struct StateChangeHookContainer {
-		std::map<SOUND_STATE, void*()> Hooks;
-		
+		std::map<SOUND_STATE, void* ()> Hooks;
+
+		StateChangeHookContainer(std::map<SOUND_STATE, void* ()> const& hooks) {
+			Hooks = hooks;
+		}
 		void OnStateChangeHook(SOUND_STATE state) {
 			auto it = Hooks.find(state);
 			if (it != Hooks.end()) {
@@ -62,11 +74,11 @@ public:
 		}
 	};
 
-	void ConnectStateChangeHook(StateChangeHook hook) { 
+	void ConnectStateChangeHook(StateChangeHook const& hook) { 
 		OnStateChange = *hook.OnStateChangeHook; 
 	}
 
-	void ConnectStateChangeHookContainer(StateChangeHookContainer hooks) { 
+	void ConnectStateChangeHookContainer(StateChangeHookContainer const& hooks) { 
 		OnStateChange = *hooks.OnStateChangeHook; 
 	}
 
@@ -105,7 +117,7 @@ public:
 	void Pause() { State(SOUND_STATE::PAUSED); handlePause_(); }
 	void Resume() { State(SOUND_STATE::PLAYING); handleResume_(); }
 	void Finish() { State(SOUND_STATE::FINISHING); handleFinish_(); }
-	void Stop() { State(SOUND_STATE::IDLE); handleStop_(); }
+	void Stop() { State(SOUND_STATE::COMPLETE); handleStop_(); }
 
 	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
 	unsigned int CurrentLoop() { return currentLoop_; }
@@ -182,10 +194,15 @@ public:
 		return state_; 
 	};
 
+	float Duration() { return duration_; }
+
 
 	/////////////////////// Protected Members ///////////////////////
 
 protected:
+	SoundObject() = default;
+	SoundObject(const SoundObject& s) = delete;
+
 	float	volume_ = 0.f;
 	float	tune_ = 0.f;
 	float	pan_ = 0.f;

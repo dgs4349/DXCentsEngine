@@ -2,6 +2,184 @@
 
 using namespace FlashBang;
 
+SoundContainer::SoundContainer(const json& j)
+{
+	auto container = new SoundContainer();
+	from_json(j, *container);
+}
+
+SoundContainer::SoundContainer(const std::string& s)
+{
+	json j = s;
+	auto container = new SoundContainer();
+	from_json(j, *container);
+}
+
+ISoundContainer& SoundContainer::operator=(const json& j)
+{
+	ISoundContainer* soundContainer = new SoundContainer(j);
+	return *soundContainer;
+}
+
+ISoundContainer& SoundContainer::operator=(const std::string& s)
+{
+	ISoundContainer& soundContainer = new SoundContainer(s);
+	return soundContainer;
+}
+
+void SoundContainer::Load()
+{
+	for (auto el : soundObjects_) {
+		el->Load();
+	}
+}
+
+void SoundContainer::Unload()
+{
+	for (auto el : soundObjects_) el->Unload();
+}
+
+
+SoundObject* SoundContainer::Current()
+{
+	return soundObjects_[current_];
+}
+
+SoundObject* SoundContainer::Next()
+{
+	return soundObjects_[current_]->After();
+}
+
+SoundObject* SoundContainer::At(int index)
+{
+	return soundObjects_[index];
+}
+
+SoundObject* SoundContainer::At(std::string const& key)
+{
+	return soundObjects_[((json)*this)[key]];
+}
+
+int SoundContainer::Index(std::string const& key)
+{
+	auto i = find(key);
+	return i == end() ? -1 : ((json)*this).at(key).get<int>();
+}
+
+int SoundContainer::CurrentIndex()
+{
+	return current_;
+}
+
+int SoundContainer::NextIndex()
+{
+	return queueOrder_[(currentQueueOrderIndex_ + 1) % queueOrder_.size()];
+}
+
+
+void SoundContainer::PlayChild(int index, bool stopCurrent = false)
+{
+	if (stopCurrent) {
+		soundObjects_[current_]->Stop();
+		soundObjects_[index]->Play();
+	}
+	else {
+		soundObjects_[current_]->After(soundObjects_[index], true);
+	}
+}
+
+void SoundContainer::PlayChild(std::string const& key, bool stopCurrent = false)
+{
+	PlayChild(Index(key), stopCurrent);
+}
+
+void SoundContainer::PlayNextChild(bool stopCurrent = false)
+{
+	PlayChild(NextIndex(), stopCurrent);
+}
+
+void SoundContainer::QueueChild(int index, bool finishCurrent = true)
+{
+	soundObjects_[current_]->After(soundObjects_[index], finishCurrent);
+}
+
+void SoundContainer::QueueChild(std::string const& key, bool finishCurrent = true)
+{
+	QueueChild(Index(key), finishCurrent);
+}
+
+
+int SoundContainer::AddSoundObject(SoundObject* soundObject)
+{
+	soundObject->ConnectStateChangeHook(onCompleteHook);
+	soundObjects_.push_back(soundObject);
+	return soundObjects_.size() - 1;
+}
+
+int SoundContainer::AddSoundObject(std::string const& key, SoundObject* soundObject)
+{
+	soundObject->ConnectStateChangeHook(onCompleteHook);
+	soundObjects_.push_back(soundObject);
+	int i = soundObjects_.size() - 1;
+	parseAddSoundObjectKey_(key, i);
+	return i;
+}
+
+void SoundContainer::AddSoundObjects(std::vector<SoundObject*> const& soundObjects)
+{
+	for (auto soundObject : soundObjects) AddSoundObject(*soundObject);
+}
+
+void SoundContainer::AddSoundObjects(std::map<std::string, SoundObject*> const& soundObjectsMap)
+{
+	for (auto it = soundObjectsMap.begin(); it != soundObjectsMap.end(); ++it) {
+		AddSoundObject(it->first, *it->second);
+	}
+}
+
+void SoundContainer::updateCurrentIndex()
+{
+	currentQueueOrderIndex_ =
+		reverse_ ? currentQueueOrderIndex_-- : currentQueueOrderIndex_++;
+	currentQueueOrderIndex_ %= currentQueueOrderIndex_, queueOrder_.size();
+	current_ = queueOrder_[currentQueueOrderIndex_];
+}
+
+SoundObject* SoundContainer::createSound_(json const& j)
+{
+	Sound sound = j;
+	AddSoundObject(&sound);
+	return &sound;
+}
+
+SoundObject* SoundContainer::createSoundContainer_(json const& attr)
+{
+	SoundContainer soundContainer = attr;
+	AddSoundObject(soundContainer);
+	return &soundContainer;
+}
+
+SoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
+{
+}
+
+SoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
+{
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 float SoundContainer::handleVolume_(float val)
 {
 	soundObjects_[current_]->Volume(val);
@@ -26,66 +204,11 @@ int SoundContainer::handleLoop_(int val)
 	return val;
 }
 
-void SoundContainer::updateEffects_(float dt)
-{
-	for (auto it = Effects.begin(); it != Effects.end(); ++it) {
-		it->second->Update(dt);
-	}
-}
-
 SOUNDCONTAINER_PLAYBACK SoundContainer::handlePlayback_(SOUNDCONTAINER_PLAYBACK val)
 {
 	return SOUNDCONTAINER_PLAYBACK();
 }
 
-SoundContainer::SoundContainer(const json& j)
-{
-}
-
-SoundContainer::SoundContainer(const std::string& s)
-{
-}
-
-ISoundContainer& SoundContainer::operator=(const json& j)
-{
-	ISoundContainer* soundContainer = new SoundContainer();
-	from_json(j, *soundContainer);
-	return *soundContainer;
-}
-
-ISoundContainer& SoundContainer::operator=(const std::string& s)
-{
-	json const& j = s;
-	ISoundContainer& soundContainer = j;
-	// todo constructors with json and string
-	return soundContainer;
-}
-
-int SoundContainer::AddSoundObject(SoundObject& soundObject)
-{
-	soundObjects_.push_back(&soundObject);
-	return soundObjects_.size() - 1;
-}
-
-int SoundContainer::AddSoundObject(std::string const& key, SoundObject& soundObject)
-{
-	soundObjects_.push_back(&soundObject);
-	auto i = soundObjects_.size() - 1;
-	(json)*this[key] = i;
-	return i;
-}
-
-void SoundContainer::AddSoundObjects(std::vector<SoundObject*> const& soundObjects)
-{
-	for (auto sound : soundObjects) {
-
-	}
-}
-
-void SoundContainer::AddSoundObjects(std::map<std::string, SoundObject*> const& keysoundObjects)
-{
-	return 0;
-}
 
 int SoundContainer::Next()
 {
@@ -135,12 +258,6 @@ int SoundContainer::ShiftIndex(int oldIndex, int newIndex)
 	return 0;
 }
 
-
-SoundContainer::~SoundContainer()
-{
-	unload_();
-}
-
 void SoundContainer::Play()
 {
 	soundObjects_[current_]->Play();
@@ -164,40 +281,6 @@ void SoundContainer::Stop()
 	soundObjects_[current_]->Stop();
 }
 
-void SoundContainer::Load()
-{
-	for (auto el : soundObjects_) {
-		el->Load();
-	}
-}
-
-void SoundContainer::Unload()
-{
-	unload_();
-}
-
-void SoundContainer::unload_()
-{
-	for (auto el : soundObjects_) el->Unload();
-}
-
-SoundObject* SoundContainer::createSound_(json const& j)
-{
-	// also have to handle indeces and what have you
-}
-
-SoundObject* SoundContainer::createSoundContainer_(json const& attr)
-{
-}
-
-SoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
-{
-}
-
-SoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
-{
-}
-
 void SoundContainer::handlePlay_()
 {
 }
@@ -212,6 +295,7 @@ void SoundContainer::handleResume_()
 
 void SoundContainer::handleFinish_()
 {
+	
 }
 
 void SoundContainer::handleStop_()
@@ -220,58 +304,7 @@ void SoundContainer::handleStop_()
 
 float SoundContainer::getDuration_()
 {
-	return 0.0f;
+	float total = 0.f;
+	for (auto soundObject : soundObjects_) total += soundObject->Duration();
+	return total;
 }
-
-SoundObject* SoundContainer::Current()
-{
-	return nullptr;
-}
-
-SoundObject* SoundContainer::Next()
-{
-	return nullptr;
-}
-
-int SoundContainer::CurrentIndex()
-{
-	return 0;
-}
-
-int SoundContainer::NextIndex()
-{
-	return 0;
-}
-
-void SoundContainer::PlayChild(int index, bool stopCurrent = false)
-{
-}
-
-void SoundContainer::PlayChild(std::string& key, bool stopCurrent = false)
-{
-}
-
-void SoundContainer::PlayNextChild(bool stopCurrent = false)
-{
-}
-
-void SoundContainer::QueueChild(int index, bool finishCurrent = true)
-{
-}
-
-void SoundContainer::QueueChild(std::string& key, bool finishCurrent = true)
-{
-}
-
-void SoundContainer::QueueNextChild(bool finishCurrent = true)
-{
-}
-
-void SoundContainer::StopThenJump(int newPosition, bool makeSkipPermenant = false)
-{
-}
-
-void SoundContainer::QueueJump(int newPosition, bool finish = true, bool makeSkipPermenant = false)
-{
-}
-

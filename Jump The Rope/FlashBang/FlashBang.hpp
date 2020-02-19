@@ -16,7 +16,7 @@ namespace FlashBang {
     enum class EFFECT_PARAMETER : char { VOLUME='v', TUNE='t', PAN='p' };
 
     // this is an int class, which is useful with state_ < READY
-	enum class SOUND_STATE { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING };
+	enum class SOUND_STATE { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING, COMPLETE };
 
     // char for parsing
     enum class SOUNDCONTAINER_TYPE : char { PLAYLIST= 'P', INDIVIDUAL= 'I' };

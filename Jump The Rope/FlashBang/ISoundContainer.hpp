@@ -17,16 +17,17 @@ using namespace FlashBang;
 class ISoundContainer : protected SoundObject, public json
 {
 public:
-
-	ISoundContainer() = delete;
 	~ISoundContainer() = default;
 
 	virtual ISoundContainer& operator=(const json& j) = 0;
 	virtual ISoundContainer& operator=(const std::string& s) = 0;
 	
-	virtual SoundObject* operator[] (std::string const& s) = 0;
+	virtual SoundObject* operator[] (std::string const& key) = 0;
 	virtual SoundObject* operator[] (int i) = 0;
 
+	virtual bool operator== (ISoundContainer const& other) { return Files == other.Files; }
+	virtual bool operator!= (ISoundContainer const& other) { return !(*this == other); }
+	
 	// todo: deleting sounds at an index or string could be useful
 	// void operator delete(void*);
 	
@@ -34,37 +35,27 @@ public:
 
 	static void from_json(const json& j, ISoundContainer& s);
 
-	virtual int AddSoundObject(SoundObject& soundObject) = 0;
-	virtual int AddSoundObject(std::string const& key, SoundObject& soundObject) = 0;
+	virtual int AddSoundObject(SoundObject* soundObject) = 0;
+	virtual int AddSoundObject(std::string const& key, SoundObject* soundObject) = 0;
 
 	virtual void AddSoundObjects(std::vector<SoundObject*> const& soundObjects) = 0;
-	virtual void AddSoundObjects(std::map<std::string, SoundObject*> const& keysoundObjects) = 0;
+	virtual void AddSoundObjects(std::map<std::string, SoundObject*> const& soundObjectsMap) = 0;
 
 	virtual SoundObject* Current() = 0;
 	virtual SoundObject* Next() = 0;
+	virtual SoundObject* At(int index) = 0;
+	virtual SoundObject* At(std::string const& key) = 0;
 
+	virtual int Index(std::string const& key) = 0;
 	virtual int CurrentIndex() = 0;
 	virtual int NextIndex() = 0;
 
 	virtual void PlayChild( int index, bool stopCurrent=false ) = 0;
-	virtual void PlayChild( std::string& key, bool stopCurrent=false ) = 0;
+	virtual void PlayChild( std::string const& key, bool stopCurrent=false ) = 0;
 	virtual void PlayNextChild( bool stopCurrent=false ) = 0;
 
 	virtual void QueueChild( int index, bool finishCurrent=true ) = 0;
-	virtual void QueueChild(std::string& key, bool finishCurrent = true ) = 0;
-	virtual void QueueNextChild(bool finishCurrent=true ) = 0;
-
-	virtual void StopThenJump(int newPosition, bool makeSkipPermenant = false) = 0;
-	virtual void QueueJump(int newPosition, bool finish = true, bool makeSkipPermenant = false) = 0;
-
-	virtual int SwapIndex(int oldIndex, int newIndex) = 0;
-	virtual int ShiftIndex(int oldIndex, int newIndex) = 0;
-
-	bool DefaultOrderOnComplete() { return resetOrderOnComplete_; }
-	bool DefaultOrderOnComplete(bool val) { 
-		resetOrderOnComplete_ = val; 
-		return resetOrderOnComplete_; 
-	}
+	virtual void QueueChild(std::string const& key, bool finishCurrent = true ) = 0;
 
 	bool Reverse() { return reverse_; }
 	bool Reverse(bool val = true) { reverse_ = val; return reverse_; }
@@ -81,13 +72,13 @@ public:
 
 protected:
 
+	ISoundContainer() = default;
+
 	// todo, repeat enums to clear up parsing logic
 	enum class SOUNDCONTAINER_ARG : char { TYPE='T', PLAYBACK= 'P'};
 
 	int current_ = 0;
-
 	bool reverse_ = false;
-	bool resetOrderOnComplete_ = true;
 
 	SOUNDCONTAINER_TYPE type_ = SOUNDCONTAINER_TYPE::INDIVIDUAL;
 	SOUNDCONTAINER_PLAYBACK playback_ = SOUNDCONTAINER_PLAYBACK::IN_ORDER;
@@ -112,4 +103,9 @@ protected:
 	void parseSoundObject_(json const& j);
 	void parseSoundObject_(std::string const& key, json const& j);
 
+private:
+		
+	// SoundContainer should NEVER be compared as a SoundObject
+	virtual bool operator!=(const SoundObject& other) override { return false; }
+	virtual bool operator==(const SoundObject& other) override { return false; }
 };
