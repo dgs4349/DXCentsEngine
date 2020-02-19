@@ -47,7 +47,7 @@ SoundObject* SoundContainer::Current()
 
 SoundObject* SoundContainer::Next()
 {
-	return soundObjects_[current_]->After();
+	return soundObjects_[current_]->Queue();
 }
 
 SoundObject* SoundContainer::At(int index)
@@ -84,7 +84,7 @@ void SoundContainer::PlayChild(int index, bool stopCurrent = false)
 		soundObjects_[index]->Play();
 	}
 	else {
-		soundObjects_[current_]->After(soundObjects_[index], true);
+		soundObjects_[current_]->Queue(soundObjects_[index], true);
 	}
 }
 
@@ -100,7 +100,7 @@ void SoundContainer::PlayNextChild(bool stopCurrent = false)
 
 void SoundContainer::QueueChild(int index, bool finishCurrent = true)
 {
-	soundObjects_[current_]->After(soundObjects_[index], finishCurrent);
+	soundObjects_[current_]->Queue(soundObjects_[index], finishCurrent);
 }
 
 void SoundContainer::QueueChild(std::string const& key, bool finishCurrent = true)
@@ -237,13 +237,13 @@ void SoundContainer::PlayNext()
 	Next();
 }
 
-void SoundContainer::Queue(int index)
+void SoundContainer::After(int index)
 {
 }
 
 void SoundContainer::QueueNext()
 {
-	soundObjects_[current_]->After(soundObjects_[current_++]);
+	soundObjects_[current_]->Queue(soundObjects_[current_++]);
 }
 
 int SoundContainer::SwapIndex(int oldIndex, int newIndex)

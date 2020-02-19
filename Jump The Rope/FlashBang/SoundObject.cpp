@@ -84,14 +84,14 @@ void SoundObject::Play()
 	updateEffects_(0.f); // do a quick rtpc update before play logic
 
 	// if state was set to playing, or there is no following sound, play immediately 
-	if (state_ == SOUND_STATE::PLAYING || afteree_ == nullptr) {
+	if (state_ == SOUND_STATE::PLAYING || queued_ == nullptr) {
 		handlePlay_();
 		currentLoop_ = 0;
 		elapsedTime_ = 0;
 		State(SOUND_STATE::PLAYING);
 	}
 	else {
-		// if we have a sound effect queued after (afteree), wait a frame to sync up this is to prevent 
+		// if we have a sound effect queued after (queuer), wait a frame to sync up this is to prevent 
 		//		a delay longer than a single frame (which might be noticable) when playing a following sound
 		// Sound will be set ready, the update loop will automatically set state to playing and therefore
 		//		start playing the sound on the synced frame
@@ -99,35 +99,35 @@ void SoundObject::Play()
 	}
 }
 
-SoundObject* SoundObject::Queue(bool finish)
-{
-	if (queuer_ == nullptr) {
-		throw std::exception("Cannot implicitly call Queue(): no 'previous' ISoundObject provided to queue this Sound");
-	}
-	else queuer_->After(this, finish);
-	return queuer_;
-}
-
-SoundObject* SoundObject::Queue(SoundObject* previous, bool finish)
-{
-	queuer_ = previous;
-	queuer_->After(this, finish);
-	return queuer_;
-}
-
 SoundObject* SoundObject::After(bool finish)
 {
 	if (afteree_ == nullptr) {
-		throw std::exception("Cannot implicitly call After(): no 'next' ISoundObject provided to call.");
+		throw std::exception("Cannot implicitly call After(): no 'previous' ISoundObject provided to queue this Sound");
 	}
-	else if (finish) State(SOUND_STATE::FINISHING);
+	else afteree_->Queue(this, finish);
 	return afteree_;
 }
 
-SoundObject* SoundObject::After(SoundObject* next, bool finish)
+SoundObject* SoundObject::After(SoundObject* previous, bool finish)
 {
-	afteree_ = next;
-	return After(finish);
+	afteree_ = previous;
+	afteree_->Queue(this, finish);
+	return afteree_;
+}
+
+SoundObject* SoundObject::Queue(bool finish)
+{
+	if (queued_ == nullptr) {
+		throw std::exception("Cannot implicitly call Queue(): no 'next' ISoundObject provided to call.");
+	}
+	else if (finish) State(SOUND_STATE::FINISHING);
+	return queued_;
+}
+
+SoundObject* SoundObject::Queue(SoundObject* next, bool finish)
+{
+	queued_ = next;
+	return Queue(finish);
 }
 
 
@@ -181,11 +181,11 @@ void SoundObject::Update(float dt) {
 			// one from of COMPLETE state for cleanup logic
 			State(SOUND_STATE::COMPLETE);
 
-			if (afteree_ != nullptr) {
-				afteree_->CopyParams(*this);
+			if (queued_ != nullptr) {
+				queued_->CopyParams(*this);
 
 				// won't there be a potential jitter if this also has to wait a frame
-				afteree_->Play();
+				queued_->Play();
 			}
 		}
 		break;
