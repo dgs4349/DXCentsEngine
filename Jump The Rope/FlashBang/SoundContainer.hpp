@@ -26,6 +26,7 @@ public:
 	void Load() override;
 	void Unload() override;
 	virtual void Reset() override;
+	virtual void Reverse() override;
 
 	virtual SoundObject* Current() override;
 	virtual SoundObject* Next() override;
@@ -60,9 +61,10 @@ private:
 	std::vector<int> queueOrder_;
 
 	void updateCurrentIndex();
+	void queueNext_();
 
 	SoundObject::StateChangeHook onCompleteHook =
-		StateChangeHook(SOUND_STATE::COMPLETE, this->updateCurrentIndex);
+		StateChangeHook(SOUND_STATE::COMPLETE, *(this->updateCurrentIndex));
 
 	int randomIndex_() {
 		return rand() % queueOrder_.size();
@@ -79,7 +81,6 @@ protected:
 	float handleVolume_(float val) override;
 	float handleTune_(float val) override;
 	float handlePan_(float val) override;
-	int handleLoop_(int val) override;
 	virtual SOUNDCONTAINER_PLAYBACK handlePlayback_(SOUNDCONTAINER_PLAYBACK val) override;
 
 	SoundObject* createSound_(json const& j) override;
@@ -93,5 +94,6 @@ protected:
 	virtual void handleFinish_() override;
 	virtual void handleStop_() override;
 
+	virtual float getDuration_(float tune) override;
 	virtual float getDuration_() override;
 };

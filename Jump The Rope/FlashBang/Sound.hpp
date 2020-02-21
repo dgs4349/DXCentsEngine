@@ -71,16 +71,18 @@ protected:
 
 	float handleTune_(float val) override {
 		DirectXSoundEffectInstance->SetPitch(val); 
-		duration_ = getDuration_();
+		duration_ = getDuration_(val);
 		return val;
 	}
 
-	virtual float getDuration_() {
+	virtual float getDuration_(float tune) {
+		if (tune == tune_ && duration_ >= 0.f) return duration_;
+
 		// if no tune (pitch) effects applied, sample duration is uneffected;
-		if (tune_ == 0.f) return DirectXSoundEffect->GetSampleDuration();
+		if (tune == 0.f) return DirectXSoundEffect->GetSampleDuration();
 
 		// tune pitches up to 1 octave(duration*2) or down one octave (duration * 0.5)
-		return DirectXSoundEffect->GetSampleDuration() * pow(2, tune_);
+		return DirectXSoundEffect->GetSampleDuration() * pow(2, tune);
 	}
 
 	virtual void handlePlay_()		override { DirectXSoundEffectInstance->Play(loop_ != 0); }

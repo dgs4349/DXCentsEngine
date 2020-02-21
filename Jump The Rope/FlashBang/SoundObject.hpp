@@ -179,7 +179,10 @@ public:
 		return state_; 
 	};
 
-	float Duration() { return duration_; }
+	float Duration() { return (duration_ >= 0.f) ? duration_ : getDuration_(); }
+
+	// slight vulnerability to float overflow if duration_ is somehow max float
+	float GetFullDuration() { Duration() * loop_; }
 
 
 	/////////////////////// Protected Members ///////////////////////
@@ -194,7 +197,7 @@ protected:
 	int		loop_ = 0;
 	
 	int	currentLoop_ = 0;
-	float duration_ = 0.f;
+	float duration_ = -1.f;
 	float elapsedTime_ = 0.f;
 
 	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
@@ -207,14 +210,19 @@ protected:
 	virtual void handleFinish_() = 0;
 	virtual void handleStop_() = 0;
 
-	virtual float getDuration_() = 0;
+	virtual float getDuration_(float tune) = 0;
+	virtual float getDuration_() { return getDuration_(tune_); }
+
 	void updateEffects_(float dt);
 
 	virtual float handleVolume_(float val) = 0;
 	virtual float handleTune_(float val) = 0;
 	virtual float handlePan_(float val) = 0;
 
-	virtual int handleLoop_(int val) { return val < 0 ? INT_MAX : val; };
+	virtual int handleLoop_(int val) { 
+		if (currentLoop_ == loop_) Finish();
+		return val < 0 ? LOOP_CAP : val; 
+	};
 
 	// overridden in ISoundContainer
 	virtual void parseParam_(std::string& key, const json& j);

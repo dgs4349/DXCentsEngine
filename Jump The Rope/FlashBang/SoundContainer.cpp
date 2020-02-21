@@ -48,10 +48,11 @@ void SoundContainer::Unload()
 
 void SoundContainer::Reset()
 {
-	currentQueueOrderIndex_ = reverse_ ? soundObjects_.size() - 1 : 0;
+	currentQueueOrderIndex_ = 0;
 	queueOrder_ = std::vector<int>(soundObjects_.size());
 	switch (playback_) {
 	case SOUNDCONTAINER_PLAYBACK::IN_ORDER:
+		if (orderSet_) return; // if order already set and we're in order, no need to continue
 		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
 		break;
 	case SOUNDCONTAINER_PLAYBACK::RANDOM_EACH:
@@ -78,6 +79,11 @@ void SoundContainer::Reset()
 	orderSet_ = true;
 }
 
+void FlashBang::SoundContainer::Reverse()
+{
+	std::reverse(queueOrder_.begin(), queueOrder_.end());
+}
+
 SoundObject* SoundContainer::Current()
 {
 	return soundObjects_[current_];
@@ -85,7 +91,7 @@ SoundObject* SoundContainer::Current()
 
 SoundObject* SoundContainer::Next()
 {
-	return soundObjects_[current_]->Queued();
+	return soundObjects_[NextIndex()];
 }
 
 SoundObject* SoundContainer::At(int index)
@@ -111,7 +117,7 @@ int SoundContainer::CurrentIndex()
 
 int SoundContainer::NextIndex()
 {
-	return queueOrder_[(currentQueueOrderIndex_ + (reverse_? 1 : -1)) % queueOrder_.size()];
+	return queueOrder_[(currentQueueOrderIndex_ + 1) % queueOrder_.size()];
 }
 
 void SoundContainer::PlayChild(int index, bool stopCurrent = false)
@@ -174,19 +180,33 @@ void SoundContainer::AddSoundObjects(std::map<std::string, SoundObject*> const& 
 		AddSoundObject(it->first, it->second);
 	}
 }
+
+void SoundContainer::queueNext_()
+{
+	// DO NOT QUEUE IF NOT IN A PLAYLIST TYPE (individual)
+
+	// don't requeue if last
+	// don't requueue begining if random container
+
+	Current()->Queue(Next());
+}
+
 void SoundContainer::updateCurrentIndex()
 {
-	currentQueueOrderIndex_ =
-		reverse_ ? currentQueueOrderIndex_-- : currentQueueOrderIndex_++;
+	currentQueueOrderIndex_ = currentQueueOrderIndex_++;
 
 	if (playback_ == SOUNDCONTAINER_PLAYBACK::IN_ORDER) {
 		currentQueueOrderIndex_ %= queueOrder_.size();
 	}
-	else if (currentQueueOrderIndex_ < 0 || currentQueueOrderIndex_ >= queueOrder_.size()) {
-		currentQueueOrderIndex_ = 0;
+	else if (currentQueueOrderIndex_ < queueOrder_.size() - 1) {
+		current_ = queueOrder_[currentQueueOrderIndex_];
+	}
+	else {
 		Reset();
 	}
-	else current_ = queueOrder_[currentQueueOrderIndex_];
+
+
+	queueNext_();
 }
 
 SoundObject* SoundContainer::createSound_(json const& j)
@@ -225,13 +245,8 @@ float SoundContainer::handleVolume_(float val)
 
 float SoundContainer::handleTune_(float val)
 {
-	// tune (pitch) will change duration
-	//	since these tune properties *should* be global
-	//	we can recalculate the total duration of the container
-	//	by calculating the effect here
-
-	duration_ = 
-
+	soundObjects_[current_]->Tune(val);
+	getDuration_(val);
 	return val;
 }
 
@@ -241,95 +256,63 @@ float SoundContainer::handlePan_(float val)
 	return val;
 }
 
-int SoundContainer::handleLoop_(int val)
-{
-	// sets the current loop of the whole sound container
-	return val;
-}
-
 SOUNDCONTAINER_PLAYBACK SoundContainer::handlePlayback_(SOUNDCONTAINER_PLAYBACK val)
 {
 	return SOUNDCONTAINER_PLAYBACK();
 }
 
-
-int SoundContainer::Next()
-{
-	soundObjects_[++current_]->Play();
-	return current_;
-}
-
-int SoundContainer::Current()
-{
-	return current_;
-}
-
-SoundObject* SoundContainer::CurrentlyPlaying()
-{
-	return soundObjects_[current_];
-}
-
-void SoundContainer::Play(int index)
-{
-	current_ = index;
-	soundObjects_[current_]->Play();
-}
-
-void SoundContainer::PlayNext()
-{
-	Next();
-}
-
-
-void SoundContainer::Play()
-{
-	soundObjects_[current_]->Play();
-	if (type_ == SOUNDCONTAINER_TYPE::PLAYLIST) {
-		QueueNext();
-	}
-}
-
-void SoundContainer::Pause()
-{
-	soundObjects_[current_]->Pause();
-}
-
-void SoundContainer::Resume()
-{
-	soundObjects_[current_]->Resume();
-}
-
-void SoundContainer::Stop()
-{
-	soundObjects_[current_]->Stop();
-}
-
 void SoundContainer::handlePlay_()
 {
 	if (!orderSet_) Reset();
+	soundObjects_[current_]->Play();
+	queueNext_();
 }
 
 void SoundContainer::handlePause_()
 {
+	soundObjects_[current_]->Pause();
 }
 
 void SoundContainer::handleResume_()
 {
+	soundObjects_[current_]->Resume();
 }
 
 void SoundContainer::handleFinish_()
 {
-	
+	// nothing, additional logic handled in queueNext_()
 }
 
 void SoundContainer::handleStop_()
 {
+	soundObjects_[current_]->Stop();
+	Reset();
 }
 
-float SoundContainer::getDuration_()
-{
-	float total = 0.f;
-	for (auto soundObject : soundObjects_) total += soundObject->Duration();
-	return total;
+float SoundContainer::getDuration_() {
+	duration_ = 0.f;
+	for (auto s : soundObjects_) {
+		if(s->Duration() < LOOP_CAP) duration_ += s->Duration();
+		else {
+			// max duration of any soundcontainer is 1B seconds, or 32 years fun fact
+			// well actually 2B if tuned down but w/e
+			duration_ = (float) LOOP_CAP;
+			break;
+		}
+	}
+	return duration_;
 }
 
+float SoundContainer::getDuration_(float tune) {
+	// if duration hasn't been calculated do it here
+	if (duration_ < 0.f) getDuration_();
+	// otherwise, if tune hasn't changed we can assume we've already
+	//  calculated duration and it's effects
+	else if (tune == tune_) return duration_;
+
+	// otherwise, duration has been calculated, but we need to 
+	//	still calculate tune effects. Since we're doing this on the whole
+	//	container, this may not be terribly accurate
+	// additionally, do we need to figure out the difference between tunes?
+	return duration_ *= pow(2, tune);
+}

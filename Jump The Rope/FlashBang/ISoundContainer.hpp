@@ -16,6 +16,11 @@ using namespace FlashBang;
 
 class ISoundContainer : protected SoundObject, public json
 {
+private:
+// if we ever want to change arg names, just do it here
+// we should also do this in SoundObject to clear up logic
+enum class SOUNDCONTAINER_ARG : char { TYPE = 'T', PLAYBACK = 'P' };
+
 public:
 	~ISoundContainer() = default;
 
@@ -57,9 +62,6 @@ public:
 	virtual void QueueChild( int index, bool finishCurrent=true ) = 0;
 	virtual void QueueChild(std::string const& key, bool finishCurrent = true ) = 0;
 
-	bool Reverse() { return reverse_; }
-	bool Reverse(bool val = true) { reverse_ = val; return reverse_; }
-
 	// immutable type, no real reason to change type after the fact
 	SOUNDCONTAINER_TYPE Type() { return type_; }
 	
@@ -71,19 +73,16 @@ public:
 	}
 
 	virtual void Reset() = 0;
+	virtual void Reverse() = 0;
 
 protected:
 
 	ISoundContainer() = default;
 
-	// todo, repeat enums to clear up parsing logic
-	enum class SOUNDCONTAINER_ARG : char { TYPE='T', PLAYBACK= 'P'};
-
 	int current_ = 0;
-	bool reverse_ = false;
 	bool orderSet_ = false;
 
-	SOUNDCONTAINER_TYPE type_ = SOUNDCONTAINER_TYPE::INDIVIDUAL;
+	SOUNDCONTAINER_TYPE type_ = SOUNDCONTAINER_TYPE::ONE_SHOT;
 	SOUNDCONTAINER_PLAYBACK playback_ = SOUNDCONTAINER_PLAYBACK::IN_ORDER;
 
 	virtual SOUNDCONTAINER_PLAYBACK handlePlayback_(SOUNDCONTAINER_PLAYBACK val) = 0;
