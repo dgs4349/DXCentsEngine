@@ -46,9 +46,8 @@ void SoundContainer::Unload()
 	for (auto el : soundObjects_) el->Unload();
 }
 
-void SoundContainer::Reset()
+void SoundContainer::reset_(bool resetIndeces)
 {
-	currentQueueOrderIndex_ = 0;
 	queueOrder_ = std::vector<int>(soundObjects_.size());
 	switch (playback_) {
 	case SOUNDCONTAINER_PLAYBACK::IN_ORDER:
@@ -77,6 +76,11 @@ void SoundContainer::Reset()
 		);
 	}
 	orderSet_ = true;
+
+	if (resetIndeces) {
+		currentQueueOrderIndex_ = 0;
+		currentSoundObjectIndex_ = queueOrder_[0];
+	}
 }
 
 void FlashBang::SoundContainer::Reverse()
@@ -86,7 +90,7 @@ void FlashBang::SoundContainer::Reverse()
 
 SoundObject* SoundContainer::Current()
 {
-	return soundObjects_[current_];
+	return soundObjects_[currentSoundObjectIndex_];
 }
 
 SoundObject* SoundContainer::Next()
@@ -112,7 +116,7 @@ int SoundContainer::Index(std::string const& key)
 
 int SoundContainer::CurrentIndex()
 {
-	return current_;
+	return currentSoundObjectIndex_;
 }
 
 int SoundContainer::NextIndex()
@@ -123,11 +127,11 @@ int SoundContainer::NextIndex()
 void SoundContainer::PlayChild(int index, bool stopCurrent = false)
 {
 	if (stopCurrent) {
-		soundObjects_[current_]->Stop();
+		soundObjects_[currentSoundObjectIndex_]->Stop();
 		soundObjects_[index]->Play();
 	}
 	else {
-		soundObjects_[current_]->Queue(soundObjects_[index], true);
+		soundObjects_[currentSoundObjectIndex_]->Queue(soundObjects_[index], true);
 	}
 }
 
@@ -143,7 +147,7 @@ void SoundContainer::PlayNextChild(bool stopCurrent = false)
 
 void SoundContainer::QueueChild(int index, bool finishCurrent = true)
 {
-	soundObjects_[current_]->Queue(soundObjects_[index], finishCurrent);
+	soundObjects_[currentSoundObjectIndex_]->Queue(soundObjects_[index], finishCurrent);
 }
 
 void SoundContainer::QueueChild(std::string const& key, bool finishCurrent = true)
@@ -183,30 +187,27 @@ void SoundContainer::AddSoundObjects(std::map<std::string, SoundObject*> const& 
 
 void SoundContainer::queueNext_()
 {
-	// DO NOT QUEUE IF NOT IN A PLAYLIST TYPE (individual)
+	if (currentSoundObjectIndex_ == LastIndex()) {
 
-	// don't requeue if last
-	// don't requueue begining if random container
+		if (state_ == SOUND_STATE::FINISHING) return; // we're done, don't queue
 
+		// if we're playing in order we're safe to just queue Next() (which is wrapped)
+		// otherwise we are a random container, and we must reshuffle the queueOrder container
+		else if (playback_ != SOUNDCONTAINER_PLAYBACK::IN_ORDER) {
+			reset_(false);
+		}
+	}
+	// isn't this so pretty? it can be faster but why wouldn't you want to look at this?
 	Current()->Queue(Next());
 }
 
-void SoundContainer::updateCurrentIndex()
+void SoundContainer::updateCurrentIndex_()
 {
-	currentQueueOrderIndex_ = currentQueueOrderIndex_++;
+	currentQueueOrderIndex_ = (++currentQueueOrderIndex_) % queueOrder_.size();
+	currentSoundObjectIndex_ = queueOrder_[currentQueueOrderIndex_];
 
-	if (playback_ == SOUNDCONTAINER_PLAYBACK::IN_ORDER) {
-		currentQueueOrderIndex_ %= queueOrder_.size();
-	}
-	else if (currentQueueOrderIndex_ < queueOrder_.size() - 1) {
-		current_ = queueOrder_[currentQueueOrderIndex_];
-	}
-	else {
-		Reset();
-	}
-
-
-	queueNext_();
+	// edge case logic handled in queueNext
+	if (type_ == SOUNDCONTAINER_TYPE::PLAYLIST) queueNext_();
 }
 
 SoundObject* SoundContainer::createSound_(json const& j)
@@ -239,20 +240,20 @@ SoundObject* SoundContainer::createSoundContainer_(std::string const& key, json 
 
 float SoundContainer::handleVolume_(float val)
 {
-	soundObjects_[current_]->Volume(val);
+	soundObjects_[currentSoundObjectIndex_]->Volume(val);
 	return val;
 }
 
 float SoundContainer::handleTune_(float val)
 {
-	soundObjects_[current_]->Tune(val);
+	soundObjects_[currentSoundObjectIndex_]->Tune(val);
 	getDuration_(val);
 	return val;
 }
 
 float SoundContainer::handlePan_(float val)
 {
-	soundObjects_[current_]->Pan(val);
+	soundObjects_[currentSoundObjectIndex_]->Pan(val);
 	return val;
 }
 
@@ -264,18 +265,18 @@ SOUNDCONTAINER_PLAYBACK SoundContainer::handlePlayback_(SOUNDCONTAINER_PLAYBACK 
 void SoundContainer::handlePlay_()
 {
 	if (!orderSet_) Reset();
-	soundObjects_[current_]->Play();
-	queueNext_();
+	soundObjects_[currentSoundObjectIndex_]->Play();
+	if (type_ == SOUNDCONTAINER_TYPE::PLAYLIST) queueNext_();
 }
 
 void SoundContainer::handlePause_()
 {
-	soundObjects_[current_]->Pause();
+	soundObjects_[currentSoundObjectIndex_]->Pause();
 }
 
 void SoundContainer::handleResume_()
 {
-	soundObjects_[current_]->Resume();
+	soundObjects_[currentSoundObjectIndex_]->Resume();
 }
 
 void SoundContainer::handleFinish_()
@@ -285,7 +286,7 @@ void SoundContainer::handleFinish_()
 
 void SoundContainer::handleStop_()
 {
-	soundObjects_[current_]->Stop();
+	soundObjects_[currentSoundObjectIndex_]->Stop();
 	Reset();
 }
 

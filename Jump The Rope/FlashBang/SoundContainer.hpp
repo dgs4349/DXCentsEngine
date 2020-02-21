@@ -25,7 +25,7 @@ public:
 	
 	void Load() override;
 	void Unload() override;
-	virtual void Reset() override;
+	virtual void Reset() override { reset_(true); }
 	virtual void Reverse() override;
 
 	virtual SoundObject* Current() override;
@@ -54,17 +54,18 @@ private:
 
 	std::vector<SoundObject*> soundObjects_;
 
-	// might still need a queueNext function for interacting with the sounds
+	bool orderSet_ = false;
 
-	// tracking queue order for non-in order
+	int currentSoundObjectIndex_ = 0;
 	int currentQueueOrderIndex_ = 0;
 	std::vector<int> queueOrder_;
 
-	void updateCurrentIndex();
+	void reset_(bool resetIndeces);
+	void updateCurrentIndex_();
 	void queueNext_();
 
 	SoundObject::StateChangeHook onCompleteHook =
-		StateChangeHook(SOUND_STATE::COMPLETE, *(this->updateCurrentIndex));
+		StateChangeHook(SOUND_STATE::COMPLETE, *(this->updateCurrentIndex_));
 
 	int randomIndex_() {
 		return rand() % queueOrder_.size();
