@@ -5,7 +5,6 @@
 
 #include "SoundObject.hpp"
 
-
 using namespace FlashBang;
 
 /*
@@ -21,7 +20,7 @@ public:
 
 	virtual ISoundContainer& operator=(const json& j) = 0;
 	virtual ISoundContainer& operator=(const std::string& s) = 0;
-	
+
 	virtual SoundObject* operator[] (std::string const& key) = 0;
 	virtual SoundObject* operator[] (int i) = 0;
 
@@ -30,7 +29,7 @@ public:
 	*/
 	// todo: deleting sounds at an index or string could be useful
 	// void operator delete(void*);
-	
+
 	static void from_json(const json& j, ISoundContainer& s) { SoundObject::from_json(j, s); }
 
 	virtual int AddSoundObject(SoundObject* soundObject) = 0;
@@ -48,16 +47,16 @@ public:
 	virtual int CurrentIndex() = 0;
 	virtual int NextIndex() = 0;
 
-	virtual void PlayChild( int index, bool stopCurrent=false ) = 0;
-	virtual void PlayChild( std::string const& key, bool stopCurrent=false ) = 0;
-	virtual void PlayNextChild( bool stopCurrent=false ) = 0;
+	virtual void PlayChild(int index, bool stopCurrent = false) = 0;
+	virtual void PlayChild(std::string const& key, bool stopCurrent = false) = 0;
+	virtual void PlayNextChild(bool stopCurrent = false) = 0;
 
-	virtual void QueueChild( int index, bool finishCurrent=true ) = 0;
-	virtual void QueueChild(std::string const& key, bool finishCurrent = true ) = 0;
+	virtual void QueueChild(int index, bool finishCurrent = true) = 0;
+	virtual void QueueChild(std::string const& key, bool finishCurrent = true) = 0;
 
 	// immutable type, no real reason to change type after the fact
 	SOUNDCONTAINER_PLAYBACK_BEHAVIOR PlaybackBehavior() { return playbackBehavior_; }
-	
+
 	// playback is allowed to be changed
 	SOUNDCONTAINER_PLAYBACK_ORDER PlaybackOrder() { return playbackOrder_; }
 	SOUNDCONTAINER_PLAYBACK_ORDER PlaybackOrder(SOUNDCONTAINER_PLAYBACK_ORDER val) {
@@ -100,5 +99,4 @@ private:
 	// SoundContainer should NEVER be compared as a SoundObject
 	virtual bool operator!=(const SoundObject& other) override { return false; }
 	virtual bool operator==(const SoundObject& other) override { return false; }
-
 };

@@ -9,7 +9,6 @@ using nlohmann::json;
 
 using namespace FlashBang;
 
-
 #define LOOP_CAP 1000000000
 
 /*
@@ -42,15 +41,13 @@ public:
 	virtual bool operator!=(const SoundObject& other) { return File.compare(other.File) != 0; }
 	virtual bool operator==(const SoundObject& other) { return !(*this != other); }
 
-
 	/////////////////////// Lifecycle (StateChange) Hooks ////////////////////
 
 	// all hooks basically connect to this one void pointer called on state change
 	void (*OnStateChange)(SOUND_STATE state) = nullptr;
-	
+
 	// methods called statically to expand on functionality
 	struct StateChangeHook {
-
 		SOUND_STATE State;
 		void (*Callback)();
 
@@ -77,20 +74,19 @@ public:
 		}
 	};
 
-	void ConnectStateChangeHook(StateChangeHook const& hook) { 
-		OnStateChange = *hook.OnStateChangeHook; 
+	void ConnectStateChangeHook(StateChangeHook const& hook) {
+		OnStateChange = *hook.OnStateChangeHook;
 	}
 
-	void ConnectStateChangeHookContainer(StateChangeHookContainer const& hooks) { 
-		OnStateChange = *hooks.OnStateChangeHook; 
+	void ConnectStateChangeHookContainer(StateChangeHookContainer const& hooks) {
+		OnStateChange = *hooks.OnStateChangeHook;
 	}
-
 
 	/////////////////////// Parsing ///////////////////////
 	std::string Key = nullptr;
 	std::string File = nullptr;
 	std::map<std::string, Effect*> Effects;
-	
+
 	// this method sadly has to be snake case and I don't like snake case :c
 	static void from_json(const json& j, SoundObject& s);
 
@@ -144,7 +140,7 @@ public:
 	//		logic in derived classes
 	// this way unfortunately makes the most intuitive sense while still
 	//		preventing accidental user-caused misbehavior
-	
+
 	float Volume() { return volume_; }
 	float Volume(float val) {
 		volume_ = handleVolume_(val);
@@ -154,10 +150,10 @@ public:
 	float Tune() { return tune_; }
 	float Tune(float val)
 	{
-	    tune_ = handleTune_(val);
+		tune_ = handleTune_(val);
 		return tune_;
 	}
-	
+
 	float Pan() { return pan_; }
 	float Pan(float val)
 	{
@@ -174,19 +170,18 @@ public:
 	}
 
 	SOUND_STATE State() { return state_; }
-	virtual SOUND_STATE State(SOUND_STATE val) { 
-		state_ = val; 
+	virtual SOUND_STATE State(SOUND_STATE val) {
+		state_ = val;
 		if (OnStateChange != nullptr) {
 			OnStateChange(state_);
 		}
-		return state_; 
+		return state_;
 	};
 
 	float Duration() { return (duration_ >= 0.f) ? duration_ : getDuration_(); }
 
 	// slight vulnerability to float overflow if duration_ is somehow max float
-	float GetFullDuration() { Duration() * loop_; }
-
+	float GetFullDuration() { Duration()* loop_; }
 
 	/////////////////////// Protected Members ///////////////////////
 
@@ -198,7 +193,7 @@ protected:
 	float	tune_ = 0.f;
 	float	pan_ = 0.f;
 	int		loop_ = 0;
-	
+
 	int	currentLoop_ = 0;
 	float duration_ = -1.f;
 	float elapsedTime_ = 0.f;
@@ -206,7 +201,7 @@ protected:
 	SOUND_STATE state_ = SOUND_STATE::UNLOADED;
 
 	SoundObject* queued_ = nullptr;
-	
+
 	virtual void handlePlay_() = 0;
 	virtual void handlePause_() = 0;
 	virtual void handleResume_() = 0;
@@ -222,9 +217,9 @@ protected:
 	virtual float handleTune_(float val) = 0;
 	virtual float handlePan_(float val) = 0;
 
-	virtual int handleLoop_(int val) { 
+	virtual int handleLoop_(int val) {
 		if (currentLoop_ == loop_) Finish();
-		return val < 0 ? LOOP_CAP : val; 
+		return val < 0 ? LOOP_CAP : val;
 	};
 
 	// overridden in ISoundContainer
@@ -233,4 +228,3 @@ protected:
 	void parseEffects_(const std::string& key, const json& j);
 	void throwEffectError_(int i, const std::string& key, const json& j);
 };
-

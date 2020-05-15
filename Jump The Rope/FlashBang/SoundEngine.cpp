@@ -41,7 +41,6 @@ void SoundEngine::Update()
 
 void SoundEngine::Update(float deltaTime)
 {
-
 	if (!DirectXAudioEngine->Update())
 	{
 		if (DirectXAudioEngine->IsCriticalError())
@@ -52,19 +51,18 @@ void SoundEngine::Update(float deltaTime)
 	}
 	else
 	{
-		
 	}
 }
 
 void SoundEngine::Init()
 {
-	if(!initiated_){
+	if (!initiated_) {
 		DirectX::AUDIO_ENGINE_FLAGS eflags = DirectX::AudioEngine_Default;
-	
-		#ifdef DEBUG
-				eflags = eflags | DirectX::AudioEngine_Debug;
-		#endif
-	
+
+#ifdef DEBUG
+		eflags = eflags | DirectX::AudioEngine_Debug;
+#endif
+
 		directXAudioEnginePointer = std::make_unique<DirectX::AudioEngine>(eflags);
 		DirectXAudioEngine = directXAudioEnginePointer.get();
 
@@ -93,10 +91,9 @@ SoundEngine::SoundEngine()
 	Init();
 }
 
-
 SoundEngine::~SoundEngine()
 {
-	if(DirectXAudioEngine)
+	if (DirectXAudioEngine)
 	{
 		DirectXAudioEngine->Suspend();
 		directXAudioEnginePointer.release();

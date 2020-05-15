@@ -3,9 +3,8 @@
 void ISoundContainer::parseParam_(const std::string& key, const json& j)
 {
 	switch ((SOUNDCONTAINER_ARG)key[0]) {
-
-	case SOUNDCONTAINER_ARG::PLAYBACK_BEHAVIOR: 
-		j[key].get_to(playbackBehavior_); 
+	case SOUNDCONTAINER_ARG::PLAYBACK_BEHAVIOR:
+		j[key].get_to(playbackBehavior_);
 		break;
 	case SOUNDCONTAINER_ARG::PLAYBACK_ORDER:
 		j[key].get_to(playbackOrder_);
@@ -34,7 +33,6 @@ void ISoundContainer::parseItems_(const json& items) {
 }
 
 void ISoundContainer::parseSchema_(const json& schema) {
-
 	// this is gross, clean this up later
 
 	std::string fileStr;
@@ -44,9 +42,8 @@ void ISoundContainer::parseSchema_(const json& schema) {
 	std::string keyKey;
 
 	for (auto [key, value] : schema.items()) {
-
 		switch ((SOUNDOBJECT_ARG)key[0]) {
-		case SOUNDOBJECT_ARG::FILE: 
+		case SOUNDOBJECT_ARG::FILE:
 			fileKey = key;
 			value.get_to(fileStr);
 			break;
@@ -60,7 +57,7 @@ void ISoundContainer::parseSchema_(const json& schema) {
 	try {
 		const auto files = processSchemaString_(fileStr);
 		const auto keys = processSchemaString_(keyStr);
-		
+
 		json j = schema;
 		for (int i = 0; i < files.size(); ++i) {
 			j[fileKey] = files[i];
@@ -69,21 +66,20 @@ void ISoundContainer::parseSchema_(const json& schema) {
 		}
 	}
 	catch (std::exception e) {
-		printf(e.what); 
-		throwSchemaError_(fileStr, keyStr); 
+		printf(e.what());
+		throwSchemaError_(fileStr, keyStr);
 	};
 }
 
 std::vector<std::string> const& ISoundContainer::processSchemaString_(
 	const std::string& str) {
-	
 	auto split = std::vector<std::string>(3);
 
 	//pad string in case no prefix or suffix
 	boost::split(split, " " + str + " ", boost::is_any_of('|'));
 
 	// remove all spaces, also removes padding
-	for(auto i : split) boost::erase_all(i, ' ');
+	for (auto i : split) boost::erase_all(i, ' ');
 
 	if (split.size() <= 2) throw std::exception(); //missing |
 
@@ -128,9 +124,8 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 
 void ISoundContainer::throwSchemaError_(
 	const std::string& files, const std::string& keys) {
-
 	const auto message = R"(
-		Error parsing |...| in provided Schema file or key string! 
+		Error parsing |...| in provided Schema file or key string!
 		Please double check formatting rules:
 		- Range: |start-stop-step| as in "sound|0-4|.wav" or "sound|0-8-2|.wav"
 		- List:  |a,b,c| as in "audio|a,b,c|.wav"
@@ -140,6 +135,6 @@ void ISoundContainer::throwSchemaError_(
 	)";
 
 	const auto vars = "\nFiles String: " + files + "\nKeys String: " + keys;
-	
+
 	throw std::exception((message + vars).c_str());
 }

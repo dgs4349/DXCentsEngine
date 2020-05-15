@@ -46,15 +46,14 @@ private:
 	std::unique_ptr<DirectX::AudioEngine> directXAudioEnginePointer;
 	bool isSilent_ = false;
 
-	
 	static SoundEngine* instance_;
-	
+
 	static bool initiated_;
-	
+
 	static int refs_;
 	static void addRef_() { ++refs_; }
 	static void releaseRef_() { --refs_; }
-	
+
 public:
 	SoundEngine(SoundEngine const&) = delete;
 	void operator=(SoundEngine const*) = delete;

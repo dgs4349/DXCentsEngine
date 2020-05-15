@@ -15,9 +15,7 @@ public:
 				- Curved/Sloped values for vertical mixing with indeces
 	*/
 
-
 	struct Connection {
-
 		float* PointerToControl; float ControlMin; float ControlMax;
 
 		Connection(float* pointerToControl, float controlMin, float controlMax) {
@@ -30,20 +28,19 @@ public:
 	float (*ValueFunctionPointer)(float val) = nullptr;
 
 	float ActiveTime = 0.f;
-	
+
 	float Value() { return value_; }
 	float Value(float v) { value_ = v; return value_; }
 
-	
 	Effect() = default;
-	
+
 	Effect(float valueMin, float valueMax)
 	{
 		ValueMin = valueMin;
 		ValueMax = valueMax;
 		ValueFunctionPointer = noop_;
 	}
-	
+
 	Effect(float (*PointerToValueSetFunc)(float val), float valueMin, float valueMax)
 	{
 		ValueMin = valueMin;
@@ -70,7 +67,7 @@ public:
 		return this;
 	}
 
-	Effect* Connect(float* pointerToControllingValue, float controllingValueMin, 
+	Effect* Connect(float* pointerToControllingValue, float controllingValueMin,
 		float controllingValueMax, bool start = true)
 	{
 		connection_ = { pointerToControllingValue, controllingValueMin, controllingValueMax };
@@ -99,12 +96,12 @@ public:
 			previousControlValue_ = *connection_.PointerToControl;
 		}
 	}
-	
+
 	bool Active() { return active_; }
 	bool Active(bool val) { active_ = val; return active_; }
-	
+
 	void Start() { active_ = true; }
-	void Stop() { active_ = false; ActiveTime = 0.f;}
+	void Stop() { active_ = false; ActiveTime = 0.f; }
 
 	/*
 	 * forces value within it's original range, then converts to a new range
@@ -137,7 +134,7 @@ private:
 
 	float value_ = 0.f;
 	float previousControlValue_ = 0.f;
-	
+
 	// default is inactive until a connection is made
 	bool active_ = false;
 

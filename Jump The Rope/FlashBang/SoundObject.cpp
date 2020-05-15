@@ -3,7 +3,6 @@
 /////////////////////// Parsing ///////////////////////
 
 void SoundObject::from_json(const json& j, SoundObject& s) {
-
 	if (j.size() == 1 && j[0].is_object()) {
 		s.Key = j.begin().key();
 		from_json(j[0], s);
@@ -42,23 +41,22 @@ SoundObject* SoundObject::CopyParams(const SoundObject& s)
 
 void SoundObject::parseParam_(const std::string& key, const json& j)
 {
-	switch ((SOUNDOBJECT_ARG) key[0])
+	switch ((SOUNDOBJECT_ARG)key[0])
 	{
 	case SOUNDOBJECT_ARG::FILE: j[key].get_to(File);  break;
 	case SOUNDOBJECT_ARG::KEY:	j[key].get_to(Key); break;
 
 	case SOUNDOBJECT_ARG::EFFECTS: parseEffects_(key, j); break;
 
-	// move to default once int parameters implemented
+		// move to default once int parameters implemented
 	case (SOUNDOBJECT_ARG)SOUND_PARAM::LOOP: j[key].get_to(loop_); break;
 
-	default: 
+	default:
 		auto func = GetParamSetFunc((SOUND_PARAM)key[0], *this);
 		if (func != nullptr) func(j[key].get<float>());
 		break;
 	}
 }
-
 
 void SoundObject::parseEffects_(const std::string& key, const json& j)
 {
@@ -66,7 +64,7 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 	/*
 		"name" : { param: "vol", low: min, high: max }
 		or { key: "name", param ... }
-	
+
 	*/
 
 	// same deal as sound
@@ -74,7 +72,6 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 
 	for (int i = 0; i < j[key].size(); ++i) {
 		try {
-
 			currentEffect = j[key][i];
 
 			// array effect
@@ -89,7 +86,7 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 				continue;
 			}
 
-			//object effect 
+			//object effect
 			std::string effectName;
 
 			// name-first object, store name then continue to body
@@ -120,7 +117,6 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 			}
 
 			AddEffect(key, effect);
-
 		}
 		catch (std::exception effect) {
 			printf(effect.what);
@@ -130,7 +126,6 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 }
 
 void SoundObject::throwEffectError_(int i, const std::string& key, const json& j) {
-
 	const auto message = R"(
 		Error parsing effect. Please double check effect schema:
 			- Array: [ key "jump_vol", param "vol", float min, float max ]
@@ -148,9 +143,7 @@ void SoundObject::throwEffectError_(int i, const std::string& key, const json& j
 	// other issues involve complex currentEffect parsing which i don't feel like doing right now
 
 	throw std::exception((message + effectIssue).c_str());
-
 }
-
 
 /////////////////////// Sound Methods ///////////////////////
 
@@ -158,7 +151,7 @@ void SoundObject::Play()
 {
 	updateEffects_(0.f); // do a quick rtpc update before play logic
 
-	// if state was set to playing, or there is no following sound, play immediately 
+	// if state was set to playing, or there is no following sound, play immediately
 	if (state_ == SOUND_STATE::PLAYING || queued_ == nullptr) {
 		handlePlay_();
 		currentLoop_ = 0;
@@ -166,7 +159,7 @@ void SoundObject::Play()
 		State(SOUND_STATE::PLAYING);
 	}
 	else {
-		// if we have a sound currentEffect queued after (queuer), wait a frame to sync up this is to prevent 
+		// if we have a sound currentEffect queued after (queuer), wait a frame to sync up this is to prevent
 		//		a delay longer than a single frame (which might be noticable) when playing a following sound
 		// Sound will be set ready, the update loop will automatically set state to playing and therefore
 		//		start playing the sound on the synced frame
@@ -181,14 +174,12 @@ SoundObject* SoundObject::Queue(SoundObject* next, bool finish)
 	return queued_;
 }
 
-
 void SoundObject::updateEffects_(float dt)
 {
 	for (auto it = Effects.begin(); it != Effects.end(); ++it) {
 		it->second->Update(dt);
 	}
 }
-
 
 void SoundObject::Update(float dt) {
 	//enum class SOUND_STATE { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING };
@@ -202,9 +193,8 @@ void SoundObject::Update(float dt) {
 	updateEffects_(dt);
 
 	switch (state_) {
-
-	case SOUND_STATE::READY: 
-		State(SOUND_STATE::PLAYING); 
+	case SOUND_STATE::READY:
+		State(SOUND_STATE::PLAYING);
 		Play();
 		// fall through
 
@@ -213,7 +203,6 @@ void SoundObject::Update(float dt) {
 		elapsedTime_ += dt;
 
 		if (elapsedTime_ > duration_) {
-
 			if (currentLoop_ < loop_) ++currentLoop_;
 			else if (currentLoop_ == loop_) Finish();
 
@@ -228,7 +217,6 @@ void SoundObject::Update(float dt) {
 		elapsedTime_ += dt;
 
 		if (elapsedTime_ > duration_) {
-
 			// one from of COMPLETE state for cleanup logic
 			State(SOUND_STATE::COMPLETE);
 
@@ -241,7 +229,7 @@ void SoundObject::Update(float dt) {
 		}
 		break;
 
-	// if complete on previous frame reset to IDLE
+		// if complete on previous frame reset to IDLE
 	case SOUND_STATE::COMPLETE:
 		State(SOUND_STATE::IDLE);
 		break;

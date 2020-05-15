@@ -1,8 +1,6 @@
 #include "OldSound.h"
 
-
-
-OldSound::OldSound(){}
+OldSound::OldSound() {}
 
 OldSound::~OldSound() {}
 
@@ -11,7 +9,7 @@ OldSound::OldSound(AudioEngine* audioEngineDX, const wchar_t* location)
 	soundEffect = std::make_unique<DirectX::OldSoundEffect>(audioEngineDX, location);
 	soundEffectInstance = soundEffect->CreateInstance();
 }
-OldSound::OldSound(AudioEngine * audioEngineDX, const wchar_t* location, bool loop)
+OldSound::OldSound(AudioEngine* audioEngineDX, const wchar_t* location, bool loop)
 {
 	soundEffect = std::make_unique<DirectX::OldSoundEffect>(audioEngineDX, location);
 	soundEffectInstance = soundEffect->CreateInstance();
@@ -29,7 +27,7 @@ void OldSound::Update(float deltaTime, float totalTime)
 		Start(totalTime);
 		break;
 	case Playing:
-		// update value, and then set 
+		// update value, and then set
 		// we have to reference the actual rtpcs[i].pval due to references, foreach is a copy
 		for (int i = 0; i < rtpcs.size(); i++) {
 			RTPC rtpc = rtpcs[i];
@@ -59,21 +57,18 @@ void OldSound::Update(float deltaTime, float totalTime)
 		}
 		break;
 	case Completed:
-		if(!isLinked) soundEffectInstance->Stop(true);
+		if (!isLinked) soundEffectInstance->Stop(true);
 		state = Ready;
 		break;
 	}
 
 	if (fadeStartTime == 0.f) {
-
 		fadeStartTime = totalTime;
 		fadeEndTime += fadeStartTime;
-
 	}
 	if (totalTime < fadeEndTime) {
 		Set(map(totalTime, fadeStartTime, fadeEndTime, fadeFrom, fadeTo));
 	}
-
 }
 
 void OldSound::Start(float totalTime) {
@@ -89,19 +84,18 @@ float OldSound::map(float in, float inmin, float inmax, float outmin, float outm
 	return outmin + ((outmax - outmin) / (inmax - inmin)) * (in - inmin);
 }
 
-void OldSound::Link(OldSound * linkee)
+void OldSound::Link(OldSound* linkee)
 {
 	linked = linkee;
 	isLinked = true;
 }
 
-void OldSound::Link(OldSound * linkee, bool loop)
+void OldSound::Link(OldSound* linkee, bool loop)
 {
 	linked = linkee;
 	linked->SetLoop(loop);
 	isLinked = true;
 }
-
 
 void OldSound::Play()
 {
@@ -145,11 +139,11 @@ OldSound::RTPCParams* OldSound::CreateRTPCParams()
 	return &rtpcParams[rtpcParams.size() - 1];
 }
 
-void OldSound::Bind(float *& param, float * control, float pmin, float pmax, float cmin, float cmax)
+void OldSound::Bind(float*& param, float* control, float pmin, float pmax, float cmin, float cmax)
 {
 	rtpcs.push_back({ pmin, pmax, pmin, control, cmin, cmax, cmin });
 	bound = true;
-	param = &rtpcs[rtpcs.size() -1].pval;
+	param = &rtpcs[rtpcs.size() - 1].pval;
 }
 
 void OldSound::SetLoop(bool loop)

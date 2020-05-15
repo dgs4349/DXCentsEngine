@@ -10,14 +10,14 @@ SoundContainer::SoundContainer()
 
 SoundContainer::SoundContainer(const json& j)
 {
-	auto container = new SoundContainer();
+	const auto container = new SoundContainer();
 	from_json(j, *container);
 }
 
 SoundContainer::SoundContainer(const std::string& s)
 {
 	json j = s;
-	auto container = new SoundContainer();
+	const auto container = new SoundContainer();
 	from_json(j, *container);
 }
 
@@ -57,16 +57,16 @@ void SoundContainer::reset_(bool resetIndeces)
 	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM_EACH:
 		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
 		std::shuffle(
-			std::begin(queueOrder_), 
-			std::end(queueOrder_), 
+			std::begin(queueOrder_),
+			std::end(queueOrder_),
 			std::default_random_engine());
 		break;
 	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM:
 		std::generate(
-			std::begin(queueOrder_), 
-			std::end(queueOrder_), 
+			std::begin(queueOrder_),
+			std::end(queueOrder_),
 			randomIndex_
-			);
+		);
 		break;
 	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM_OTHER:
 		std::generate(
@@ -124,7 +124,7 @@ int SoundContainer::NextIndex()
 	return queueOrder_[(currentQueueOrderIndex_ + 1) % queueOrder_.size()];
 }
 
-void SoundContainer::PlayChild(int index, bool stopCurrent = false)
+void SoundContainer::PlayChild(int index, bool stopCurrent)
 {
 	if (stopCurrent) {
 		soundObjects_[currentSoundObjectIndex_]->Stop();
@@ -135,22 +135,22 @@ void SoundContainer::PlayChild(int index, bool stopCurrent = false)
 	}
 }
 
-void SoundContainer::PlayChild(std::string const& key, bool stopCurrent = false)
+void SoundContainer::PlayChild(std::string const& key, bool stopCurrent)
 {
 	PlayChild(Index(key), stopCurrent);
 }
 
-void SoundContainer::PlayNextChild(bool stopCurrent = false)
+void SoundContainer::PlayNextChild(bool stopCurrent)
 {
 	PlayChild(NextIndex(), stopCurrent);
 }
 
-void SoundContainer::QueueChild(int index, bool finishCurrent = true)
+void SoundContainer::QueueChild(int index, bool finishCurrent)
 {
 	soundObjects_[currentSoundObjectIndex_]->Queue(soundObjects_[index], finishCurrent);
 }
 
-void SoundContainer::QueueChild(std::string const& key, bool finishCurrent = true)
+void SoundContainer::QueueChild(std::string const& key, bool finishCurrent)
 {
 	QueueChild(Index(key), finishCurrent);
 }
@@ -168,7 +168,7 @@ int SoundContainer::AddSoundObject(std::string const& key, SoundObject* soundObj
 	soundObject->ConnectStateChangeHook(onCompleteHook);
 	soundObjects_.push_back(soundObject);
 	int i = soundObjects_.size() - 1;
-	parseAddSoundObjectKey_(key, i);
+	((json)*this)[key] = i;
 	orderSet_ = false;
 	return i;
 }
@@ -188,7 +188,6 @@ void SoundContainer::AddSoundObjects(std::map<std::string, SoundObject*> const& 
 void SoundContainer::queueNext_()
 {
 	if (currentSoundObjectIndex_ == LastIndex()) {
-
 		if (state_ == SOUND_STATE::FINISHING) return; // we're done, don't queue
 
 		// if we're playing in order we're safe to just queue Next() (which is wrapped)
@@ -215,27 +214,6 @@ SoundObject* SoundContainer::createSound_(json const& j)
 	Sound sound = j;
 	AddSoundObject(&sound);
 	return &sound;
-}
-
-SoundObject* SoundContainer::createSoundContainer_(json const& attr)
-{
-	SoundContainer* soundContainer = new SoundContainer(attr);
-	AddSoundObject(soundContainer);
-	return soundContainer;
-}
-
-SoundObject* SoundContainer::createSound_(std::string const& key, json const& j)
-{
-	Sound sound = j;
-	AddSoundObject(key, &sound);
-	return &sound;
-}
-
-SoundObject* SoundContainer::createSoundContainer_(std::string const& key, json const& attr)
-{
-	SoundContainer* soundContainer = new SoundContainer(attr);
-	AddSoundObject(key, soundContainer);
-	return soundContainer;
 }
 
 float SoundContainer::handleVolume_(float val)
@@ -293,11 +271,11 @@ void SoundContainer::handleStop_()
 float SoundContainer::getDuration_() {
 	duration_ = 0.f;
 	for (auto s : soundObjects_) {
-		if(s->Duration() < LOOP_CAP) duration_ += s->Duration();
+		if (s->Duration() < LOOP_CAP) duration_ += s->Duration();
 		else {
 			// max duration of any soundcontainer is 1B seconds, or 32 years fun fact
 			// well actually 2B if tuned down but w/e
-			duration_ = (float) LOOP_CAP;
+			duration_ = (float)LOOP_CAP;
 			break;
 		}
 	}
@@ -311,7 +289,7 @@ float SoundContainer::getDuration_(float tune) {
 	//  calculated duration and it's effects
 	else if (tune == tune_) return duration_;
 
-	// otherwise, duration has been calculated, but we need to 
+	// otherwise, duration has been calculated, but we need to
 	//	still calculate tune effects. Since we're doing this on the whole
 	//	container, this may not be terribly accurate
 	// additionally, do we need to figure out the difference between tunes?

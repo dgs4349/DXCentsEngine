@@ -60,9 +60,9 @@ private:
 	}
 
 protected:
-	float handleVolume_(float val) override { 
-		DirectXSoundEffectInstance->SetVolume(val); 
-		return val; 
+	float handleVolume_(float val) override {
+		DirectXSoundEffectInstance->SetVolume(val);
+		return val;
 	}
 	float handlePan_(float val)	override {
 		DirectXSoundEffectInstance->SetPan(val);
@@ -70,7 +70,7 @@ protected:
 	}
 
 	float handleTune_(float val) override {
-		DirectXSoundEffectInstance->SetPitch(val); 
+		DirectXSoundEffectInstance->SetPitch(val);
 		duration_ = getDuration_(val);
 		return val;
 	}

@@ -3,7 +3,6 @@
 
 using namespace FlashBang;
 
-
 OldSoundEngine* OldSoundEngine::instance = nullptr;
 int OldSoundEngine::refs = 0;
 
@@ -47,26 +46,26 @@ void OldSoundEngine::Release() {
 
 void OldSoundEngine::Update(float deltaTime, float totalTime)
 {
-	 if (!audioEngineDX->Update())
+	if (!audioEngineDX->Update())
 	{
 		if (audioEngineDX->IsCriticalError())
 		{
 			printf("AUDIO DEVICE LOST\n");
 		}
 	}
-	 else {
-		 for (int i = 0; i < effects.size(); i++) {
-			 effects[i]->Update(deltaTime, totalTime);
-		 }
-	 }
+	else {
+		for (int i = 0; i < effects.size(); i++) {
+			effects[i]->Update(deltaTime, totalTime);
+		}
+	}
 }
 
 void OldSoundEngine::Init()
 {
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
-	#ifdef %!%DEBUG
+#ifdef %!%DEBUG
 	eflags = eflags | AudioEngine_Debug;
-	#endif
+#endif
 	audioEngineDX = std::make_unique<AudioEngine>(eflags);
 
 	isSilent = !audioEngineDX->IsAudioDevicePresent();
@@ -82,11 +81,11 @@ void OldSoundEngine::Resume()
 	audioEngineDX->Resume();
 }
 
-void OldSoundEngine::AddSoundObject(SoundObject * object)
+void OldSoundEngine::AddSoundObject(SoundObject* object)
 {
 }
 
-Sound * OldSoundEngine::CreateSound(const wchar_t* location, bool loop)
+Sound* OldSoundEngine::CreateSound(const wchar_t* location, bool loop)
 {
 	Sound* effect = new Sound(audioEngineDX.get(), location, loop);
 	Add(effect);
@@ -94,12 +93,12 @@ Sound * OldSoundEngine::CreateSound(const wchar_t* location, bool loop)
 	return effect;
 }
 
-void OldSoundEngine::Add(Sound * effect)
+void OldSoundEngine::Add(Sound* effect)
 {
 	effects.push_back(effect);
 }
 
-void OldSoundEngine::Manage(Sound * effect)
+void OldSoundEngine::Manage(Sound* effect)
 {
 	managedEffects.push_back(effect);
 }

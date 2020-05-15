@@ -25,7 +25,7 @@ public:
 	OldSound(AudioEngine* audioEngineDX, const wchar_t* location, bool loop);
 	~OldSound();
 
-	enum PARAMS{VOLUME, PITCH, PAN, PLAY};
+	enum PARAMS { VOLUME, PITCH, PAN, PLAY };
 
 	// todo: fix
 	enum OldSoundEffectState { Stopped = 0, Ready = 1, Playing = 2, Completed = 3 };
@@ -36,7 +36,7 @@ public:
 		To add:
 		Time(start, end) //total time in audio handler to effect
 		Lifetime(start, end) // lifetime of audio as it's playing
-	
+
 	*/
 	struct Connection { float* gameVar; float varMin; float varMax; float prevValue; };
 
@@ -46,7 +46,6 @@ public:
 	//	float* control; float cmin; float cmax; float cval;
 	//};
 	//struct RTPCParams { float* volume; float* pitch; float* pan; };
-
 
 	void Update(float deltaTime, float totaltime);
 
@@ -74,7 +73,7 @@ public:
 	Connection Connect(float* gameVar, float varMin, float varMax);
 
 	void Stop(bool immediate = true);
-	void Set(float volume=1.f, float pitch=0.f, float pan=0.f, bool setLinked=true);
+	void Set(float volume = 1.f, float pitch = 0.f, float pan = 0.f, bool setLinked = true);
 	void SetRTPCs();
 
 	// TODO replace with Effect Class to hold various Effects, including Effect.Fade for instance
@@ -85,9 +84,9 @@ public:
 	OldSoundEffectState GetPlaybackStatus() { return state; }
 
 private:
-	OldSound * linked = nullptr;
+	OldSound* linked = nullptr;
 	bool isLinked = false;
-	
+
 	OldSoundEffectState state = Ready;
 
 	void Start(float totalTime);
@@ -96,7 +95,7 @@ private:
 	bool paramsSetting = false;
 	bool rtpcUpdate = false;
 
-	// parameters held and updated on 
+	// parameters held and updated on
 	bool bound = false;
 	std::vector<RTPC> rtpcs;
 	std::vector<RTPCParams> rtpcParams;
@@ -119,4 +118,3 @@ private:
 	std::unique_ptr<SoundEffect> soundEffect;
 	std::unique_ptr<SoundEffectInstance> soundEffectInstance;
 };
-

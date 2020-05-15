@@ -4,7 +4,6 @@
 #include "ISoundContainer.hpp"
 #include "Sound.hpp"
 
-
 class FlashBang::SoundContainer : public ISoundContainer
 {
 public:
@@ -22,7 +21,7 @@ public:
 	virtual ISoundContainer& operator=(const std::string& key) override;
 	SoundObject* operator[] (std::string const& key) { return At(key); }
 	SoundObject* operator[] (int i) { return At(i); }
-	
+
 	void Load() override;
 	void Unload() override;
 	virtual void Reset() override { reset_(true); }
@@ -86,7 +85,7 @@ private:
 		prev = (r == prev) ? r++ : r;
 		return prev;
 	}
-	
+
 protected:
 	float handleVolume_(float val) override;
 	float handleTune_(float val) override;
