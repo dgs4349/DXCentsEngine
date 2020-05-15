@@ -1,8 +1,15 @@
 #pragma once
 
 #include <Audio.h>
+#include <nlohmann/json.hpp>
+
 
 #include "FlashBang.hpp"
+#include "Effect.hpp"
+
+using nlohmann::json;
+
+using namespace FlashBang;
 
 class FlashBang::SoundEngine
 {
@@ -17,6 +24,28 @@ public:
 	void Init();
 	void Suspend();
 	void Resume();
+
+
+	struct EffectControl
+	{
+		float* control;
+		const std::string& effectKey;
+		float min;
+		float max;
+		Effect::Connection to_connection() { return { control, min, max }; };
+	};
+	
+	void AddEffectControl(EffectControl const& control);
+	void AddEffectControls(json const& j);
+	void AddEffectControls(std::vector<EffectControl> const& effects);
+
+	void RemoveEffectControl(const std::string& effectKey);
+	void RemoveEffectControl(EffectControl const& control);
+	void RemoveEffectControls(json const& j);
+	void RemoveEffectControls(std::vector<std::string> const& effectKeys);
+	void RemoveEffectControls(std::vector<EffectControl> const& effects);
+
+	static EffectControl* GetEffectControl(const std::string& effectKey);
 
 	static std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location)
 	{
@@ -54,7 +83,10 @@ private:
 	static void addRef_() { ++refs_; }
 	static void releaseRef_() { --refs_; }
 
+	std::map<std::string, EffectControl*> effectControls_;
+	
 public:
 	SoundEngine(SoundEngine const&) = delete;
 	void operator=(SoundEngine const*) = delete;
+	
 };

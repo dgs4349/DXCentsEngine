@@ -63,9 +63,6 @@
     <ClCompile Include="FlashBang\OldSound.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\OldSoundEngine.cpp">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundEngine.cpp">
       <Filter>FlashBang</Filter>
     </ClCompile>
@@ -80,6 +77,9 @@
     </ClCompile>
     <ClCompile Include="Schema.cpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\OldSoundEngine.txt">
+      <Filter>FlashBang</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,9 +107,6 @@
     <ClInclude Include="FlashBang\FlashBang.hpp">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\OldSoundEngine.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
     <ClInclude Include="FlashBang\ISoundContainer.hpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
     </ClInclude>
@@ -129,6 +126,9 @@
       <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="Schema.h" />
+    <ClInclude Include="FlashBang\OldSoundEngine.h.txt">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">

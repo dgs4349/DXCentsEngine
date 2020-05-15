@@ -6,7 +6,9 @@
 namespace FlashBang {
 	/*
 		RELEASE 0 TODO:
+			- single include
 			- move parse logic to a function call during load
+			- flex effect-sound connection logic
 			- Generic numerical/vector type for effect
 			- Reverb + positional audio
 			- Dynamic loading/unloading of container children through SoundEngine

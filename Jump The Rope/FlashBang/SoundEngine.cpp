@@ -1,5 +1,9 @@
+
 #include "SoundEngine.hpp"
+
 #include <set>
+
+#include "ISoundContainer.hpp"
 
 using namespace FlashBang;
 
@@ -81,13 +85,47 @@ void SoundEngine::Resume()
 	DirectXAudioEngine->Resume();
 }
 
-void SoundEngine::AddSoundContainer(ISoundContainer* container)
+void SoundEngine::AddEffectControl(EffectControl const& control)
+{
+	
+}
+
+void SoundEngine::AddEffectControls(json const& j)
 {
 }
 
+void SoundEngine::AddEffectControls(std::vector<EffectControl> const& effects)
+{
+}
+
+void SoundEngine::RemoveEffectControl(const std::string& effectKey)
+{
+}
+
+void SoundEngine::RemoveEffectControl(EffectControl const& control)
+{
+}
+
+void SoundEngine::RemoveEffectControls(json const& j)
+{
+}
+
+void SoundEngine::RemoveEffectControls(std::vector<std::string> const& effectKeys)
+{
+}
+
+void SoundEngine::RemoveEffectControls(std::vector<EffectControl> const& effects)
+{
+}
+
+SoundEngine::EffectControl& SoundEngine::GetEffectControl(const std::string& effectKey)
+{
+}
+
+
 SoundEngine::SoundEngine()
 {
-	sounds_ = std::multiset<int, SoundObject*>();
+	//sounds_ = std::multiset<int, SoundObject*>();
 	Init();
 }
 
@@ -98,6 +136,6 @@ SoundEngine::~SoundEngine()
 		DirectXAudioEngine->Suspend();
 		directXAudioEnginePointer.release();
 	}
-	for (int i = 0; i < sounds_.size(); i++) delete sounds_[i];
-	for (auto it = sounds_.begin(); )
+	/*for (int i = 0; i < sounds_.size(); i++) delete sounds_[i];
+	for (auto it = sounds_.begin(); )*/
 }

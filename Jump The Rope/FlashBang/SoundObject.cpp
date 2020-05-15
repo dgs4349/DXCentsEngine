@@ -75,7 +75,7 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 			currentEffect = j[key][i];
 
 			// array effect
-			if (currentEffect.is_array) {
+			if (currentEffect.is_array()) {
 				Effect* effect = new Effect(
 					// currentEffect[1] = "volume", currentEffect[1][0] = 'v' = SOUND_PARAM::VOLUME
 					GetParamSetFunc((SOUND_PARAM)(currentEffect[1])[0], *this),
@@ -119,14 +119,14 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 			AddEffect(key, effect);
 		}
 		catch (std::exception effect) {
-			printf(effect.what);
+			printf(effect.what());
 			throwEffectError_(i, key, j);
 		}
 	}
 }
 
 void SoundObject::throwEffectError_(int i, const std::string& key, const json& j) {
-	const auto message = R"(
+	const char* message = R"(
 		Error parsing effect. Please double check effect schema:
 			- Array: [ key "jump_vol", param "vol", float min, float max ]
 			- Object: { key: "keyName", param: "vol", low: floatMin, high: floatMax }

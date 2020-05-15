@@ -4,6 +4,8 @@
 #include "ISoundContainer.hpp"
 #include "Sound.hpp"
 
+using namespace FlashBang;
+
 class FlashBang::SoundContainer : public ISoundContainer
 {
 public:
