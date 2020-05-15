@@ -52,6 +52,15 @@ public:
 private:
 	SoundContainer();
 
+	/*
+		DECISIONS
+		we are json, we are holding pointers to sound objects
+		we should access sound objects from ourselves, but in a way
+		where directly adding to json[asd]=asd is permitted
+
+		overwrite what happens when adding?
+		or, storing an index attribute on sound object, either works
+	*/
 	std::vector<SoundObject*> soundObjects_;
 
 	bool orderSet_ = false;
@@ -82,13 +91,10 @@ protected:
 	float handleVolume_(float val) override;
 	float handleTune_(float val) override;
 	float handlePan_(float val) override;
-	virtual SOUNDCONTAINER_PLAYBACK handlePlayback_(SOUNDCONTAINER_PLAYBACK val) override;
+	virtual SOUNDCONTAINER_PLAYBACK_ORDER handlePlayback_(SOUNDCONTAINER_PLAYBACK_ORDER val) override;
 
 	SoundObject* createSound_(json const& j) override;
-	SoundObject* createSoundContainer_(json const& attr) override;
-	SoundObject* createSound_(std::string const& key, json const& j) override;
-	SoundObject* createSoundContainer_(std::string const& key, json const& attr) override;
-	
+
 	virtual void handlePlay_() override;
 	virtual void handlePause_() override;
 	virtual void handleResume_() override;

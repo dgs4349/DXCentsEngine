@@ -83,10 +83,6 @@ void SoundEngine::Resume()
 	DirectXAudioEngine->Resume();
 }
 
-void SoundEngine::AddSoundObject(SoundObject* object)
-{
-}
-
 void SoundEngine::AddSoundContainer(ISoundContainer* container)
 {
 }

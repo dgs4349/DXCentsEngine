@@ -9,6 +9,9 @@ using nlohmann::json;
 
 using namespace FlashBang;
 
+
+#define LOOP_CAP 1000000000
+
 /*
 	Handles parsing
 	Handles basic update logic
@@ -84,7 +87,7 @@ public:
 
 
 	/////////////////////// Parsing ///////////////////////
-
+	std::string Key = nullptr;
 	std::string File = nullptr;
 	std::map<std::string, Effect*> Effects;
 	
@@ -93,7 +96,7 @@ public:
 
 	// todo: handle non char keys, such as Position and the like
 	typedef float (*ParamSetterFunc)(float val);
-	static ParamSetterFunc GetParamSetFunc(EFFECT_PARAMETER p, SoundObject& s);
+	static ParamSetterFunc GetParamSetFunc(SOUND_PARAM p, SoundObject& s);
 
 	virtual SoundObject* CopyParams(const SoundObject& s);
 
@@ -225,9 +228,9 @@ protected:
 	};
 
 	// overridden in ISoundContainer
-	virtual void parseParam_(std::string& key, const json& j);
-	virtual void parseFile_(std::string& fileKey, const json& j);
-	void parseEffects_(std::string& effectsKey, const json& j);
+	virtual void parseParam_(const std::string& key, const json& j);
 
+	void parseEffects_(const std::string& key, const json& j);
+	void throwEffectError_(int i, const std::string& key, const json& j);
 };
 

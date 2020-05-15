@@ -78,11 +78,11 @@ public:
 		return this;
 	}
 
-	Effect* Connect(COMMON_EFFECTS effect, float from, float to, bool start = true)
+	Effect* Connect(AUTO_EFFECT effect, float from, float to, bool start = true)
 	{
 		switch (effect)
 		{
-		case COMMON_EFFECTS::TIME:
+		case AUTO_EFFECT::TIME:
 			Connect({ &ActiveTime, from, to });
 			break;
 		}

@@ -29,7 +29,7 @@ struct SimpleShaderVariable
 struct SimpleConstantBuffer
 {
 	std::string Name;
-	D3D_CBUFFER_TYPE Type;
+	D3D_CBUFFER_TYPE PlaybackBehavior;
 	unsigned int Size;
 	unsigned int BindIndex;
 	ID3D11Buffer* ConstantBuffer;

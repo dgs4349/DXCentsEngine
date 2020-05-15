@@ -6,6 +6,7 @@ namespace FlashBang {
 
     /*
         RELEASE 0 TODO:
+            - move parse logic to a function call during load
             - Generic numerical/vector type for effect
             - Reverb + positional audio
             - Dynamic loading/unloading of container children through SoundEngine
@@ -38,33 +39,76 @@ namespace FlashBang {
     */
 
 
-
-
-
-
-
-
-    // basically longer than ever needed, but should still allow in-bounds int arithmatic
-    const int LOOP_CAP = 1000000000;
-
     // forward declarations, so far no need to declare other functionality in forwards
     extern class Sound; // includes SoundObject, effects
     extern class SoundContainer;
     extern class SoundEngine;
 
-    // yes this one's plural, it just makes more sense in this instance
-	enum class COMMON_EFFECTS : char { TIME='T' };
 
-    // basic parameters are lowercase to match common arg rules
-    enum class EFFECT_PARAMETER : char { VOLUME='v', TUNE='t', PAN='p' };
+    /*
+        - Global Enums:
+            - SOUND_STATE,
+                - the current playback state of a sound:
+                   - UNLOADED:  audio content is not loaded
+                   - IDLE:      audio content is loaded but not scheduled to play
+                   - PAUSED:    audio is paused
+                   - QUEUED:    audio is next to be played after a previous SoundObject
+                   - READY:     audio will be played on the following update frame
+                   - PLAYING:   audio is playing
+                   - FINISHING: audio is on the final playback loop
+                   - COMPLETE:  audio has completed its loops, and will transition to IDLE
+           
+           - SOUND_PARAM:
+                - parameters for audio content
 
-    // this is an int class, which is useful with state_ < READY
-	enum class SOUND_STATE { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING, COMPLETE };
+            - AUTO_EFFECT:
+                - audio effects independent of game vars, i.e. time, lfo's, other effects
+                    - TIME: linear effect based on elapsed time
+
+            - SOUNDCONTAINER_GROUP_TYPE:
+                - SoundObject group type contained in SoundContainer json 'items' param
+                    - CONTAINER: target item is another SoundContainer
+                    - SCHEMA:    group of SoundObjects to be parsed from file and name schemas
+            
+            - SOUNDCONTAINER_PLAYBACK_BEHAVIOR:
+                - defines the behavior when a child is played
+                    - PLAYLIST: horizontal container, soundobjects are queued to be played
+                                    following the previous sound's completion
+                    - ONE_SHOT: sounds are independently triggered
+    */
+
+
+    enum class SOUND_STATE { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING, COMPLETE };
+    enum class SOUND_PARAM : char { VOLUME = 'v', TUNE = 't', PAN = 'p', LOOP = 'l'};
+
+    enum class AUTO_EFFECT : char { TIME = 'T' };
+
+    enum class SOUNDOBJECT_ARG : char {
+        FILE = 'f', KEY = 'k', EFFECTS = 'e', 
+    };
+    enum class EFFECT_ARG : char {
+        KEY= 'k', PARAM= 'p', MIN = 'l', MAX = 'h', // 'low', 'high'
+    };
+
+    enum class SOUNDCONTAINER_ARG : char {
+        PLAYBACK_BEHAVIOR = 'b',
+        PLAYBACK_ORDER = 'o',
+        ITEMS = 'i',
+    };
+
+    enum class SOUNDCONTAINER_ITEM_TYPE : char { CONTAINER, SCHEMA, SOUND, };
+    static const std::map<std::string, SOUNDCONTAINER_ITEM_TYPE> SOUNDCONATINER_ITEM_TYPE_ARGS = {
+        {"Container", CONTAINER},
+        {"Schema", SCHEMA},
+        {"Sound", SOUND}, // will be implied if previous items do not match
+    }; 
+
+       
+    enum class SOUNDCONTAINER_PLAYBACK_BEHAVIOR : char { PLAYLIST = 'P', ONE_SHOT = 'O' };
+    enum class SOUNDCONTAINER_PLAYBACK_ORDER : char { IN_ORDER = 'I', RANDOM = 'R', RANDOM_EACH = 'E', RANDOM_OTHER = 'O' };
+
 
     // char for parsing
-    enum class SOUNDCONTAINER_TYPE : char { PLAYLIST= 'P', ONE_SHOT= 'O' };
-    enum class SOUNDCONTAINER_PLAYBACK : char { IN_ORDER='I', RANDOM='R', RANDOM_EACH='E', RANDOM_OTHER='O' };
-
 	/* investigate including these
 	
     static const XAUDIO2FX_REVERB_I3DL2_PARAMETERS gReverbPresets[] =

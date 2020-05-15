@@ -16,11 +16,6 @@ using namespace FlashBang;
 
 class ISoundContainer : protected SoundObject, public json
 {
-private:
-// if we ever want to change arg names, just do it here
-// we should also do this in SoundObject to clear up logic
-enum class SOUNDCONTAINER_ARG : char { TYPE = 'T', PLAYBACK = 'P' };
-
 public:
 	~ISoundContainer() = default;
 
@@ -30,15 +25,13 @@ public:
 	virtual SoundObject* operator[] (std::string const& key) = 0;
 	virtual SoundObject* operator[] (int i) = 0;
 
-	virtual bool operator== (ISoundContainer const& other) { return Files == other.Files; }
+	/*virtual bool operator== (ISoundContainer const& other) { return Files == other.Files; }
 	virtual bool operator!= (ISoundContainer const& other) { return !(*this == other); }
-	
+	*/
 	// todo: deleting sounds at an index or string could be useful
 	// void operator delete(void*);
 	
-	std::vector<std::string> Files;
-
-	static void from_json(const json& j, ISoundContainer& s);
+	static void from_json(const json& j, ISoundContainer& s) { SoundObject::from_json(j, s); }
 
 	virtual int AddSoundObject(SoundObject* soundObject) = 0;
 	virtual int AddSoundObject(std::string const& key, SoundObject* soundObject) = 0;
@@ -63,13 +56,13 @@ public:
 	virtual void QueueChild(std::string const& key, bool finishCurrent = true ) = 0;
 
 	// immutable type, no real reason to change type after the fact
-	SOUNDCONTAINER_TYPE Type() { return type_; }
+	SOUNDCONTAINER_PLAYBACK_BEHAVIOR PlaybackBehavior() { return playbackBehavior_; }
 	
 	// playback is allowed to be changed
-	SOUNDCONTAINER_PLAYBACK Playback() { return playback_; }
-	SOUNDCONTAINER_PLAYBACK Playback(SOUNDCONTAINER_PLAYBACK val) {
-		playback_ = handlePlayback_(val);
-		return playback_;
+	SOUNDCONTAINER_PLAYBACK_ORDER PlaybackOrder() { return playbackOrder_; }
+	SOUNDCONTAINER_PLAYBACK_ORDER PlaybackOrder(SOUNDCONTAINER_PLAYBACK_ORDER val) {
+		playbackOrder_ = handlePlayback_(val);
+		return playbackOrder_;
 	}
 
 	virtual void Reset() = 0;
@@ -81,31 +74,29 @@ protected:
 
 	ISoundContainer() = default;
 
-	SOUNDCONTAINER_TYPE type_ = SOUNDCONTAINER_TYPE::ONE_SHOT;
-	SOUNDCONTAINER_PLAYBACK playback_ = SOUNDCONTAINER_PLAYBACK::IN_ORDER;
+	SOUNDCONTAINER_PLAYBACK_BEHAVIOR playbackBehavior_ = SOUNDCONTAINER_PLAYBACK_BEHAVIOR::ONE_SHOT;
+	SOUNDCONTAINER_PLAYBACK_ORDER playbackOrder_ = SOUNDCONTAINER_PLAYBACK_ORDER::IN_ORDER;
 
-	virtual SOUNDCONTAINER_PLAYBACK handlePlayback_(SOUNDCONTAINER_PLAYBACK val) = 0;
+	virtual SOUNDCONTAINER_PLAYBACK_ORDER handlePlayback_(SOUNDCONTAINER_PLAYBACK_ORDER val) = 0;
 
 	virtual SoundObject* createSound_(json const& j) = 0;
-	virtual SoundObject* createSoundContainer_(json const& attr) = 0;
 
-	virtual SoundObject* createSound_(std::string const& key, json const& j) = 0;
-	virtual SoundObject* createSoundContainer_(std::string const& key, json const& attr) = 0;
+	void parseParam_(const std::string& key, const json& j) override;
+	void parseItems_(const json& items);
 
-	void parseParam_(std::string& key, const json& j) override;
-	void parseFile_(std::string& fileKey, const json& j) override;
+	void parseSchema_(const json& schema);
+	std::vector<std::string> const& processSchemaString_(const std::string& str);
 
-	bool checkFileString_(std::string& s);
+	void throwSchemaError_(const std::string& files, const std::string& keys);
 
-	// atrocious name, but this needs to be clear
-	void checkSplitThenAddFileString_(std::string& f);
-	
-	void parseAddSoundObjectKey_(std::string const& originalKey, int soundObjectIndex);
-	void parseSoundObject_(json const& j);
-	void parseSoundObject_(std::string const& key, json const& j);
+	static SOUNDCONTAINER_ITEM_TYPE getItemType_(const std::string& itemKey) {
+		auto const it = SOUNDCONATINER_ITEM_TYPE_ARGS.find(itemKey);
+		if (it != SOUNDCONATINER_ITEM_TYPE_ARGS.end()) return SOUNDCONTAINER_ITEM_TYPE::SOUND;
+		return it->second;
+	}
 
 private:
-		
+
 	// SoundContainer should NEVER be compared as a SoundObject
 	virtual bool operator!=(const SoundObject& other) override { return false; }
 	virtual bool operator==(const SoundObject& other) override { return false; }

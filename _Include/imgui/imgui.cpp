@@ -5843,7 +5843,7 @@ void ImGui::PopStyleColor(int count)
 
 struct ImGuiStyleVarInfo
 {
-    ImGuiDataType   Type;
+    ImGuiDataType   PlaybackBehavior;
     ImU32           Count;
     ImU32           Offset;
     void*           GetVarPtr(ImGuiStyle* style) const { return (void*)((unsigned char*)style + Offset); }
@@ -5886,7 +5886,7 @@ static const ImGuiStyleVarInfo* GetStyleVarInfo(ImGuiStyleVar idx)
 void ImGui::PushStyleVar(ImGuiStyleVar idx, float val)
 {
     const ImGuiStyleVarInfo* var_info = GetStyleVarInfo(idx);
-    if (var_info->Type == ImGuiDataType_Float && var_info->Count == 1)
+    if (var_info->PlaybackBehavior == ImGuiDataType_Float && var_info->Count == 1)
     {
         ImGuiContext& g = *GImGui;
         float* pvar = (float*)var_info->GetVarPtr(&g.Style);
@@ -5900,7 +5900,7 @@ void ImGui::PushStyleVar(ImGuiStyleVar idx, float val)
 void ImGui::PushStyleVar(ImGuiStyleVar idx, const ImVec2& val)
 {
     const ImGuiStyleVarInfo* var_info = GetStyleVarInfo(idx);
-    if (var_info->Type == ImGuiDataType_Float && var_info->Count == 2)
+    if (var_info->PlaybackBehavior == ImGuiDataType_Float && var_info->Count == 2)
     {
         ImGuiContext& g = *GImGui;
         ImVec2* pvar = (ImVec2*)var_info->GetVarPtr(&g.Style);
@@ -5916,12 +5916,12 @@ void ImGui::PopStyleVar(int count)
     ImGuiContext& g = *GImGui;
     while (count > 0)
     {
-        // We avoid a generic memcpy(data, &backup.Backup.., GDataTypeSize[info->Type] * info->Count), the overhead in Debug is not worth it.
+        // We avoid a generic memcpy(data, &backup.Backup.., GDataTypeSize[info->PlaybackBehavior] * info->Count), the overhead in Debug is not worth it.
         ImGuiStyleMod& backup = g.StyleModifiers.back();
         const ImGuiStyleVarInfo* info = GetStyleVarInfo(backup.VarIdx);
         void* data = info->GetVarPtr(&g.Style);
-        if (info->Type == ImGuiDataType_Float && info->Count == 1)      { ((float*)data)[0] = backup.BackupFloat[0]; }
-        else if (info->Type == ImGuiDataType_Float && info->Count == 2) { ((float*)data)[0] = backup.BackupFloat[0]; ((float*)data)[1] = backup.BackupFloat[1]; }
+        if (info->PlaybackBehavior == ImGuiDataType_Float && info->Count == 1)      { ((float*)data)[0] = backup.BackupFloat[0]; }
+        else if (info->PlaybackBehavior == ImGuiDataType_Float && info->Count == 2) { ((float*)data)[0] = backup.BackupFloat[0]; ((float*)data)[1] = backup.BackupFloat[1]; }
         g.StyleModifiers.pop_back();
         count--;
     }
@@ -9139,7 +9139,7 @@ void ImGui::LoadIniSettingsFromMemory(const char* ini_data, size_t ini_size)
             continue;
         if (line[0] == '[' && line_end > line && line_end[-1] == ']')
         {
-            // Parse "[Type][Name]". Note that 'Name' can itself contains [] characters, which is acceptable with the current format and parsing code.
+            // Parse "[PlaybackBehavior][Name]". Note that 'Name' can itself contains [] characters, which is acceptable with the current format and parsing code.
             line_end[-1] = 0;
             const char* name_end = line_end - 1;
             const char* type_start = line + 1;

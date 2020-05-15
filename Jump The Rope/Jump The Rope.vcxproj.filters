@@ -78,6 +78,9 @@
     <ClCompile Include="FlashBang\SoundObject.cpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="Schema.cpp">
+      <Filter>FlashBang\Parsing Interfaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -125,6 +128,7 @@
     <ClInclude Include="FlashBang\SoundEngine.hpp">
       <Filter>FlashBang</Filter>
     </ClInclude>
+    <ClInclude Include="Schema.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">

@@ -3,24 +3,31 @@
 /////////////////////// Parsing ///////////////////////
 
 void SoundObject::from_json(const json& j, SoundObject& s) {
-	std::string key;
+
+	if (j.size() == 1 && j[0].is_object()) {
+		s.Key = j.begin().key();
+		from_json(j[0], s);
+	}
+
 	for (auto i : j.items()) {
-		key = i.key();
-		s.parseParam_(key, j);
+		s.parseParam_(i.key(), j);
 	}
 }
 
-
-SoundObject::ParamSetterFunc SoundObject::GetParamSetFunc(EFFECT_PARAMETER p, SoundObject& s)
+/*
+	returns pointer to var based on SOUND_PARAM chars
+*/
+SoundObject::ParamSetterFunc SoundObject::GetParamSetFunc(SOUND_PARAM p, SoundObject& s)
 {
 	switch (p) {
-	case EFFECT_PARAMETER::VOLUME: return *s.Volume;
-	case EFFECT_PARAMETER::TUNE: return  *s.Tune;
-	case EFFECT_PARAMETER::PAN: return *s.Pan;
+	case SOUND_PARAM::VOLUME: return *s.Volume;
+	case SOUND_PARAM::TUNE: return  *s.Tune;
+	case SOUND_PARAM::PAN: return *s.Pan;
 
 	default: return nullptr;
 	}
 }
+
 SoundObject* SoundObject::CopyParams(const SoundObject& s)
 {
 	if (this != &s)
@@ -33,49 +40,117 @@ SoundObject* SoundObject::CopyParams(const SoundObject& s)
 	return this;
 }
 
-void SoundObject::parseParam_(std::string& key, const json& j)
+void SoundObject::parseParam_(const std::string& key, const json& j)
 {
-	if (islower(key[0]))
+	switch ((SOUNDOBJECT_ARG) key[0])
 	{
-		switch (key[0])
-		{
-		// move to default once int parameters implemented
-		case 'l': j[key].get_to(loop_); break;
+	case SOUNDOBJECT_ARG::FILE: j[key].get_to(File);  break;
+	case SOUNDOBJECT_ARG::KEY:	j[key].get_to(Key); break;
 
-		case 'f': parseFile_(key, j);  break;
-		case 'e': parseEffects_(key, j);break;
+	case SOUNDOBJECT_ARG::EFFECTS: parseEffects_(key, j); break;
 
-		default: 
-			auto func = GetParamSetFunc((EFFECT_PARAMETER)key[0], *this);
-			if (func != nullptr) func(j[key].get<float>());
-			break;
+	// move to default once int parameters implemented
+	case (SOUNDOBJECT_ARG)SOUND_PARAM::LOOP: j[key].get_to(loop_); break;
+
+	default: 
+		auto func = GetParamSetFunc((SOUND_PARAM)key[0], *this);
+		if (func != nullptr) func(j[key].get<float>());
+		break;
+	}
+}
+
+
+void SoundObject::parseEffects_(const std::string& key, const json& j)
+{
+	// currentEffect array syntax: [ key "jump_vol", param "vol", float min, float max ]
+	/*
+		"name" : { param: "vol", low: min, high: max }
+		or { key: "name", param ... }
+	
+	*/
+
+	// same deal as sound
+	json currentEffect;
+
+	for (int i = 0; i < j[key].size(); ++i) {
+		try {
+
+			currentEffect = j[key][i];
+
+			// array effect
+			if (currentEffect.is_array) {
+				Effect* effect = new Effect(
+					// currentEffect[1] = "volume", currentEffect[1][0] = 'v' = SOUND_PARAM::VOLUME
+					GetParamSetFunc((SOUND_PARAM)(currentEffect[1])[0], *this),
+					currentEffect[2],
+					currentEffect[3]
+				);
+				AddEffect(currentEffect[0], effect);
+				continue;
+			}
+
+			//object effect 
+			std::string effectName;
+
+			// name-first object, store name then continue to body
+			if (currentEffect.size() == 1) {
+				effectName = currentEffect.begin().key();
+				currentEffect = currentEffect[effectName];
+			}
+
+			Effect* effect = new Effect();
+
+			for (auto [key, value] : currentEffect.items()) {
+				switch ((EFFECT_ARG)key[0]) {
+				case EFFECT_ARG::KEY:
+					value.get_to(effectName);
+					break;
+				case EFFECT_ARG::PARAM:
+					SOUND_PARAM param;
+					value.get_to(param);
+					effect->ValueFunctionPointer = GetParamSetFunc(param, *this);
+					break;
+				case EFFECT_ARG::MIN:
+					value.get_to(effect->ValueMin);
+					break;
+				case EFFECT_ARG::MAX:
+					value.get_to(effect->ValueMax);
+					break;
+				}
+			}
+
+			AddEffect(key, effect);
+
+		}
+		catch (std::exception effect) {
+			printf(effect.what);
+			throwEffectError_(i, key, j);
 		}
 	}
 }
 
-void SoundObject::parseFile_(std::string& fileKey, const json& j)
-{
-	j[fileKey].get_to(File);
-}
+void SoundObject::throwEffectError_(int i, const std::string& key, const json& j) {
 
-void SoundObject::parseEffects_(std::string& effectsKey, const json& j)
-{
-	// effect json syntax: "name": { "vol": { float min, float max } }
-	for (auto effect : j[effectsKey].items()) {
+	const auto message = R"(
+		Error parsing effect. Please double check effect schema:
+			- Array: [ key "jump_vol", param "vol", float min, float max ]
+			- Object: { key: "keyName", param: "vol", low: floatMin, high: floatMax }
+			- Object-Alt: "key" : { param: "vol", low: floatMin, high: floatMax }
+	)";
 
-		std::string EffectName = effect.key();
+	const auto currentEffect = j[key][i];
+	std::string effectIssue = std::string("\nEffect index: ") + std::to_string(i) + "\n";
 
-		auto effectArgs = effect.value().items()[0]; // "vol": { float min, float max }
-
-		ParamSetterFunc func = GetParamSetFunc(effectArgs.key()[0], *this);
-
-		AddEffect(
-			EffectName,
-			new Effect(
-				func, effectArgs.value()[0], effectArgs.value()[1]
-			));
+	if (currentEffect.size() < 4) {
+		effectIssue += "Effect is not the right length!"
+			+ std::string("\nEffect length: ") + std::to_string(currentEffect.size());
 	}
+	// other issues involve complex currentEffect parsing which i don't feel like doing right now
+
+	throw std::exception((message + effectIssue).c_str());
+
 }
+
 
 /////////////////////// Sound Methods ///////////////////////
 
@@ -91,7 +166,7 @@ void SoundObject::Play()
 		State(SOUND_STATE::PLAYING);
 	}
 	else {
-		// if we have a sound effect queued after (queuer), wait a frame to sync up this is to prevent 
+		// if we have a sound currentEffect queued after (queuer), wait a frame to sync up this is to prevent 
 		//		a delay longer than a single frame (which might be noticable) when playing a following sound
 		// Sound will be set ready, the update loop will automatically set state to playing and therefore
 		//		start playing the sound on the synced frame
@@ -184,9 +259,9 @@ Effect* SoundObject::FindEffect(std::string const& key)
 	return nullptr;
 }
 
-void SoundObject::AddEffect(std::string key, Effect* effect)
+void SoundObject::AddEffect(std::string key, Effect* currentEffect)
 {
-	Effects.insert({ key, effect });
+	Effects.insert({ key, currentEffect });
 }
 
 void SoundObject::AddEffects(std::map<std::string, Effect*> const& effects)
@@ -198,23 +273,23 @@ void SoundObject::AddEffects(std::map<std::string, Effect*> const& effects)
 
 bool SoundObject::DeleteEffect(std::string const& key)
 {
-	Effect* e = FindEffect(key);
-	if (e != nullptr) delete e;
+	Effect* effect = FindEffect(key);
+	if (effect != nullptr) delete effect;
 	Effects.erase(key);
 }
 
 SoundObject* SoundObject::ConnectEffect(std::string const& effectKey, Effect::Connection connection)
 {
-	auto effect = FindEffect(effectKey);
-	if (effect != nullptr) effect->Connect(connection);
+	auto currentEffect = FindEffect(effectKey);
+	if (currentEffect != nullptr) currentEffect->Connect(connection);
 	return this;
 }
 
 SoundObject* SoundObject::ConnectEffects(std::map<std::string, Effect::Connection> const& connections)
 {
 	for (auto it = connections.begin(); it != connections.end(); it++) {
-		auto effect = FindEffect(it->first);
-		if (effect != nullptr) effect->Connect(it->second);
+		auto currentEffect = FindEffect(it->first);
+		if (currentEffect != nullptr) currentEffect->Connect(it->second);
 	}
 	return this;
 }

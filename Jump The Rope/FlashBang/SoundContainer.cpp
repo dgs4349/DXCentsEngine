@@ -49,26 +49,26 @@ void SoundContainer::Unload()
 void SoundContainer::reset_(bool resetIndeces)
 {
 	queueOrder_ = std::vector<int>(soundObjects_.size());
-	switch (playback_) {
-	case SOUNDCONTAINER_PLAYBACK::IN_ORDER:
+	switch (playbackOrder_) {
+	case SOUNDCONTAINER_PLAYBACK_ORDER::IN_ORDER:
 		if (orderSet_) return; // if order already set and we're in order, no need to continue
 		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
 		break;
-	case SOUNDCONTAINER_PLAYBACK::RANDOM_EACH:
+	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM_EACH:
 		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
 		std::shuffle(
 			std::begin(queueOrder_), 
 			std::end(queueOrder_), 
 			std::default_random_engine());
 		break;
-	case SOUNDCONTAINER_PLAYBACK::RANDOM:
+	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM:
 		std::generate(
 			std::begin(queueOrder_), 
 			std::end(queueOrder_), 
 			randomIndex_
 			);
 		break;
-	case SOUNDCONTAINER_PLAYBACK::RANDOM_OTHER:
+	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM_OTHER:
 		std::generate(
 			std::begin(queueOrder_),
 			std::end(queueOrder_),
@@ -193,7 +193,7 @@ void SoundContainer::queueNext_()
 
 		// if we're playing in order we're safe to just queue Next() (which is wrapped)
 		// otherwise we are a random container, and we must reshuffle the queueOrder container
-		else if (playback_ != SOUNDCONTAINER_PLAYBACK::IN_ORDER) {
+		else if (playbackOrder_ != SOUNDCONTAINER_PLAYBACK_ORDER::IN_ORDER) {
 			reset_(false);
 		}
 	}
@@ -207,7 +207,7 @@ void SoundContainer::updateCurrentIndex_()
 	currentSoundObjectIndex_ = queueOrder_[currentQueueOrderIndex_];
 
 	// edge case logic handled in queueNext
-	if (type_ == SOUNDCONTAINER_TYPE::PLAYLIST) queueNext_();
+	if (playbackBehavior_ == SOUNDCONTAINER_PLAYBACK_BEHAVIOR::PLAYLIST) queueNext_();
 }
 
 SoundObject* SoundContainer::createSound_(json const& j)
@@ -257,16 +257,16 @@ float SoundContainer::handlePan_(float val)
 	return val;
 }
 
-SOUNDCONTAINER_PLAYBACK SoundContainer::handlePlayback_(SOUNDCONTAINER_PLAYBACK val)
+SOUNDCONTAINER_PLAYBACK_ORDER SoundContainer::handlePlayback_(SOUNDCONTAINER_PLAYBACK_ORDER val)
 {
-	return SOUNDCONTAINER_PLAYBACK();
+	return SOUNDCONTAINER_PLAYBACK_ORDER();
 }
 
 void SoundContainer::handlePlay_()
 {
 	if (!orderSet_) Reset();
 	soundObjects_[currentSoundObjectIndex_]->Play();
-	if (type_ == SOUNDCONTAINER_TYPE::PLAYLIST) queueNext_();
+	if (playbackBehavior_ == SOUNDCONTAINER_PLAYBACK_BEHAVIOR::PLAYLIST) queueNext_();
 }
 
 void SoundContainer::handlePause_()

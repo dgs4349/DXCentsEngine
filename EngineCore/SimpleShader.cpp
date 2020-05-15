@@ -113,7 +113,7 @@ bool ISimpleShader::LoadShaderFile(LPCWSTR shaderFile)
 		refl->GetResourceBindingDesc(r, &resourceDesc);
 
 		// Check the type
-		switch (resourceDesc.Type)
+		switch (resourceDesc.PlaybackBehavior)
 		{
 		case D3D_SIT_TEXTURE: // A texture resource
 		{
@@ -153,7 +153,7 @@ bool ISimpleShader::LoadShaderFile(LPCWSTR shaderFile)
 		cb->GetDesc(&bufferDesc);
 		
 		// Save the type, which we reference when setting these buffers
-		constantBuffers[b].Type = bufferDesc.Type;
+		constantBuffers[b].PlaybackBehavior = bufferDesc.PlaybackBehavior;
 
 		// Get the description of the resource binding, so
 		// we know exactly how it's bound in the shader
@@ -765,7 +765,7 @@ void SimpleVertexShader::SetShaderAndCBs()
 	for (unsigned int i = 0; i < constantBufferCount; i++)
 	{
 		// Skip "buffers" that aren't true constant buffers
-		if (constantBuffers[i].Type != D3D11_CT_CBUFFER)
+		if (constantBuffers[i].PlaybackBehavior != D3D11_CT_CBUFFER)
 			continue;
 
 		// This is a real constant buffer, so set it
@@ -891,7 +891,7 @@ void SimplePixelShader::SetShaderAndCBs()
 	for (unsigned int i = 0; i < constantBufferCount; i++)
 	{
 		// Skip "buffers" that aren't true constant buffers
-		if (constantBuffers[i].Type != D3D11_CT_CBUFFER)
+		if (constantBuffers[i].PlaybackBehavior != D3D11_CT_CBUFFER)
 			continue;
 
 		// This is a real constant buffer, so set it
@@ -1019,7 +1019,7 @@ void SimpleDomainShader::SetShaderAndCBs()
 	for (unsigned int i = 0; i < constantBufferCount; i++)
 	{
 		// Skip "buffers" that aren't true constant buffers
-		if (constantBuffers[i].Type != D3D11_CT_CBUFFER)
+		if (constantBuffers[i].PlaybackBehavior != D3D11_CT_CBUFFER)
 			continue;
 
 		// This is a real constant buffer, so set it
@@ -1146,7 +1146,7 @@ void SimpleHullShader::SetShaderAndCBs()
 	for (unsigned int i = 0; i < constantBufferCount; i++)
 	{
 		// Skip "buffers" that aren't true constant buffers
-		if (constantBuffers[i].Type != D3D11_CT_CBUFFER)
+		if (constantBuffers[i].PlaybackBehavior != D3D11_CT_CBUFFER)
 			continue;
 
 		// This is a real constant buffer, so set it
@@ -1395,7 +1395,7 @@ void SimpleGeometryShader::SetShaderAndCBs()
 	for (unsigned int i = 0; i < constantBufferCount; i++)
 	{
 		// Skip "buffers" that aren't true constant buffers
-		if (constantBuffers[i].Type != D3D11_CT_CBUFFER)
+		if (constantBuffers[i].PlaybackBehavior != D3D11_CT_CBUFFER)
 			continue;
 
 		// This is a real constant buffer, so set it
@@ -1552,7 +1552,7 @@ bool SimpleComputeShader::CreateShader(ID3DBlob* shaderBlob)
 		refl->GetResourceBindingDesc(r, &resourceDesc);
 
 		// Check the type, looking for any kind of UAV
-		switch (resourceDesc.Type)
+		switch (resourceDesc.PlaybackBehavior)
 		{
 		case D3D_SIT_UAV_APPEND_STRUCTURED:
 		case D3D_SIT_UAV_CONSUME_STRUCTURED:
@@ -1585,7 +1585,7 @@ void SimpleComputeShader::SetShaderAndCBs()
 	for (unsigned int i = 0; i < constantBufferCount; i++)
 	{
 		// Skip "buffers" that aren't true constant buffers
-		if (constantBuffers[i].Type != D3D11_CT_CBUFFER)
+		if (constantBuffers[i].PlaybackBehavior != D3D11_CT_CBUFFER)
 			continue;
 
 		// This is a real constant buffer, so set it

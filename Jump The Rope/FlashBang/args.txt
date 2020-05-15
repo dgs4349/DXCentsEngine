@@ -1,3 +1,54 @@
+
+
+sounds can be inferred.
+jump {
+	file: "jump.wav"
+	v: 0.5,
+}
+
+containers must be explicit
+
+Container {
+	jump {
+		v: 0.5,
+		items: {
+			...
+		}
+	}
+}
+
+containers can also have a name,
+	just check for items key
+
+Container {
+	name: "jump",
+	items: [
+		...
+	]
+}
+
+schemas
+
+Container {
+	jump {
+		vol: 0.5,
+		items: [
+			Schema: {
+				f: "jumps/|0-4|.wav"
+			},
+		]
+	}
+}
+
+Container and Schema are types.
+
+
+
+
+finally, NO MORE $jump BULLSHIT
+
+
+
 Current Args:
 
 ISoundObject:

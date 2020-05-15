@@ -10,7 +10,7 @@ Index of this file:
 // [SECTION] Widgets: Main (Button, Image, Checkbox, RadioButton, ProgressBar, Bullet, etc.)
 // [SECTION] Widgets: Low-level Layout helpers (Spacing, Dummy, NewLine, Separator, etc.)
 // [SECTION] Widgets: ComboBox
-// [SECTION] Data Type and Data Formatting Helpers
+// [SECTION] Data PlaybackBehavior and Data Formatting Helpers
 // [SECTION] Widgets: DragScalar, DragFloat, DragInt, etc.
 // [SECTION] Widgets: SliderScalar, SliderFloat, SliderInt, etc.
 // [SECTION] Widgets: InputScalar, InputFloat, InputInt, etc.
@@ -104,7 +104,7 @@ static const ImU64          IM_U64_MAX = (2ULL * 9223372036854775807LL + 1);
 // [SECTION] Forward Declarations
 //-------------------------------------------------------------------------
 
-// Data Type helpers
+// Data PlaybackBehavior helpers
 static inline int       DataTypeFormatString(char* buf, int buf_size, ImGuiDataType data_type, const void* data_ptr, const char* format);
 static void             DataTypeApplyOp(ImGuiDataType data_type, int op, void* output, void* arg_1, const void* arg_2);
 static bool             DataTypeApplyOpFromText(const char* buf, const char* initial_value_buf, ImGuiDataType data_type, void* data_ptr, const char* format);
@@ -1485,7 +1485,7 @@ bool ImGui::Combo(const char* label, int* current_item, const char* items_separa
 }
 
 //-------------------------------------------------------------------------
-// [SECTION] Data Type and Data Formatting Helpers [Internal]
+// [SECTION] Data PlaybackBehavior and Data Formatting Helpers [Internal]
 //-------------------------------------------------------------------------
 // - PatchFormatStringFloatToInt()
 // - DataTypeFormatString()
