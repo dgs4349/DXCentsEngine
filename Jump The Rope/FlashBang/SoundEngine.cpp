@@ -85,43 +85,19 @@ void SoundEngine::Resume()
 	DirectXAudioEngine->Resume();
 }
 
-void SoundEngine::AddEffectControl(EffectControl const& control)
+void SoundEngine::RegisterEffectControl(EffectControl const& control)
 {
-	
+	effectControls_[control.soundKey].push_back(
+		std::make_pair(control.effectKey, control)
+	);
 }
 
-void SoundEngine::AddEffectControls(json const& j)
+void SoundEngine::RegisterEffectControls(std::vector<EffectControl> const& controls)
 {
+	for (auto c : controls)
+		effectControls_[c.soundKey].push_back(
+			std::make_pair(c.effectKey, c));
 }
-
-void SoundEngine::AddEffectControls(std::vector<EffectControl> const& effects)
-{
-}
-
-void SoundEngine::RemoveEffectControl(const std::string& effectKey)
-{
-}
-
-void SoundEngine::RemoveEffectControl(EffectControl const& control)
-{
-}
-
-void SoundEngine::RemoveEffectControls(json const& j)
-{
-}
-
-void SoundEngine::RemoveEffectControls(std::vector<std::string> const& effectKeys)
-{
-}
-
-void SoundEngine::RemoveEffectControls(std::vector<EffectControl> const& effects)
-{
-}
-
-SoundEngine::EffectControl& SoundEngine::GetEffectControl(const std::string& effectKey)
-{
-}
-
 
 SoundEngine::SoundEngine()
 {

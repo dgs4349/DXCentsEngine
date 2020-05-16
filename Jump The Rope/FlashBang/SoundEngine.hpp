@@ -26,28 +26,41 @@ public:
 	void Resume();
 
 
+	// TODO: from_json
+	// TODO: move to smart pointer
 	struct EffectControl
 	{
-		float* control;
-		const std::string& effectKey;
-		float min;
-		float max;
-		Effect::Connection to_connection() { return { control, min, max }; };
+		float* controlVarPtr;
+		std::string& soundKey;
+		std::string& effectKey;
+		float controlMin = 0.f;
+		float controlMax = 0.f;
+		Effect::Connection to_connection() const
+		{
+			return { controlVarPtr, controlMin, controlMin };
+		};
+		
 	};
-	
-	void AddEffectControl(EffectControl const& control);
-	void AddEffectControls(json const& j);
-	void AddEffectControls(std::vector<EffectControl> const& effects);
 
-	void RemoveEffectControl(const std::string& effectKey);
+	// todo: investigate a url-type path for soundContainer.../sound/effect for easy traversal
+
+	void RegisterEffectControl(EffectControl const& control);
+	void RegisterEffectControls(std::vector<EffectControl> const& controls);
+	// TODO: void RegisterEffectControls(const json& j);
+
 	void RemoveEffectControl(EffectControl const& control);
-	void RemoveEffectControls(json const& j);
-	void RemoveEffectControls(std::vector<std::string> const& effectKeys);
-	void RemoveEffectControls(std::vector<EffectControl> const& effects);
+	void RemoveEffectControls(std::vector<EffectControl> const& controls);
+	void RemoveEffectControls(const std::string& soundKey);
+	void RemoveEffectControls(const std::vector<std::string&>& soundKeys);
+	
+	std::vector<std::pair<std::string, EffectControl>>&
+	PopEffectControls(std::string const& soundKey)
+	{
+		std::vector<std::pair<std::string, EffectControl>>& element = 
+		return effectControls_[soundKey];
+	}
 
-	static EffectControl* GetEffectControl(const std::string& effectKey);
-
-	static std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location)
+	std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location) const
 	{
 		if (!initiated_) GetOnce();
 		return std::make_unique<DirectX::SoundEffect>(instance_->DirectXAudioEngine, location);
@@ -58,7 +71,7 @@ public:
 	 *	positions within array. If changing index is necessary, just swap with element at that position, but
 	 *	hopefully the index within sound engine shouldn't be touched
 	 *
-	 *	but do we need this? i guesss we could set it to nullptr so it doesnt shift indeces, that could make sense
+	 *	but do we need this? i guess we could set it to nullptr so it doesnt shift indeces, that could make sense
 	 *		when a new scene is loaded all objects of that scene should be cleared or changed.
 	 *		but then we'd need to find new empty positions in the array
 	 *		maybe this should really be a hash then or something
@@ -83,7 +96,10 @@ private:
 	static void addRef_() { ++refs_; }
 	static void releaseRef_() { --refs_; }
 
-	std::map<std::string, EffectControl*> effectControls_;
+	// soundKey, {effectKey
+	std::unordered_map<std::string,
+						std::vector<
+						std::pair<std::string, EffectControl>>> effectControls_;
 	
 public:
 	SoundEngine(SoundEngine const&) = delete;

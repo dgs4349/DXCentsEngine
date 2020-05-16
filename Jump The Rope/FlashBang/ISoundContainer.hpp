@@ -13,6 +13,9 @@ using namespace FlashBang;
 	- abstracts basic behaviors
 */
 
+// TODO: move json => unordered_map, or reevaluate both key and index access
+//		add an index_ prop to sound for faster order traversal
+
 class ISoundContainer : protected SoundObject, public json
 {
 public:
