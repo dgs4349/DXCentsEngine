@@ -21,9 +21,6 @@ class ISoundContainer : protected SoundObject, public json
 public:
 	~ISoundContainer() = default;
 
-	virtual ISoundContainer& operator=(const json& j) = 0;
-	virtual ISoundContainer& operator=(const std::string& s) = 0;
-
 	virtual SoundObject* operator[] (std::string const& key) = 0;
 	virtual SoundObject* operator[] (int i) = 0;
 

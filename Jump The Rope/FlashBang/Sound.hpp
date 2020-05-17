@@ -57,8 +57,10 @@ private:
 		DirectXSoundEffectInstance.release();
 		DirectXSoundEffect.release();
 		State(SOUND_STATE::UNLOADED);
-	}
 
+		SoundEngine::QueueUnregisterEffectControls(Key);
+	}
+	
 protected:
 	float handleVolume_(float val) override {
 		DirectXSoundEffectInstance->SetVolume(val);

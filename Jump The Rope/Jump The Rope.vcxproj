@@ -154,11 +154,12 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="CurrAudImp.cpp" />
     <ClCompile Include="FlashBang\ISoundContainer.cpp" />
     <ClCompile Include="FlashBang\SoundObject.cpp" />
     <ClCompile Include="FlashBang\SoundEngine.cpp" />
-    <ClCompile Include="FlashBang\OldSound.cpp" />
+    <ClCompile Include="FlashBang\OldSound.cpp.txt" />
     <ClCompile Include="FlashBang\SoundContainer.cpp" />
     <ClCompile Include="FlashBang\OldSoundEngine.txt" />
     <ClCompile Include="Emitter.cpp" />
@@ -169,14 +170,14 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <ClCompile Include="Schema.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audio.h" />
     <ClInclude Include="CurrAudImp.h" />
-    <ClInclude Include="example.h" />
     <ClInclude Include="FlashBang\Effect.hpp" />
     <ClInclude Include="FlashBang\FlashBang.hpp" />
     <ClInclude Include="FlashBang\ISoundContainer.hpp" />
     <ClInclude Include="FlashBang\SoundObject.hpp" />
     <ClInclude Include="FlashBang\SoundEngine.hpp" />
-    <ClInclude Include="FlashBang\OldSound.h" />
+    <ClInclude Include="FlashBang\OldSound.h.txt" />
     <ClInclude Include="FlashBang\Sound.hpp" />
     <ClInclude Include="FlashBang\SoundContainer.hpp" />
     <ClInclude Include="FlashBang\OldSoundEngine.h.txt" />

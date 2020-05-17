@@ -21,15 +21,15 @@ SoundContainer::SoundContainer(const std::string& s)
 	from_json(j, *container);
 }
 
-ISoundContainer& SoundContainer::operator=(const json& j)
+SoundContainer& SoundContainer::operator=(const json& j)
 {
-	ISoundContainer* soundContainer = new SoundContainer(j);
+	const auto soundContainer = new SoundContainer(j);
 	return *soundContainer;
 }
 
-ISoundContainer& SoundContainer::operator=(const std::string& s)
+SoundContainer& SoundContainer::operator=(const std::string& s)
 {
-	ISoundContainer* soundContainer = new SoundContainer(s);
+	const auto soundContainer = new SoundContainer(s);
 	return *soundContainer;
 }
 

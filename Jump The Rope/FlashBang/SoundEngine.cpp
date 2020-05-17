@@ -35,13 +35,14 @@ void SoundEngine::Release()
 		delete instance_;
 		instance_ = nullptr;
 	}
-}
 
-void SoundEngine::Update()
-{
-	// this will be called if SoundEngine is running from its own loop
-	Update(0.f);
 }
+//
+//void SoundEngine::Update()
+//{
+//	// this will be called if SoundEngine is running from its own loop
+//	Update(0.f);
+//}
 
 void SoundEngine::Update(float deltaTime)
 {
@@ -53,8 +54,22 @@ void SoundEngine::Update(float deltaTime)
 			throw std::exception("Critical DirectX::AudioEngine error occured!");
 		}
 	}
-	else
+	if(unregisterTimer_ >= 0.f)
 	{
+		unregisterTimer_ += deltaTime;
+		if(unregisterTimer_ > FreeControlRegisterDelay)
+		{
+			// TODO: find thread-safe solution to allow non-blocking clear
+			const auto it = unregisterCache_.begin();
+			
+			for(int i = unregisterCache_.size() -1; i >= 0; --i)
+			{
+				effectControls_.erase(*unregisterCache_[i]);
+				unregisterCache_.erase(it + i);
+			}
+
+			unregisterTimer_ = -1.f;
+		}
 	}
 }
 

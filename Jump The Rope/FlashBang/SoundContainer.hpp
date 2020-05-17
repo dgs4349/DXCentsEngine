@@ -16,11 +16,11 @@ public:
 		for (auto el : soundObjects_) {
 			delete el;
 		}
-		SoundObject::~SoundObject();
+		SoundEngine::QueueUnregisterEffectControls(Key);
 	}
 
-	virtual ISoundContainer& operator=(const json& j) override;
-	virtual ISoundContainer& operator=(const std::string& key) override;
+	SoundContainer& operator=(const json& j) override;
+	SoundContainer& operator=(const std::string& key) override;
 	SoundObject* operator[] (std::string const& key) { return At(key); }
 	SoundObject* operator[] (int i) { return At(i); }
 

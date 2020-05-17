@@ -18,13 +18,15 @@ public:
 	static SoundEngine* GetOnce();
 	static void Release();
 
-	void Update();
 	void Update(float deltaTime);
 
 	void Init();
 	void Suspend();
 	void Resume();
 
+	bool FreeControlRegisterOnUnload = true;
+	float FreeControlRegisterDelay = 100.f;
+	void FreeControlRegister() { unregisterTimer_ = 0.f; }
 
 	// TODO: from_json
 	// TODO: move to smart pointer
@@ -48,19 +50,29 @@ public:
 	void RegisterEffectControls(std::vector<EffectControl> const& controls);
 	// TODO: void RegisterEffectControls(const json& j);
 
-	void RemoveEffectControl(EffectControl const& control);
-	void RemoveEffectControls(std::vector<EffectControl> const& controls);
-	void RemoveEffectControls(const std::string& soundKey);
-	void RemoveEffectControls(const std::vector<std::string&>& soundKeys);
-	
-	std::vector<std::pair<std::string, EffectControl>>&
-	PopEffectControls(std::string const& soundKey)
-	{
-		std::vector<std::pair<std::string, EffectControl>>& element = 
-		return effectControls_[soundKey];
+	/*
+	 * I am okay with game-side logic managing instances of SoundEngine
+	 * I am not comfortable with Sounds doing so, simply too many calls to too many instances
+	 * For logic that Sounds need to call, these should be static
+	 *
+	 * TODO: move copy-args to smart pointers
+	 */
+	static void QueueUnregisterEffectControls(const std::string soundKey) {
+		instance_->unregisterCache_.push_back(soundKey);
+		if (instance_->FreeControlRegisterOnUnload)  instance_->unregisterTimer_ = 0.f;
 	}
+	static void QueueUnregisterEffectControls(const std::vector<std::string> soundKeys) {
+		for (auto e : soundKeys)  instance_->unregisterCache_.push_back(e);
+		if (instance_->FreeControlRegisterOnUnload)  instance_->unregisterTimer_ = 0.f;
+	}
+	
+	static std::vector<std::pair<std::string, EffectControl>>&
+		GetEffectControls(std::string const& soundKey)
+		{
+			return instance_->effectControls_[soundKey];
+		}
 
-	std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location) const
+	static std::unique_ptr<DirectX::SoundEffect> LoadSoundDX(const wchar_t* location)
 	{
 		if (!initiated_) GetOnce();
 		return std::make_unique<DirectX::SoundEffect>(instance_->DirectXAudioEngine, location);
@@ -96,10 +108,13 @@ private:
 	static void addRef_() { ++refs_; }
 	static void releaseRef_() { --refs_; }
 
-	// soundKey, {effectKey
+	// soundKey: [effectKey: {effect...}, ...]
 	std::unordered_map<std::string,
 						std::vector<
 						std::pair<std::string, EffectControl>>> effectControls_;
+
+	std::vector<const std::string> unregisterCache_;
+	float unregisterTimer_ = -1.f;
 	
 public:
 	SoundEngine(SoundEngine const&) = delete;
