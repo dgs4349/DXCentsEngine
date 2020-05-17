@@ -10,6 +10,7 @@
 #include "Flame.h"
 
 #include "CurrAudImp.h"
+#include "FlashBang/SoundEngine.hpp"
 
 namespace GameState
 {
@@ -31,6 +32,8 @@ public:
 	Game(HINSTANCE hInstance);
 	~Game();
 
+	SoundEngine* soundEngine;
+
 	// Overridden setup and game loop methods, which
 	// will be called automatically
 	void Init();
@@ -49,9 +52,7 @@ public:
 	void OnResuming();
 
 private:
-
-	CurrAudImp* audImp;
-
+	
 	Lights lights;
 
 	float startRopeSpeed = 100.f;

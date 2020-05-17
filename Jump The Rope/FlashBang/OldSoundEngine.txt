@@ -1,4 +1,4 @@
-#include "FlashBang.hpp"
+#include "FlashBang_Fwd.hpp"
 #include "OldSoundEngine.h"
 
 using namespace FlashBang;

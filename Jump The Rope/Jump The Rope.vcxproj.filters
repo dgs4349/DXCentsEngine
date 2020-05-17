@@ -60,9 +60,6 @@
     <ClCompile Include="CurrAudImp.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\SoundEngine.cpp">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundContainer.cpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClCompile>
@@ -72,15 +69,14 @@
     <ClCompile Include="FlashBang\SoundObject.cpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="Schema.cpp">
-      <Filter>FlashBang\Parsing Interfaces</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\OldSoundEngine.txt">
       <Filter>FlashBang</Filter>
     </ClCompile>
-    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="FlashBang\OldSound.cpp.txt">
       <Filter>FlashBang</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\SoundEngine.cpp">
+      <Filter>FlashBang\Core Elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,9 +94,6 @@
     </ClInclude>
     <ClInclude Include="CurrAudImp.h">
       <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\FlashBang.hpp">
-      <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\ISoundContainer.hpp">
       <Filter>FlashBang\Parsing Interfaces</Filter>
@@ -120,12 +113,23 @@
     <ClInclude Include="FlashBang\SoundEngine.hpp">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="Schema.h" />
     <ClInclude Include="FlashBang\OldSoundEngine.h.txt">
       <Filter>FlashBang</Filter>
     </ClInclude>
-    <ClInclude Include="Audio.h" />
     <ClInclude Include="FlashBang\OldSound.h.txt">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="GameAudio.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\IGameAudioClass.h">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="FlashBang\FlashBang_Fwd.hpp">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\FlashBang.hpp">
       <Filter>FlashBang</Filter>
     </ClInclude>
   </ItemGroup>
@@ -161,5 +165,8 @@
     <Text Include="FlashBang\args.txt">
       <Filter>FlashBang\Parsing Interfaces</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Jump The Rope.rc" />
   </ItemGroup>
 </Project>

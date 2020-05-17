@@ -1,8 +1,7 @@
 #pragma once
 
-#include "FlashBang.hpp"
+#include "FlashBang_Fwd.hpp"
 #include "SoundObject.hpp"
-#include "ISoundContainer.hpp"
 #include "SoundEngine.hpp"
 
 #include <Audio.h>

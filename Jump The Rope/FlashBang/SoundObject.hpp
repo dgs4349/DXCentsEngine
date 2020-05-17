@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FlashBang.hpp"
+#include "FlashBang_Fwd.hpp"
 #include "Effect.hpp"
 
 #include <nlohmann/json.hpp>

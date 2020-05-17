@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FlashBang.hpp"
+#include "FlashBang_Fwd.hpp"
 #include "ISoundContainer.hpp"
 #include "Sound.hpp"
 

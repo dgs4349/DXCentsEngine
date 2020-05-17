@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FlashBang.hpp"
+#include "FlashBang_Fwd.hpp"
 using namespace FlashBang;
 
 class Effect

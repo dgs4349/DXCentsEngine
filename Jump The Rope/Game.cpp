@@ -37,7 +37,7 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camera = camObject->AddComponent<Camera>();
 	lights = Lights();
 
-	audImp = new CurrAudImp();
+	soundEngine->Get();
 }
 
 // --------------------------------------------------------
@@ -50,7 +50,7 @@ Game::~Game()
 	ObjectManager::ReleaseInstance();
 	RenderManager::ReleaseInstance();
 
-	delete audImp;
+	soundEngine->Release();
 
 	delete vertexShader;
 	delete pixelShader;
@@ -131,7 +131,7 @@ void Game::Init()
 	camera->transform->Rotate(0.f, -30.f, 0.f);
 	camera->SetScreenSize(width, height);
 
-	audImp->Init();
+	soundEngine->Init();
 
 	lights.ambientLights[0] = { Color(0.05f), 1 };
 	lights.ambientLightCount = 1;
@@ -1180,13 +1180,5 @@ void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 void Game::OnMouseWheel(float wheelDelta, int x, int y)
 {
 	// Add any custom code here...
-}
-void Game::OnSuspending()
-{
-	audImp->Suspend();
-}
-void Game::OnResuming()
-{
-	audImp->Resume();
 }
 #pragma endregion

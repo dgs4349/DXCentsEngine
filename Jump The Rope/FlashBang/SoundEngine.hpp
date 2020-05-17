@@ -3,8 +3,7 @@
 #include <Audio.h>
 #include <nlohmann/json.hpp>
 
-
-#include "FlashBang.hpp"
+#include "FlashBang_Fwd.hpp"
 #include "Effect.hpp"
 
 using nlohmann::json;
@@ -48,6 +47,7 @@ public:
 
 	void RegisterEffectControl(EffectControl const& control);
 	void RegisterEffectControls(std::vector<EffectControl> const& controls);
+	
 	// TODO: void RegisterEffectControls(const json& j);
 
 	/*
