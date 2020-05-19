@@ -64,7 +64,7 @@ void SoundEngine::Update(float deltaTime)
 			
 			for(int i = unregisterCache_.size() -1; i >= 0; --i)
 			{
-				effectControls_.erase(*unregisterCache_[i]);
+				effectControls_.erase(unregisterCache_[i]);
 				unregisterCache_.erase(it + i);
 			}
 

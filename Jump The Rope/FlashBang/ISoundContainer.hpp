@@ -1,7 +1,6 @@
 #pragma once
 
 #include "nlohmann/json.hpp"
-#include <boost/algorithm/string.hpp>
 
 #include "SoundObject.hpp"
 
@@ -16,7 +15,7 @@ using namespace FlashBang;
 // TODO: move json => unordered_map, or reevaluate both key and index access
 //		add an index_ prop to sound for faster order traversal
 
-class ISoundContainer : protected SoundObject, public json
+class ISoundContainer : public SoundObject, public json
 {
 public:
 	~ISoundContainer() = default;

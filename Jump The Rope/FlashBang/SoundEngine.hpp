@@ -15,7 +15,7 @@ class FlashBang::SoundEngine
 public:
 	static SoundEngine* Get();
 	static SoundEngine* GetOnce();
-	static void Release();
+	void Release();
 
 	void Update(float deltaTime);
 

@@ -155,6 +155,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CurrAudImp.cpp" />
+    <ClCompile Include="FlashBang\IGameAudio.cpp" />
     <ClCompile Include="FlashBang\ISoundContainer.cpp" />
     <ClCompile Include="FlashBang\SoundObject.cpp" />
     <ClCompile Include="FlashBang\SoundEngine.cpp" />
@@ -169,7 +170,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FlashBang\FlashBang.hpp" />
-    <ClInclude Include="FlashBang\IGameAudioClass.h" />
+    <ClInclude Include="FlashBang\IGameAudio.hpp" />
     <ClInclude Include="GameAudio.hpp" />
     <ClInclude Include="CurrAudImp.h" />
     <ClInclude Include="FlashBang\Effect.hpp" />

@@ -78,6 +78,9 @@
     <ClCompile Include="FlashBang\SoundEngine.cpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClCompile>
+    <ClCompile Include="FlashBang\IGameAudio.cpp">
+      <Filter>FlashBang</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -122,14 +125,14 @@
     <ClInclude Include="GameAudio.hpp">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="FlashBang\IGameAudioClass.h">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="FlashBang\FlashBang_Fwd.hpp">
       <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\FlashBang.hpp">
+      <Filter>FlashBang</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBang\IGameAudio.hpp">
       <Filter>FlashBang</Filter>
     </ClInclude>
   </ItemGroup>
