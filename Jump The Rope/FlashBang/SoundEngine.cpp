@@ -90,14 +90,69 @@ void SoundEngine::Init()
 	}
 }
 
-void SoundEngine::Suspend()
+void SoundEngine::Suspend() const
 {
 	DirectXAudioEngine->Suspend();
 }
 
-void SoundEngine::Resume()
+void SoundEngine::Resume() const
 {
 	DirectXAudioEngine->Resume();
+}
+
+void SoundEngine::PauseAll()
+{
+	for (const auto [key, val] : activeScenes_) {
+		val->Container->Pause();
+	}
+}
+
+void SoundEngine::ResumeAll()
+{
+	for (const auto [key, val] : activeScenes_) {
+		val->Container->Resume();
+	}
+}
+
+SoundEngine::Scene* SoundEngine::AddScene(Scene* scene, bool start)
+{
+	scenes_.at(scene->Key) = scene;
+	if (start) scene->Start();
+	return scene;
+}
+
+SoundEngine::Scene* SoundEngine::RemoveScene(std::string const& sceneKey)
+{
+	auto *const scene = scenes_[sceneKey];
+	if(scene->active_)
+	{
+		activeScenes_.erase(scene->Key);
+	}
+	scenes_.erase(scene->Key);
+	return scene;
+}
+
+SoundEngine::Scene& SoundEngine::StartScene(Scene* scene)
+{
+	if (scene->active_) return *scene;
+
+	if (scenes_.find(scene->Key) == scenes_.end())
+	{
+		scenes_[scene->Key] = scene;
+	}
+
+	activeScenes_[scene->Key] = scene;
+	scene->active_ = true;
+	
+	return *scene;
+}
+
+SoundEngine::Scene& SoundEngine::StopScene(Scene* scene, bool remove)
+{
+	if(scene->active_) activeScenes_.erase(scene->Key);
+	scene->active_ = false;
+	if (remove) scenes_.erase(scene->Key);
+	return *scene;
 }
 
 void SoundEngine::RegisterEffectControl(EffectControl const& control)
@@ -116,7 +171,6 @@ void SoundEngine::RegisterEffectControls(std::vector<EffectControl> const& contr
 
 SoundEngine::SoundEngine()
 {
-	//sounds_ = std::multiset<int, SoundObject*>();
 	Init();
 }
 

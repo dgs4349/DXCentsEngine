@@ -74,8 +74,7 @@ private:
 	void updateCurrentIndex_();
 	void queueNext_();
 
-	SoundObject::StateChangeHook onCompleteHook =
-		StateChangeHook(SOUND_STATE::COMPLETE, *(this->updateCurrentIndex_));
+	StateChangeHook onCompleteHook = { SOUND_STATE::COMPLETE, *(this->updateCurrentIndex_) };
 
 	int randomIndex_() {
 		return rand() % queueOrder_.size();

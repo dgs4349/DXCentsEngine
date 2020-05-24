@@ -5,23 +5,102 @@
 
 #include "FlashBang_Fwd.hpp"
 #include "Effect.hpp"
+#include "SoundContainer.hpp"
 
 using nlohmann::json;
 
 using namespace FlashBang;
+
+
+/*
+ *TODO simplify, all we have to do is add to active or not, rest can be handled in
+ *	various sound stuff
+ * TODO generic string type to simplify ["sadf"] vs [string"asdasd"]
+ * 
+ */
+
 
 class FlashBang::SoundEngine
 {
 public:
 	static SoundEngine* Get();
 	static SoundEngine* GetOnce();
+
 	void Release();
 
 	void Update(float deltaTime);
 
 	void Init();
-	void Suspend();
-	void Resume();
+	void Suspend() const;
+	void Resume() const;
+
+	class Scene
+	{
+	public:
+		friend class SoundEngine;
+
+		Scene(std::string key, SoundContainer* container)
+		{
+			Key = std::move(key);
+			Container = container;
+			container->FromStateChange(&onload_);
+			container->OnStateChange(&onunload_);
+		}
+		std::string Key;
+		SoundContainer* Container;
+
+		void Start() { instance_->StartScene(this); }
+		void Stop() { instance_->StopScene(this); }
+
+	private:
+		bool active_ = false;
+
+		SoundObject::StateChangeHook onload_ = { SOUND_STATE::UNLOADED, &this->Start };
+		SoundObject::StateChangeHook onunload_ = { SOUND_STATE::UNLOADED, &this->Stop };
+	};
+
+
+	struct GetContainer
+	{
+		SoundContainer& operator[](std::string const& key) const
+		{
+			return *(instance_->scenes_[key]->Container);
+		}
+
+		SoundContainer& operator[](const char* key) const
+		{
+			return *(instance_->scenes_[std::string(key)]->Container);
+		}
+	};
+
+	struct GetScene
+	{
+		Scene& operator[](std::string const& key) const
+		{
+			return *(instance_->scenes_[key]);
+		}
+
+		Scene& operator[](const char* key) const
+		{
+			return *(instance_->scenes_[std::string(key)]);
+		}
+	};
+	
+	static inline GetContainer Sounds = {};
+	static inline GetScene Scenes = {};
+
+	static void SystemSuspend() { instance_->Suspend(); }
+	static void SystemResume(){ instance_->Resume(); }
+
+
+	void PauseAll();
+	void ResumeAll();
+
+	Scene* AddScene(Scene* scene, bool start = true);
+	Scene* RemoveScene(std::string const& sceneKey);
+	
+	Scene& StartScene(Scene* scene);
+	Scene& StopScene(Scene* scene, bool remove = true);
 
 	bool FreeControlRegisterOnUnload = true;
 	float FreeControlRegisterDelay = 100.f;
@@ -57,7 +136,7 @@ public:
 	 *
 	 * TODO: move copy-args to smart pointers
 	 */
-	static void QueueUnregisterEffectControls(const std::string soundKey) {
+	static void QueueUnregisterEffectControls(const std::string& soundKey) {
 		instance_->unregisterCache_.push_back(soundKey);
 		if (instance_->FreeControlRegisterOnUnload)  instance_->unregisterTimer_ = 0.f;
 	}
@@ -92,7 +171,8 @@ public:
 	 * */
 
 	DirectX::AudioEngine* DirectXAudioEngine;
-private:
+
+protected:
 	SoundEngine();
 	~SoundEngine();
 
@@ -108,6 +188,7 @@ private:
 	static void addRef_() { ++refs_; }
 	static void releaseRef_() { --refs_; }
 
+	// list of effect key-value pairs, assigned to a sound key
 	// soundKey: [effectKey: {effect...}, ...]
 	std::unordered_map<std::string,
 						std::vector<
@@ -115,6 +196,9 @@ private:
 
 	std::vector<const std::string> unregisterCache_;
 	float unregisterTimer_ = -1.f;
+
+	std::unordered_map<std::string, Scene*> scenes_;
+	std::map<std::string, Scene*> activeScenes_;
 	
 public:
 	SoundEngine(SoundEngine const&) = delete;

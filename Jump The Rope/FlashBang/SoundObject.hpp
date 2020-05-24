@@ -9,14 +9,14 @@ using nlohmann::json;
 
 using namespace FlashBang;
 
-#define LOOP_CAP 1000000000
+static const int LOOP_CAP = 1000000000;
 
 /*
 	Handles parsing
 	Handles basic update logic
 
-	Creates basic behavior for derrived classes
-	is NOT in charge of playback, that is for derrived classes
+	Creates basic behavior for derived classes
+	is NOT in charge of playback, that is for derived classes
 */
 class SoundObject
 {
@@ -24,10 +24,8 @@ public:
 
 	/////////////////////// Operators ///////////////////////
 
-	~SoundObject() {
-		for (auto it = Effects.begin(); it != Effects.end(); it++) {
-			delete it->second;
-		}
+	virtual ~SoundObject() {
+		for (auto [key, val] : Effects) delete val;
 	}
 
 	virtual SoundObject& operator=(const json& j) = 0;
@@ -38,50 +36,37 @@ public:
 	//	the same "sound" even if they are not the same instance of SoundObject, which is useful
 
 	// != operator will be faster in this instance
-	virtual bool operator!=(const SoundObject& other) { return File.compare(other.File) != 0; }
+	virtual bool operator!=(const SoundObject& other) { return File != other.File; }
 	virtual bool operator==(const SoundObject& other) { return !(*this != other); }
 
 	/////////////////////// Lifecycle (StateChange) Hooks ////////////////////
+	// TODO: investigate complexity and size on these, maybe divide to another object
 
-	// all hooks basically connect to this one void pointer called on state change
-	void (*OnStateChange)(SOUND_STATE state) = nullptr;
+	struct StateChangeHook { SOUND_STATE State; void(*Callback)(); };
+	
+	std::map<SOUND_STATE, std::vector<void(*)()>> StateChangeHooks;
+	std::map<SOUND_STATE, std::vector<void(*)()>> FromStateChangeHooks;
 
-	// methods called statically to expand on functionality
-	struct StateChangeHook {
-		SOUND_STATE State;
-		void (*Callback)();
-
-		StateChangeHook(SOUND_STATE state, void(*callback)()) {
-			State = state;
-			Callback = callback;
-		}
-		void OnStateChangeHook(SOUND_STATE state) {
-			if (State == state) Callback();
-		}
-	};
-
-	struct StateChangeHookContainer {
-		std::map<SOUND_STATE, void* ()> Hooks;
-
-		StateChangeHookContainer(std::map<SOUND_STATE, void* ()> const& hooks) {
-			Hooks = hooks;
-		}
-		void OnStateChangeHook(SOUND_STATE state) {
-			auto it = Hooks.find(state);
-			if (it != Hooks.end()) {
-				*(it->second)();
-			}
-		}
-	};
-
-	void ConnectStateChangeHook(StateChangeHook const& hook) {
-		OnStateChange = *hook.OnStateChangeHook;
+	void OnStateChange(SOUND_STATE state, void(*callback)())
+	{
+		StateChangeHooks[state].push_back(callback);
 	}
 
-	void ConnectStateChangeHookContainer(StateChangeHookContainer const& hooks) {
-		OnStateChange = *hooks.OnStateChangeHook;
+	void OnStateChange(const StateChangeHook* hook)
+	{
+		StateChangeHooks[hook->State].push_back(hook->Callback);
 	}
 
+	void FromStateChange(SOUND_STATE state, void(*callback)())
+	{
+		FromStateChangeHooks[state].push_back(callback);
+	}
+
+	void FromStateChange(const StateChangeHook* hook)
+	{
+		FromStateChangeHooks[hook->State].push_back(hook->Callback);
+	}
+	
 	/////////////////////// Parsing ///////////////////////
 	std::string Key = nullptr;
 	std::string File = nullptr;
@@ -118,11 +103,11 @@ public:
 	void Finish() { State(SOUND_STATE::FINISHING); handleFinish_(); }
 	void Stop() { State(SOUND_STATE::COMPLETE); handleStop_(); }
 
-	bool Playing() { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
-	unsigned int CurrentLoop() { return currentLoop_; }
+	bool Playing() const { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
+	unsigned int CurrentLoop() const { return currentLoop_; }
 
 	SoundObject* Queue(SoundObject* next, bool finish = false);
-	SoundObject* Queued() { return queued_; }
+	SoundObject* Queued() const { return queued_; }
 
 	/////////////////////// Effect Methods ///////////////////////
 
@@ -141,53 +126,67 @@ public:
 	// this way unfortunately makes the most intuitive sense while still
 	//		preventing accidental user-caused misbehavior
 
-	float Volume() { return volume_; }
-	float Volume(float val) {
+	float Volume() const { return volume_; }
+	float Volume(const float val) {
 		volume_ = handleVolume_(val);
 		return volume_;
 	}
 
-	float Tune() { return tune_; }
-	float Tune(float val)
+	float Tune() const { return tune_; }
+	float Tune(const float val)
 	{
 		tune_ = handleTune_(val);
 		return tune_;
 	}
 
-	float Pan() { return pan_; }
-	float Pan(float val)
+	float Pan() const { return pan_; }
+	float Pan(const float val)
 	{
 		pan_ = handlePan_(val);
 		return pan_;
 	}
 
-	int Loop() { return loop_; }
-	int Loop(int val, bool resetCurrentLoop = false)
+	int Loop() const { return loop_; }
+	int Loop(const int val, const bool resetCurrentLoop = false)
 	{
 		loop_ = handleLoop_(val);
 		if (resetCurrentLoop) currentLoop_ = 0;
 		return loop_;
 	}
 
-	SOUND_STATE State() { return state_; }
-	virtual SOUND_STATE State(SOUND_STATE val) {
-		state_ = val;
-		if (OnStateChange != nullptr) {
-			OnStateChange(state_);
+	SOUND_STATE State() const { return state_; }
+	virtual SOUND_STATE State(const SOUND_STATE val) {
+		if(state_ != val)
+		{
+			if (!FromStateChangeHooks[state_].empty())
+			{
+				for (auto func : FromStateChangeHooks[state_]) func();
+			}
+
+			state_ = val;
+
+			if (!StateChangeHooks[state_].empty())
+			{
+				for (auto func : StateChangeHooks[state_]) func();
+			}
+
 		}
+		
 		return state_;
 	};
 
 	float Duration() { return (duration_ >= 0.f) ? duration_ : getDuration_(); }
 
 	// slight vulnerability to float overflow if duration_ is somehow max float
-	float GetFullDuration() { Duration()* loop_; }
+	float GetFullDuration() { return Duration() * static_cast<float> (loop_); }
 
 	/////////////////////// Protected Members ///////////////////////
 
+	SoundObject(const SoundObject & s) = delete;
+	
 protected:
+	
 	SoundObject() = default;
-	SoundObject(const SoundObject& s) = delete;
 
 	float	volume_ = 0.f;
 	float	tune_ = 0.f;

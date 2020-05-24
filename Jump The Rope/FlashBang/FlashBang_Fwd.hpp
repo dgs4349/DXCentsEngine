@@ -76,7 +76,7 @@ namespace FlashBang {
 					- ONE_SHOT: sounds are independently triggered
 	*/
 
-	enum class SOUND_STATE { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING, COMPLETE };
+	enum class SOUND_STATE : int { UNLOADED, IDLE, PAUSED, QUEUED, READY, PLAYING, FINISHING, COMPLETE };
 	enum class SOUND_PARAM : char { VOLUME = 'v', TUNE = 't', PAN = 'p', LOOP = 'l' };
 
 	enum class AUTO_EFFECT : char { TIME = 'T' };
