@@ -43,8 +43,8 @@ public:
 		{
 			Key = std::move(key);
 			Container = container;
-			container->FromStateChange(&onload_);
-			container->OnStateChange(&onunload_);
+			Container->FromStateChange(SOUND_STATE::UNLOADED, startCallback);
+			Container->OnStateChange(SOUND_STATE::UNLOADED, stopCallback);
 		}
 		std::string Key;
 		SoundContainer* Container;
@@ -54,9 +54,8 @@ public:
 
 	private:
 		bool active_ = false;
-
-		SoundObject::StateChangeHook onload_ = { SOUND_STATE::UNLOADED, &this->Start };
-		SoundObject::StateChangeHook onunload_ = { SOUND_STATE::UNLOADED, &this->Stop };
+		void (*startCallback)() = this->Start;
+		void (*stopCallback)() = this->Stop;
 	};
 
 
@@ -86,7 +85,7 @@ public:
 		}
 	};
 	
-	static inline GetContainer Sounds = {};
+	static inline GetContainer Containers = {};
 	static inline GetScene Scenes = {};
 
 	static void SystemSuspend() { instance_->Suspend(); }
@@ -111,21 +110,28 @@ public:
 	struct EffectControl
 	{
 		float* controlVarPtr;
-		std::string& soundKey;
-		std::string& effectKey;
+		std::string soundKey;
+		std::string effectKey;
 		float controlMin = 0.f;
 		float controlMax = 0.f;
 		Effect::Connection to_connection() const
 		{
 			return { controlVarPtr, controlMin, controlMin };
 		};
-		
 	};
 
 	// todo: investigate a url-type path for soundContainer.../sound/effect for easy traversal
 
-	void RegisterEffectControl(EffectControl const& control);
+	void RegisterEffectControl(EffectControl const& control); void RegisterEffectControls(float* varPointer, char* soundKeyCStr, char* effectKeyCStr, float Min, float Max);
+	void RegisterEffectControl(float* controlVarPtr, const char* soundKeyCStr, const char* effectKeyCStr, float controlMin, float controlMax);
 	void RegisterEffectControls(std::vector<EffectControl> const& controls);
+	
+
+	static float StaticRegisterEffectControl(float initialValue, EffectControl const& control)
+	{
+		instance_->RegisterEffectControl(control);
+		return initialValue;
+	}
 	
 	// TODO: void RegisterEffectControls(const json& j);
 

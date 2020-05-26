@@ -1,8 +1,9 @@
 #include "ISoundContainer.hpp"
+#include <boost/algorithm/string.hpp>
 
 void ISoundContainer::parseParam_(const std::string& key, const json& j)
 {
-	switch ((SOUNDCONTAINER_ARG)key[0]) {
+	switch (static_cast<SOUNDCONTAINER_ARG>(key[0])) {
 	case SOUNDCONTAINER_ARG::PLAYBACK_BEHAVIOR:
 		j[key].get_to(playbackBehavior_);
 		break;
@@ -42,7 +43,7 @@ void ISoundContainer::parseSchema_(const json& schema) {
 	std::string keyKey;
 
 	for (auto [key, value] : schema.items()) {
-		switch ((SOUNDOBJECT_ARG)key[0]) {
+		switch (static_cast<SOUNDOBJECT_ARG>(key[0])) {
 		case SOUNDOBJECT_ARG::FILE:
 			fileKey = key;
 			value.get_to(fileStr);
@@ -51,6 +52,7 @@ void ISoundContainer::parseSchema_(const json& schema) {
 			keyKey = key;
 			value.get_to(keyStr);
 			break;
+		default: break;
 		}
 	}
 
@@ -65,14 +67,16 @@ void ISoundContainer::parseSchema_(const json& schema) {
 			createSound_(j);
 		}
 	}
-	catch (std::exception e) {
+	catch (std::exception& e) {
 		printf(e.what());
 		throwSchemaError_(fileStr, keyStr);
 	};
 }
 
+
+// TODO, Schema param? say the last sound should play infinitely?
 std::vector<std::string> const& ISoundContainer::processSchemaString_(
-	const std::string& str) {
+	const std::string& str) const {
 	auto split = std::vector<std::string>(3);
 
 	//pad string in case no prefix or suffix
@@ -105,12 +109,11 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 	else if (split[1].find('-') != std::string::npos)
 	{
 		// "0-4-1" => {0, 4, 1}, from-to-step
-		std::vector<std::string> parsedArgs;
 		boost::split(parsedArgs, split[1], boost::is_any_of('-'));
 
 		// for (i = 0; i < 4; i += 1), add "aud" + i + ".wav"
 		for (
-			int i = std::stoi(parsedArgs[0]);
+			auto i = std::stoi(parsedArgs[0]);
 			i < std::stoi(parsedArgs[1]);
 			i += (parsedArgs.size() > 2) ? std::stoi(parsedArgs[2]) : 1
 			)

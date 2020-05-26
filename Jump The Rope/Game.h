@@ -9,7 +9,7 @@
 #include "Emitter.h"
 #include "Flame.h"
 
-#include "CurrAudImp.h"
+#include "GameAudio.hpp"
 #include "FlashBang/SoundEngine.hpp"
 
 namespace GameState
@@ -33,6 +33,7 @@ public:
 	~Game();
 
 	SoundEngine* soundEngine;
+	GameAudio* gameAudio;
 
 	// Overridden setup and game loop methods, which
 	// will be called automatically
@@ -65,7 +66,9 @@ private:
 	float ropeWidth = 10.f;
 	float ropeHeight = 0.5f;
 	float timer;
+
 	float readyLength = 1.f;
+	
 	float endScreenLength = 1.f;
 	float animSpeed = 0.2f; // the speed of the animation in seconds
 	float animTimer = animSpeed; // the time it takes for the hash animation to move to the next frame

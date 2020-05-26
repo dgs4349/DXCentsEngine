@@ -57,17 +57,14 @@
     <ClCompile Include="Flame.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="CurrAudImp.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundContainer.cpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClCompile>
     <ClCompile Include="FlashBang\ISoundContainer.cpp">
-      <Filter>FlashBang\Parsing Interfaces</Filter>
+      <Filter>FlashBang\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="FlashBang\SoundObject.cpp">
-      <Filter>FlashBang\Parsing Interfaces</Filter>
+      <Filter>FlashBang\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="FlashBang\OldSoundEngine.txt">
       <Filter>FlashBang</Filter>
@@ -76,6 +73,9 @@
       <Filter>FlashBang</Filter>
     </ClCompile>
     <ClCompile Include="FlashBang\SoundEngine.cpp">
+      <Filter>FlashBang\Core Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBang\IGameAudio.cpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,17 +92,14 @@
     <ClInclude Include="Flame.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CurrAudImp.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
     <ClInclude Include="FlashBang\ISoundContainer.hpp">
-      <Filter>FlashBang\Parsing Interfaces</Filter>
+      <Filter>FlashBang\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\Effect.hpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\SoundObject.hpp">
-      <Filter>FlashBang\Parsing Interfaces</Filter>
+      <Filter>FlashBang\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="FlashBang\Sound.hpp">
       <Filter>FlashBang\Core Elements</Filter>
@@ -143,11 +140,11 @@
     <Filter Include="FlashBang">
       <UniqueIdentifier>{ac792ef2-82b8-4463-80a4-018170b58e41}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FlashBang\Parsing Interfaces">
-      <UniqueIdentifier>{11128d3d-de07-45aa-b5c0-b98cf57a04f7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="FlashBang\Core Elements">
       <UniqueIdentifier>{e2ce1d61-fce8-4fc8-9262-2188e5a03030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FlashBang\Interfaces">
+      <UniqueIdentifier>{11128d3d-de07-45aa-b5c0-b98cf57a04f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -160,7 +157,7 @@
       <Filter>Audio</Filter>
     </Text>
     <Text Include="FlashBang\args.txt">
-      <Filter>FlashBang\Parsing Interfaces</Filter>
+      <Filter>FlashBang\Interfaces</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

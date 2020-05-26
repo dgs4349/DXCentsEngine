@@ -20,9 +20,9 @@ class ISoundContainer : public SoundObject, public json
 public:
 	~ISoundContainer() = default;
 
-	virtual SoundObject* operator[] (std::string const& key) = 0;
-	virtual SoundObject* operator[] (int i) = 0;
-
+	virtual SoundObject& operator[] (const char* key) = 0;
+	virtual SoundObject& operator[] (int i) = 0;
+	
 	/*virtual bool operator== (ISoundContainer const& other) { return Files == other.Files; }
 	virtual bool operator!= (ISoundContainer const& other) { return !(*this == other); }
 	*/
@@ -83,9 +83,9 @@ protected:
 	void parseItems_(const json& items);
 
 	void parseSchema_(const json& schema);
-	std::vector<std::string> const& processSchemaString_(const std::string& str);
+	std::vector<std::string> const& processSchemaString_(const std::string& str) const;
 
-	void throwSchemaError_(const std::string& files, const std::string& keys);
+	static void throwSchemaError_(const std::string& files, const std::string& keys);
 
 	static SOUNDCONTAINER_ITEM_TYPE getItemType_(const std::string& itemKey) {
 		auto const it = SOUNDCONATINER_ITEM_TYPE_ARGS.find(itemKey);

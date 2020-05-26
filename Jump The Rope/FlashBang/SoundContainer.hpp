@@ -21,8 +21,8 @@ public:
 
 	SoundContainer& operator=(const json& j) override;
 	SoundContainer& operator=(const std::string& key) override;
-	SoundObject* operator[] (std::string const& key) { return At(key); }
-	SoundObject* operator[] (int i) { return At(i); }
+	SoundObject& operator[] (const char* key) { return *At(key); }
+	SoundObject& operator[] (int i) { return *At(i); }
 
 	void Load() override;
 	void Unload() override;
@@ -74,15 +74,15 @@ private:
 	void updateCurrentIndex_();
 	void queueNext_();
 
-	StateChangeHook onCompleteHook = { SOUND_STATE::COMPLETE, *(this->updateCurrentIndex_) };
+	StateChangeHook onCompleteHook_ = { SOUND_STATE::COMPLETE, *(this->updateCurrentIndex_) };
 
 	int randomIndex_() {
 		return rand() % queueOrder_.size();
 	}
 
 	int randomOther_() {
-		static int prev = -1;
-		int r = randomIndex_();
+		static auto prev = -1;
+		auto r = randomIndex_();
 		prev = (r == prev) ? r++ : r;
 		return prev;
 	}

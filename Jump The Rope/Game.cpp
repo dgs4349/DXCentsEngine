@@ -37,7 +37,21 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	camera = camObject->AddComponent<Camera>();
 	lights = Lights();
 
-	soundEngine->Get();
+	soundEngine = SoundEngine::Get();
+
+	soundEngine->RegisterEffectControl(
+		&timer, 
+		"Menu", 
+		"menuFade", 
+		0.f, 
+		readyLength);
+	
+	soundEngine->RegisterEffectControl(
+		&ropeSpeed, 
+		"jump", 
+		"jumpPitch", 
+		startRopeSpeed, 
+		speedIncreaseMax);
 }
 
 // --------------------------------------------------------
@@ -51,6 +65,7 @@ Game::~Game()
 	RenderManager::ReleaseInstance();
 
 	soundEngine->Release();
+	delete gameAudio;
 
 	delete vertexShader;
 	delete pixelShader;
@@ -132,6 +147,7 @@ void Game::Init()
 	camera->SetScreenSize(width, height);
 
 	soundEngine->Init();
+	gameAudio = new GameAudio();
 
 	lights.ambientLights[0] = { Color(0.05f), 1 };
 	lights.ambientLightCount = 1;
@@ -721,6 +737,8 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	soundEngine->Update(deltaTime);
+	
 	SetShaderHashTextures(deltaTime);
 
 	bool p1Input = GetAsyncKeyState(*"Q");
@@ -751,13 +769,9 @@ void Game::Update(float deltaTime, float totalTime)
 
 			timer += deltaTime;
 
-			// NOTE: while this is safe, calling scene transition every frame during inputs is poor design
-			audImp->SwitchScene(CurrAudImp::TO_GAME);
-
 			if (timer >= readyLength)
 			{
-				audImp->SwitchScene(CurrAudImp::GAME);
-				gameState = GameState::Playing;
+				gameAudio->ToGame();
 
 				numJumps = 0;
 
@@ -771,7 +785,7 @@ void Game::Update(float deltaTime, float totalTime)
 		else
 		{
 			timer = 0;
-			audImp->SwitchScene(CurrAudImp::MENU);
+			gameAudio->ToMenu();
 		}
 	}
 	if (gameState == GameState::Playing)
@@ -804,12 +818,13 @@ void Game::Update(float deltaTime, float totalTime)
 		else if (rope->transform->EulerAngles().x > 180 + ropeWidth && !awardedJump) {
 			numJumps++;
 			awardedJump = true;
-			if (awardedJump) audImp->OneHit(CurrAudImp::JUMP);
+			//todo: access from gameAudio
+			if (awardedJump) SoundEngine::Containers["SFX"]["Jump"]();
 		}
 	}
 	if (gameState == GameState::End)
 	{
-		audImp->SwitchScene(CurrAudImp::TO_MENU);
+		gameAudio->ToMenu();
 
 		timer += deltaTime;
 
@@ -858,9 +873,6 @@ void Game::Update(float deltaTime, float totalTime)
 
 
 	camera->Update(deltaTime);
-
-	audImp->Update(deltaTime, totalTime);
-
 
 	// animate the torches light
 	lights.pointLights[0].color = XMFLOAT3(1.f, 0.3f, 0.1f);

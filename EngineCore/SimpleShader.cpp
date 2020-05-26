@@ -113,7 +113,7 @@ bool ISimpleShader::LoadShaderFile(LPCWSTR shaderFile)
 		refl->GetResourceBindingDesc(r, &resourceDesc);
 
 		// Check the type
-		switch (resourceDesc.PlaybackBehavior)
+		switch (resourceDesc.Type)
 		{
 		case D3D_SIT_TEXTURE: // A texture resource
 		{
@@ -153,7 +153,7 @@ bool ISimpleShader::LoadShaderFile(LPCWSTR shaderFile)
 		cb->GetDesc(&bufferDesc);
 		
 		// Save the type, which we reference when setting these buffers
-		constantBuffers[b].PlaybackBehavior = bufferDesc.PlaybackBehavior;
+		constantBuffers[b].PlaybackBehavior = bufferDesc.Type;
 
 		// Get the description of the resource binding, so
 		// we know exactly how it's bound in the shader
@@ -1552,7 +1552,7 @@ bool SimpleComputeShader::CreateShader(ID3DBlob* shaderBlob)
 		refl->GetResourceBindingDesc(r, &resourceDesc);
 
 		// Check the type, looking for any kind of UAV
-		switch (resourceDesc.PlaybackBehavior)
+		switch (resourceDesc.Type)
 		{
 		case D3D_SIT_UAV_APPEND_STRUCTURED:
 		case D3D_SIT_UAV_CONSUME_STRUCTURED:

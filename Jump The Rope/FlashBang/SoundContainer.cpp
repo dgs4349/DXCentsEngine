@@ -1,4 +1,6 @@
 #include "SoundContainer.hpp"
+
+#include <ctime>
 #include <random>
 
 using namespace FlashBang;
@@ -157,7 +159,7 @@ void SoundContainer::QueueChild(std::string const& key, bool finishCurrent)
 
 int SoundContainer::AddSoundObject(SoundObject* soundObject)
 {
-	soundObject->ConnectStateChangeHook(onCompleteHook);
+	soundObject->OnStateChange(&onCompleteHook_);
 	soundObjects_.push_back(soundObject);
 	orderSet_ = false;
 	return soundObjects_.size() - 1;
@@ -165,7 +167,7 @@ int SoundContainer::AddSoundObject(SoundObject* soundObject)
 
 int SoundContainer::AddSoundObject(std::string const& key, SoundObject* soundObject)
 {
-	soundObject->ConnectStateChangeHook(onCompleteHook);
+	soundObject->OnStateChange(&onCompleteHook_);
 	soundObjects_.push_back(soundObject);
 	int i = soundObjects_.size() - 1;
 	((json)*this)[key] = i;

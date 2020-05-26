@@ -162,6 +162,17 @@ void SoundEngine::RegisterEffectControl(EffectControl const& control)
 	);
 }
 
+void SoundEngine::RegisterEffectControl(float* controlVarPtr, const char* soundKeyCStr, const char* effectKeyCStr, float controlMin, float controlMax)
+{
+	EffectControl e = {
+		controlVarPtr,
+		std::string(soundKeyCStr),
+		std::string(effectKeyCStr),
+		controlMin,
+		controlMax };
+	RegisterEffectControl(e);
+}
+
 void SoundEngine::RegisterEffectControls(std::vector<EffectControl> const& controls)
 {
 	for (auto c : controls)

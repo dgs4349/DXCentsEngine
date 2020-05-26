@@ -42,7 +42,13 @@ public:
 	/////////////////////// Lifecycle (StateChange) Hooks ////////////////////
 	// TODO: investigate complexity and size on these, maybe divide to another object
 
-	struct StateChangeHook { SOUND_STATE State; void(*Callback)(); };
+	struct StateChangeHook
+	{
+		SOUND_STATE State; void(*Callback)();
+		StateChangeHook(SOUND_STATE state, void(*callback)())
+			{ State = state; Callback = callback; }
+		StateChangeHook() = default;
+	};
 	
 	std::map<SOUND_STATE, std::vector<void(*)()>> StateChangeHooks;
 	std::map<SOUND_STATE, std::vector<void(*)()>> FromStateChangeHooks;
