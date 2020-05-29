@@ -66,16 +66,7 @@
     <ClCompile Include="FlashBang\SoundObject.cpp">
       <Filter>FlashBang\Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="FlashBang\OldSoundEngine.txt">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
-    <ClCompile Include="FlashBang\OldSound.cpp.txt">
-      <Filter>FlashBang</Filter>
-    </ClCompile>
     <ClCompile Include="FlashBang\SoundEngine.cpp">
-      <Filter>FlashBang\Core Elements</Filter>
-    </ClCompile>
-    <ClCompile Include="FlashBang\IGameAudio.cpp">
       <Filter>FlashBang\Core Elements</Filter>
     </ClCompile>
   </ItemGroup>
@@ -106,12 +97,6 @@
     </ClInclude>
     <ClInclude Include="FlashBang\SoundContainer.hpp">
       <Filter>FlashBang\Core Elements</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\OldSoundEngine.h.txt">
-      <Filter>FlashBang</Filter>
-    </ClInclude>
-    <ClInclude Include="FlashBang\OldSound.h.txt">
-      <Filter>FlashBang</Filter>
     </ClInclude>
     <ClInclude Include="GameAudio.hpp">
       <Filter>Game</Filter>

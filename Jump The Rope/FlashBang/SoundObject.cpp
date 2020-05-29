@@ -16,12 +16,12 @@ void SoundObject::from_json(const json& j, SoundObject& s) {
 /*
 	returns pointer to var based on SOUND_PARAM chars
 */
-SoundObject::ParamSetterFunc SoundObject::GetParamSetFunc(SOUND_PARAM p, SoundObject& s)
+ParameterCallablePtr SoundObject::GetParameterCallable(SOUND_PARAM p, SoundObject& s)
 {
 	switch (p) {
-	case SOUND_PARAM::VOLUME: return *s.Volume;
-	case SOUND_PARAM::TUNE: return  *s.Tune;
-	case SOUND_PARAM::PAN: return *s.Pan;
+	case SOUND_PARAM::VOLUME: return s.VolumeCall;
+	case SOUND_PARAM::TUNE: return  s.TuneCall;
+	case SOUND_PARAM::PAN: return s.PanCall;
 
 	default: return nullptr;
 	}
@@ -41,7 +41,7 @@ SoundObject* SoundObject::CopyParams(const SoundObject& s)
 
 void SoundObject::parseParam_(const std::string& key, const json& j)
 {
-	switch ((SOUNDOBJECT_ARG)key[0])
+	switch (static_cast<SOUNDOBJECT_ARG>(key[0]))
 	{
 	case SOUNDOBJECT_ARG::FILE: j[key].get_to(File);  break;
 	case SOUNDOBJECT_ARG::KEY:	j[key].get_to(Key); break;
@@ -52,8 +52,8 @@ void SoundObject::parseParam_(const std::string& key, const json& j)
 	case (SOUNDOBJECT_ARG)SOUND_PARAM::LOOP: j[key].get_to(loop_); break;
 
 	default:
-		auto func = GetParamSetFunc((SOUND_PARAM)key[0], *this);
-		if (func != nullptr) func(j[key].get<float>());
+		auto * funcPtr = GetParameterCallable((SOUND_PARAM)key[0], *this);
+		if (funcPtr != nullptr) (*funcPtr)(j[key].get<float>());
 		break;
 	}
 }
@@ -68,17 +68,18 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 	*/
 
 	// same deal as sound
-	json currentEffect;
+	json currentEffect = json(NULL);
 
-	for (int i = 0; i < j[key].size(); ++i) {
+	// range based loop to keep reference to index used in exception handling
+	for (unsigned int i = 0; i < j[key].size(); ++i) {
 		try {
 			currentEffect = j[key][i];
 
 			// array effect
 			if (currentEffect.is_array()) {
-				Effect* effect = new Effect(
+				auto* effect = new Effect(
 					// currentEffect[1] = "volume", currentEffect[1][0] = 'v' = SOUND_PARAM::VOLUME
-					GetParamSetFunc((SOUND_PARAM)(currentEffect[1])[0], *this),
+					GetParameterCallable((SOUND_PARAM)(currentEffect[1])[0], *this),
 					currentEffect[2],
 					currentEffect[3]
 				);
@@ -95,37 +96,37 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 				currentEffect = currentEffect[effectName];
 			}
 
-			Effect* effect = new Effect();
+			auto * effect = new Effect();
 
 			for (auto [key, value] : currentEffect.items()) {
-				switch ((EFFECT_ARG)key[0]) {
+				switch (static_cast<EFFECT_ARG>(key[0])) {
 				case EFFECT_ARG::KEY:
 					value.get_to(effectName);
 					break;
 				case EFFECT_ARG::PARAM:
 					SOUND_PARAM param;
 					value.get_to(param);
-					effect->ValueFunctionPointer = GetParamSetFunc(param, *this);
+					effect->ParameterCallPtr = GetParameterCallable(param, *this);
 					break;
 				case EFFECT_ARG::MIN:
-					value.get_to(effect->ValueMin);
+					value.get_to(effect->ParameterMin);
 					break;
 				case EFFECT_ARG::MAX:
-					value.get_to(effect->ValueMax);
+					value.get_to(effect->ParameterMax);
 					break;
 				}
 			}
 
 			AddEffect(key, effect);
 		}
-		catch (std::exception effect) {
+		catch (std::exception& effect) {
 			printf(effect.what());
 			throwEffectError_(i, key, j);
 		}
 	}
 }
 
-void SoundObject::throwEffectError_(int i, const std::string& key, const json& j) {
+void SoundObject::throwEffectError_(int i, const std::string& key, const json& j) const {
 	const char* message = R"(
 		Error parsing effect. Please double check effect schema:
 			- Array: [ key "jump_vol", param "vol", float min, float max ]
@@ -134,7 +135,7 @@ void SoundObject::throwEffectError_(int i, const std::string& key, const json& j
 	)";
 
 	const auto currentEffect = j[key][i];
-	std::string effectIssue = std::string("\nEffect index: ") + std::to_string(i) + "\n";
+	auto effectIssue = std::string("\nEffect index: ") + std::to_string(i) + "\n";
 
 	if (currentEffect.size() < 4) {
 		effectIssue += "Effect is not the right length!"
@@ -176,9 +177,7 @@ SoundObject* SoundObject::Queue(SoundObject* next, bool finish)
 
 void SoundObject::updateEffects_(float dt)
 {
-	for (auto it = Effects.begin(); it != Effects.end(); ++it) {
-		it->second->Update(dt);
-	}
+	for (auto [key, effect] : Effects) effect->Update(dt);
 }
 
 void SoundObject::Update(float dt) {
@@ -193,46 +192,47 @@ void SoundObject::Update(float dt) {
 	updateEffects_(dt);
 
 	switch (state_) {
-	case SOUND_STATE::READY:
-		State(SOUND_STATE::PLAYING);
-		Play();
-		// fall through
+		case SOUND_STATE::READY:
+			State(SOUND_STATE::PLAYING);
+			Play();
+			// fall through
 
-	case SOUND_STATE::PLAYING:
+		case SOUND_STATE::PLAYING:
 
-		elapsedTime_ += dt;
+			elapsedTime_ += dt;
 
-		if (elapsedTime_ > duration_) {
-			if (currentLoop_ < loop_) ++currentLoop_;
-			else if (currentLoop_ == loop_) Finish();
+			if (elapsedTime_ > duration_) {
+				if (currentLoop_ < loop_) ++currentLoop_;
+				else if (currentLoop_ == loop_) Finish();
 
-			// reset elapsed time 0 + overlap
-			elapsedTime_ = elapsedTime_ - duration_;
-		}
-
-		break;
-
-	case SOUND_STATE::FINISHING:
-
-		elapsedTime_ += dt;
-
-		if (elapsedTime_ > duration_) {
-			// one from of COMPLETE state for cleanup logic
-			State(SOUND_STATE::COMPLETE);
-
-			if (queued_ != nullptr) {
-				queued_->CopyParams(*this);
-
-				// won't there be a potential jitter if this also has to wait a frame
-				queued_->Play();
+				// reset elapsed time 0 + overlap
+				elapsedTime_ = elapsedTime_ - duration_;
 			}
-		}
-		break;
 
-		// if complete on previous frame reset to IDLE
-	case SOUND_STATE::COMPLETE:
-		State(SOUND_STATE::IDLE);
-		break;
+			break;
+
+		case SOUND_STATE::FINISHING:
+
+			elapsedTime_ += dt;
+
+			if (elapsedTime_ > duration_) {
+				// one from of COMPLETE state for cleanup logic
+				State(SOUND_STATE::COMPLETE);
+
+				if (queued_ != nullptr) {
+					queued_->CopyParams(*this);
+
+					// won't there be a potential jitter if this also has to wait a frame
+					queued_->Play();
+				}
+			}
+			break;
+
+			// if complete on previous frame reset to IDLE
+		case SOUND_STATE::COMPLETE:
+			State(SOUND_STATE::IDLE);
+			break;
+		default: break;
 	}
 }
 
@@ -259,10 +259,10 @@ void SoundObject::AddEffects(std::map<std::string, Effect*> const& effects)
 	}
 }
 
-bool SoundObject::DeleteEffect(std::string const& key)
+void SoundObject::DeleteEffect(std::string const& key)
 {
 	Effect* effect = FindEffect(key);
-	if (effect != nullptr) delete effect;
+	delete effect;
 	Effects.erase(key);
 }
 

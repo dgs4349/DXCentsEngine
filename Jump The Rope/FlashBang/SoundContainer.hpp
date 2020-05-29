@@ -13,9 +13,10 @@ public:
 	SoundContainer(const std::string& s);
 
 	~SoundContainer() {
-		for (auto el : soundObjects_) {
+		for (auto *el : soundObjects_) {
 			delete el;
 		}
+		delete indexCallable_;
 		SoundEngine::QueueUnregisterEffectControls(Key);
 	}
 
@@ -71,10 +72,22 @@ private:
 	std::vector<int> queueOrder_;
 
 	void reset_(bool resetIndeces);
-	void updateCurrentIndex_();
 	void queueNext_();
 
-	StateChangeHook onCompleteHook_ = { SOUND_STATE::COMPLETE, *(this->updateCurrentIndex_) };
+	void updateCurrentIndex_();
+	
+	class UpdateIndexCallable : ICallable
+	{
+		friend class SoundContainer;
+		SoundContainer* c_;
+	public:
+		UpdateIndexCallable(SoundContainer* c) { c_ = c; }
+		void operator()() override { c_->updateCurrentIndex_(); }
+	};
+
+	UpdateIndexCallable* indexCallable_ = new UpdateIndexCallable(this);
+	
+	StateChangeHook onCompleteHook_ = { SOUND_STATE::COMPLETE, indexCallable_ };
 
 	int randomIndex_() {
 		return rand() % queueOrder_.size();

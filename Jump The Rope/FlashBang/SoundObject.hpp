@@ -17,6 +17,8 @@ static const int LOOP_CAP = 1000000000;
 
 	Creates basic behavior for derived classes
 	is NOT in charge of playback, that is for derived classes
+
+	TODO: make const SoundObject for better memory overhead w/o complex setters and effects
 */
 class SoundObject
 {
@@ -26,6 +28,9 @@ public:
 
 	virtual ~SoundObject() {
 		for (auto [key, val] : Effects) delete val;
+		delete VolumeCall;
+		delete TuneCall;
+		delete PanCall;
 	}
 
 	virtual SoundObject& operator=(const json& j) = 0;
@@ -44,16 +49,16 @@ public:
 
 	struct StateChangeHook
 	{
-		SOUND_STATE State; void(*Callback)();
-		StateChangeHook(SOUND_STATE state, void(*callback)())
+		SOUND_STATE State; CallablePtr Callback;
+		StateChangeHook(SOUND_STATE state, CallablePtr callback)
 			{ State = state; Callback = callback; }
 		StateChangeHook() = default;
 	};
 	
-	std::map<SOUND_STATE, std::vector<void(*)()>> StateChangeHooks;
-	std::map<SOUND_STATE, std::vector<void(*)()>> FromStateChangeHooks;
+	std::map<SOUND_STATE, std::vector<CallablePtr>> StateChangeHooks;
+	std::map<SOUND_STATE, std::vector<CallablePtr>> FromStateChangeHooks;
 
-	void OnStateChange(SOUND_STATE state, void(*callback)())
+	void OnStateChange(SOUND_STATE state, CallablePtr callback)
 	{
 		StateChangeHooks[state].push_back(callback);
 	}
@@ -63,7 +68,7 @@ public:
 		StateChangeHooks[hook->State].push_back(hook->Callback);
 	}
 
-	void FromStateChange(SOUND_STATE state, void(*callback)())
+	void FromStateChange(SOUND_STATE state, CallablePtr callback)
 	{
 		FromStateChangeHooks[state].push_back(callback);
 	}
@@ -82,11 +87,9 @@ public:
 	static void from_json(const json& j, SoundObject& s);
 
 	// todo: handle non char keys, such as Position and the like
-	typedef float (*ParamSetterFunc)(float val);
-	static ParamSetterFunc GetParamSetFunc(SOUND_PARAM p, SoundObject& s);
+	static ParameterCallablePtr GetParameterCallable(SOUND_PARAM p, SoundObject& s);
 
 	virtual SoundObject* CopyParams(const SoundObject& s);
-
 	virtual void SetParams() {
 		Volume(volume_);
 		Pan(pan_);
@@ -120,7 +123,7 @@ public:
 	Effect* FindEffect(std::string const& key);
 	void AddEffect(std::string key, Effect* effect);
 	void AddEffects(std::map<std::string, Effect*> const& effects);
-	bool DeleteEffect(std::string const& key);
+	void DeleteEffect(std::string const& key);
 
 	SoundObject* ConnectEffect(std::string const& effectKey, Effect::Connection connection);
 	SoundObject* ConnectEffects(std::map<std::string, Effect::Connection> const& connections);
@@ -131,7 +134,7 @@ public:
 	//		logic in derived classes
 	// this way unfortunately makes the most intuitive sense while still
 	//		preventing accidental user-caused misbehavior
-
+	
 	float Volume() const { return volume_; }
 	float Volume(const float val) {
 		volume_ = handleVolume_(val);
@@ -166,14 +169,14 @@ public:
 		{
 			if (!FromStateChangeHooks[state_].empty())
 			{
-				for (auto func : FromStateChangeHooks[state_]) func();
+				for (auto *const funcPtr : FromStateChangeHooks[state_]) (*funcPtr)();
 			}
 
 			state_ = val;
 
 			if (!StateChangeHooks[state_].empty())
 			{
-				for (auto func : StateChangeHooks[state_]) func();
+				for (auto* const funcPtr : StateChangeHooks[state_]) (*funcPtr)();
 			}
 
 		}
@@ -186,12 +189,45 @@ public:
 	// slight vulnerability to float overflow if duration_ is somehow max float
 	float GetFullDuration() { return Duration() * static_cast<float> (loop_); }
 
+	/////////////////////// Parameter Callables (Functionoids) ///////////////////////
+
+	class VolumeCallable : public IParameterCallable
+	{
+		SoundObject* s_;
+	public:
+		VolumeCallable(SoundObject* s) { s_ = s; }
+		float operator()() override { return s_->volume_; }
+		float operator()(float val) override { return s_->Volume(val); }
+	};
+
+	class TuneCallable : public IParameterCallable
+	{
+		SoundObject* s_;
+	public:
+		TuneCallable(SoundObject* s) { s_ = s; }
+		float operator()() override { return s_->tune_; }
+		float operator()(float val) override { return s_->Tune(val); }
+	};
+
+	class PanCallable : public IParameterCallable
+	{
+		SoundObject* s_;
+	public:
+		PanCallable(SoundObject* s) { s_ = s; }
+		float operator()() override { return s_->pan_; }
+		float operator()(float val) override { return s_->Pan(val); }
+	};
+
+	VolumeCallable* VolumeCall = new VolumeCallable(this);
+	TuneCallable* TuneCall = new TuneCallable(this);
+	PanCallable* PanCall = new PanCallable(this);
+
+	
 	/////////////////////// Protected Members ///////////////////////
 
 	SoundObject(const SoundObject & s) = delete;
 	
 protected:
-	
 	SoundObject() = default;
 
 	float	volume_ = 0.f;
@@ -231,5 +267,5 @@ protected:
 	virtual void parseParam_(const std::string& key, const json& j);
 
 	void parseEffects_(const std::string& key, const json& j);
-	void throwEffectError_(int i, const std::string& key, const json& j);
+	void throwEffectError_(int i, const std::string& key, const json& j) const;
 };

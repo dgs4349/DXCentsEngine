@@ -12,7 +12,7 @@ public:
 			- Custom typing, for int and vector support
 			- LFO and other non-pointer connected types
 			- Custom external mapping functions
-				- Curved/Sloped values for vertical mixing with indeces
+				- Curved/Sloped values for vertical mixing with indices
 	*/
 
 	struct Connection {
@@ -23,43 +23,42 @@ public:
 		}
 	};
 
-	float ValueMin;
-	float ValueMax;
-	float (*ValueFunctionPointer)(float val) = nullptr;
+	float ParameterMin = 0.f;
+	float ParameterMax = 0.f;
+	ParameterCallablePtr ParameterCallPtr = nullptr;
 
 	float ActiveTime = 0.f;
 
-	float Value() { return value_; }
-	float Value(float v) { value_ = v; return value_; }
+	float Value() const { return value_; }
+	float Value(const float v) { value_ = v; return value_; }
 
 	Effect() = default;
 
-	Effect(float valueMin, float valueMax)
+	Effect(const float valueMin, const float valueMax)
 	{
-		ValueMin = valueMin;
-		ValueMax = valueMax;
-		ValueFunctionPointer = noop_;
+		ParameterMin = valueMin;
+		ParameterMax = valueMax;
 	}
 
-	Effect(float (*PointerToValueSetFunc)(float val), float valueMin, float valueMax)
+	Effect(ParameterCallablePtr parameterCallPtr, const float valueMin, const float valueMax)
 	{
-		ValueMin = valueMin;
-		ValueMax = valueMax;
-		ValueFunctionPointer = PointerToValueSetFunc;
+		ParameterMin = valueMin;
+		ParameterMax = valueMax;
+		ParameterCallPtr = parameterCallPtr;
 	}
 
-	Effect(float (*PointerToValueSetFunc)(float val), float valueMin, float valueMax, Connection connection)
+	Effect(ParameterCallablePtr parameterCallPtr, const float valueMin, const float valueMax, Connection connection)
 	{
-		ValueMin = valueMin;
-		ValueMax = valueMax;
-		ValueFunctionPointer = PointerToValueSetFunc;
+		ParameterMin = valueMin;
+		ParameterMax = valueMax;
+		ParameterCallPtr = parameterCallPtr;
 
 		Connect(connection);
 	}
 
 	~Effect() = default;
 
-	Effect* Connect(Connection connection, bool start = true)
+	Effect* Connect(Connection connection, const bool start = true)
 	{
 		connection_ = connection;
 
@@ -92,12 +91,12 @@ public:
 
 		if (active_ && *connection_.PointerToControl != previousControlValue_)
 		{
-			value_ = (*ValueFunctionPointer)(GetMappedValue());
+			value_ = (*ParameterCallPtr)(GetMappedValue());
 			previousControlValue_ = *connection_.PointerToControl;
 		}
 	}
 
-	bool Active() { return active_; }
+	bool Active() const { return active_; }
 	bool Active(bool val) { active_ = val; return active_; }
 
 	void Start() { active_ = true; }
@@ -113,15 +112,15 @@ public:
 		return toRangeMin + ((toRangeMax - toRangeMin) / (valueMax - valueMin) * (value - valueMin));
 	}
 
-	float GetMappedValue()
+	float GetMappedValue() const
 	{
 		// map connection params to this value params
 		return MapRange(
 			*connection_.PointerToControl,
 			connection_.ControlMin,
 			connection_.ControlMax,
-			ValueMin,
-			ValueMax
+			ParameterMin,
+			ParameterMax
 		);
 	}
 

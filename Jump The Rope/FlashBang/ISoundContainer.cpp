@@ -80,7 +80,7 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 	auto split = std::vector<std::string>(3);
 
 	//pad string in case no prefix or suffix
-	boost::split(split, " " + str + " ", boost::is_any_of('|'));
+	boost::split(split, " " + str + " ", boost::is_any_of("|"));
 
 	// remove all spaces, also removes padding
 	for (auto i : split) boost::erase_all(i, ' ');
@@ -97,7 +97,7 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 	if (split[1].find(',') != std::string::npos)
 	{
 		// just parse the array, "a,b,c" => {a, b, c}
-		boost::split(parsedArgs, split[1], boost::is_any_of(','));
+		boost::split(parsedArgs, split[1], boost::is_any_of(","));
 
 		// for each item {a,b,c} add "aud" + "a" + ".wav
 		for (auto item : parsedArgs) {
@@ -109,7 +109,7 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 	else if (split[1].find('-') != std::string::npos)
 	{
 		// "0-4-1" => {0, 4, 1}, from-to-step
-		boost::split(parsedArgs, split[1], boost::is_any_of('-'));
+		boost::split(parsedArgs, split[1], boost::is_any_of("-"));
 
 		// for (i = 0; i < 4; i += 1), add "aud" + i + ".wav"
 		for (
@@ -127,7 +127,7 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 
 void ISoundContainer::throwSchemaError_(
 	const std::string& files, const std::string& keys) {
-	const auto message = R"(
+	const auto * message = R"(
 		Error parsing |...| in provided Schema file or key string!
 		Please double check formatting rules:
 		- Range: |start-stop-step| as in "sound|0-4|.wav" or "sound|0-8-2|.wav"

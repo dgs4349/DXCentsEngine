@@ -4,8 +4,9 @@
 #include <nlohmann/json.hpp>
 
 #include "FlashBang_Fwd.hpp"
-#include "Effect.hpp"
+
 #include "SoundContainer.hpp"
+#include "Effect.hpp"
 
 using nlohmann::json;
 
@@ -13,9 +14,9 @@ using namespace FlashBang;
 
 
 /*
- *TODO simplify, all we have to do is add to active or not, rest can be handled in
- *	various sound stuff
- * TODO generic string type to simplify ["sadf"] vs [string"asdasd"]
+ * TODO:
+ *	move dependencies of soundengine effect registering in sounds and sounds
+ *		container to sound engine on remove
  * 
  */
 
@@ -37,60 +38,72 @@ public:
 	class Scene
 	{
 	public:
-		friend class SoundEngine;
+
+		Scene() = default;
+		
+		class StartCallable : public ICallable {
+			Scene* s_;
+		public:
+			StartCallable(Scene* s) { s_ = s; }
+			void operator()() override { s_->Start(); }
+		};
+
+		class StopCallable : public ICallable {
+			Scene* s_;
+		public:
+			StopCallable(Scene* s) { s_ = s; }
+			void operator()() override { s_->Stop(); }
+		};
+
+		std::string Key;
+		SoundContainer* Container;
 
 		Scene(std::string key, SoundContainer* container)
 		{
 			Key = std::move(key);
 			Container = container;
-			Container->FromStateChange(SOUND_STATE::UNLOADED, startCallback);
-			Container->OnStateChange(SOUND_STATE::UNLOADED, stopCallback);
+
+			startCall_ = new StartCallable(this);
+			stopCall_ = new StopCallable(this);
+
+			Container->FromStateChange(SOUND_STATE::UNLOADED, startCall_);
+			Container->OnStateChange(SOUND_STATE::UNLOADED, stopCall_);
 		}
-		std::string Key;
-		SoundContainer* Container;
+		~Scene() { delete startCall_; delete stopCall_; }
 
 		void Start() { instance_->StartScene(this); }
 		void Stop() { instance_->StopScene(this); }
 
 	private:
+		StartCallable* startCall_;
+		StopCallable* stopCall_;
+
 		bool active_ = false;
-		void (*startCallback)() = this->Start;
-		void (*stopCallback)() = this->Stop;
 	};
-
-
+	
 	struct GetContainer
 	{
-		SoundContainer& operator[](std::string const& key) const
-		{
-			return *(instance_->scenes_[key]->Container);
-		}
+		SoundContainer& operator[](std::string const& key)
+		const { return *(instance_->scenes_[key]->Container); }
 
-		SoundContainer& operator[](const char* key) const
-		{
-			return *(instance_->scenes_[std::string(key)]->Container);
-		}
+		SoundContainer& operator[](const char* key)
+		const { return *(instance_->scenes_[std::string(key)]->Container); }
 	};
 
 	struct GetScene
 	{
-		Scene& operator[](std::string const& key) const
-		{
-			return *(instance_->scenes_[key]);
-		}
+		Scene& operator[](std::string const& key)
+		const { return *(instance_->scenes_[key]); }
 
-		Scene& operator[](const char* key) const
-		{
-			return *(instance_->scenes_[std::string(key)]);
-		}
+		Scene& operator[](const char* key)
+		const { return *(instance_->scenes_[std::string(key)]); }
 	};
 	
 	static inline GetContainer Containers = {};
 	static inline GetScene Scenes = {};
 
 	static void SystemSuspend() { instance_->Suspend(); }
-	static void SystemResume(){ instance_->Resume(); }
-
+	static void SystemResume() { instance_->Resume(); }
 
 	void PauseAll();
 	void ResumeAll();
@@ -122,7 +135,7 @@ public:
 
 	// todo: investigate a url-type path for soundContainer.../sound/effect for easy traversal
 
-	void RegisterEffectControl(EffectControl const& control); void RegisterEffectControls(float* varPointer, char* soundKeyCStr, char* effectKeyCStr, float Min, float Max);
+	void RegisterEffectControl(EffectControl const& control);
 	void RegisterEffectControl(float* controlVarPtr, const char* soundKeyCStr, const char* effectKeyCStr, float controlMin, float controlMax);
 	void RegisterEffectControls(std::vector<EffectControl> const& controls);
 	
@@ -208,6 +221,5 @@ protected:
 	
 public:
 	SoundEngine(SoundEngine const&) = delete;
-	void operator=(SoundEngine const*) = delete;
-	
+	SoundEngine& operator=(SoundEngine const*) = delete;
 };

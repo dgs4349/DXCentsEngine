@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <map>
 #include <string>
 
@@ -39,11 +40,7 @@ namespace FlashBang {
 
 	*/
 
-	// forward declarations, so far no need to declare other functionality in forwards
-	extern class Sound; // includes SoundObject, effects
-	extern class SoundContainer;
-	extern class SoundEngine;
-
+	
 	/*
 		- Global Enums:
 			- SOUND_STATE,
@@ -105,6 +102,35 @@ namespace FlashBang {
 	enum class SOUNDCONTAINER_PLAYBACK_BEHAVIOR : char { PLAYLIST = 'P', ONE_SHOT = 'O' };
 	enum class SOUNDCONTAINER_PLAYBACK_ORDER : char { IN_ORDER = 'I', RANDOM = 'R', RANDOM_EACH = 'E', RANDOM_OTHER = 'O' };
 
+	// generic functionoid
+	class ICallable
+	{
+	public:
+		virtual void operator()() = 0;
+		virtual ~ICallable() = default;;
+	};
+	typedef ICallable* CallablePtr;
+
+
+	// TODO: typedef generic parameter value
+	class IParameterCallable
+	{
+	public:
+		virtual float operator()() = 0;
+		virtual float operator()(float val) = 0;
+		virtual ~IParameterCallable() = default;
+	};
+	typedef IParameterCallable* ParameterCallablePtr;
+
+	// forward declarations, so far no need to declare other functionality in forwards
+	extern class Sound; // includes SoundObject, effects
+	extern class SoundContainer;
+	extern class SoundEngine;
+
+
+
+
+	
 	// char for parsing
 	/* investigate including these
 
