@@ -1,8 +1,18 @@
 #pragma once
 
+#include <random>
+
 #include "FlashBang_Fwd.hpp"
 #include "ISoundContainer.hpp"
 #include "Sound.hpp"
+
+
+
+
+
+
+
+
 
 using namespace FlashBang;
 
@@ -17,7 +27,7 @@ public:
 			delete el;
 		}
 		delete indexCallable_;
-		SoundEngine::QueueUnregisterEffectControls(Key);
+		SoundConnectionsManager::QueueUnregisterEffectControls(Key);
 	}
 
 	SoundContainer& operator=(const json& j) override;
@@ -51,6 +61,19 @@ public:
 	virtual void AddSoundObjects(std::vector<SoundObject*> const& soundObjects) override;
 	virtual void AddSoundObjects(std::map<std::string, SoundObject*> const& soundObjectsMap) override;
 
+
+	// todo: fix function* vs member*
+	int RandomIndex() const {
+		return rand() % queueOrder_.size();
+	}
+
+	int RandomOther() const {
+		static auto prev = -1;
+		auto r = RandomIndex();
+		prev = (r == prev) ? r++ : r;
+		return prev;
+	}
+	
 private:
 	SoundContainer();
 
@@ -71,7 +94,7 @@ private:
 	int currentQueueOrderIndex_ = 0;
 	std::vector<int> queueOrder_;
 
-	void reset_(bool resetIndeces);
+	void reset_(bool resetIndices);
 	void queueNext_();
 
 	void updateCurrentIndex_();
@@ -89,18 +112,10 @@ private:
 	
 	StateChangeHook onCompleteHook_ = { SOUND_STATE::COMPLETE, indexCallable_ };
 
-	int randomIndex_() {
-		return rand() % queueOrder_.size();
-	}
-
-	int randomOther_() {
-		static auto prev = -1;
-		auto r = randomIndex_();
-		prev = (r == prev) ? r++ : r;
-		return prev;
-	}
-
 protected:
+
+	std::random_device randomDevice_;
+	
 	float handleVolume_(float val) override;
 	float handleTune_(float val) override;
 	float handlePan_(float val) override;

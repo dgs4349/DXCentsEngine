@@ -7,37 +7,38 @@ using namespace FlashBang;
 
 SoundContainer::SoundContainer()
 {
-	srand(time(NULL));
+	srand(randomDevice_());
 }
 
 SoundContainer::SoundContainer(const json& j)
 {
-	const auto container = new SoundContainer();
+	auto* container = new SoundContainer();
 	from_json(j, *container);
 }
 
 SoundContainer::SoundContainer(const std::string& s)
 {
 	json j = s;
-	const auto container = new SoundContainer();
+	auto* container = new SoundContainer();
 	from_json(j, *container);
 }
 
+//TODO: fix incorrect = operator
 SoundContainer& SoundContainer::operator=(const json& j)
 {
-	const auto soundContainer = new SoundContainer(j);
+	auto* soundContainer = new SoundContainer(j);
 	return *soundContainer;
 }
 
 SoundContainer& SoundContainer::operator=(const std::string& s)
 {
-	const auto soundContainer = new SoundContainer(s);
+	auto* soundContainer = new SoundContainer(s);
 	return *soundContainer;
 }
 
 void SoundContainer::Load()
 {
-	for (auto el : soundObjects_) {
+	for (auto* el : soundObjects_) {
 		el->Load();
 	}
 	Reset();
@@ -45,10 +46,10 @@ void SoundContainer::Load()
 
 void SoundContainer::Unload()
 {
-	for (auto el : soundObjects_) el->Unload();
+	for (auto* el : soundObjects_) el->Unload();
 }
 
-void SoundContainer::reset_(bool resetIndeces)
+void SoundContainer::reset_(const bool resetIndices)
 {
 	queueOrder_ = std::vector<int>(soundObjects_.size());
 	switch (playbackOrder_) {
@@ -61,25 +62,25 @@ void SoundContainer::reset_(bool resetIndeces)
 		std::shuffle(
 			std::begin(queueOrder_),
 			std::end(queueOrder_),
-			std::default_random_engine());
+			randomDevice_);
 		break;
 	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM:
 		std::generate(
 			std::begin(queueOrder_),
 			std::end(queueOrder_),
-			randomIndex_
+			RandomIndex
 		);
 		break;
 	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM_OTHER:
 		std::generate(
 			std::begin(queueOrder_),
 			std::end(queueOrder_),
-			randomOther_
+			RandomOther
 		);
 	}
 	orderSet_ = true;
 
-	if (resetIndeces) {
+	if (resetIndices) {
 		currentQueueOrderIndex_ = 0;
 		currentSoundObjectIndex_ = queueOrder_[0];
 	}
@@ -107,13 +108,13 @@ SoundObject* SoundContainer::At(int index)
 
 SoundObject* SoundContainer::At(std::string const& key)
 {
-	return soundObjects_[((json)*this)[key]];
+	return soundObjects_[static_cast<json>(*this)[key]];
 }
 
 int SoundContainer::Index(std::string const& key)
 {
 	auto i = find(key);
-	return i == end() ? -1 : ((json)*this).at(key).get<int>();
+	return i == end() ? -1 : static_cast<json>(*this).at(key).get<int>();
 }
 
 int SoundContainer::CurrentIndex()
@@ -170,7 +171,7 @@ int SoundContainer::AddSoundObject(std::string const& key, SoundObject* soundObj
 	soundObject->OnStateChange(&onCompleteHook_);
 	soundObjects_.push_back(soundObject);
 	int i = soundObjects_.size() - 1;
-	((json)*this)[key] = i;
+	static_cast<json>(*this)[key] = i;
 	orderSet_ = false;
 	return i;
 }
@@ -272,12 +273,12 @@ void SoundContainer::handleStop_()
 
 float SoundContainer::getDuration_() {
 	duration_ = 0.f;
-	for (auto s : soundObjects_) {
+	for (auto* s : soundObjects_) {
 		if (s->Duration() < LOOP_CAP) duration_ += s->Duration();
 		else {
 			// max duration of any soundcontainer is 1B seconds, or 32 years fun fact
 			// well actually 2B if tuned down but w/e
-			duration_ = (float)LOOP_CAP;
+			duration_ = static_cast<float>(LOOP_CAP);
 			break;
 		}
 	}

@@ -46,31 +46,16 @@ void SoundEngine::Release()
 
 void SoundEngine::Update(float deltaTime)
 {
-	if (!DirectXAudioEngine->Update())
+	if (!dxAudioEngine_->Update())
 	{
-		if (DirectXAudioEngine->IsCriticalError())
+		if (dxAudioEngine_->IsCriticalError())
 		{
 			printf("AUDIO DEVICE LOST\n");
 			throw std::exception("Critical DirectX::AudioEngine error occured!");
 		}
 	}
-	if(unregisterTimer_ >= 0.f)
-	{
-		unregisterTimer_ += deltaTime;
-		if(unregisterTimer_ > FreeControlRegisterDelay)
-		{
-			// TODO: find thread-safe solution to allow non-blocking clear
-			const auto it = unregisterCache_.begin();
-			
-			for(int i = unregisterCache_.size() -1; i >= 0; --i)
-			{
-				effectControls_.erase(unregisterCache_[i]);
-				unregisterCache_.erase(it + i);
-			}
 
-			unregisterTimer_ = -1.f;
-		}
-	}
+	connectionsManager_->Update(deltaTime);
 }
 
 void SoundEngine::Init()
@@ -82,22 +67,21 @@ void SoundEngine::Init()
 		eflags = eflags | DirectX::AudioEngine_Debug;
 #endif
 
-		directXAudioEnginePointer = std::make_unique<DirectX::AudioEngine>(eflags);
-		DirectXAudioEngine = directXAudioEnginePointer.get();
+		dxAudioEngine_ = std::make_unique<DirectX::AudioEngine>(eflags);
 
-		isSilent_ = !DirectXAudioEngine->IsAudioDevicePresent();
+		isSilent_ = !dxAudioEngine_->IsAudioDevicePresent();
 		initiated_ = true;
 	}
 }
 
 void SoundEngine::Suspend() const
 {
-	DirectXAudioEngine->Suspend();
+	dxAudioEngine_->Suspend();
 }
 
 void SoundEngine::Resume() const
 {
-	DirectXAudioEngine->Resume();
+	dxAudioEngine_->Resume();
 }
 
 void SoundEngine::PauseAll()
@@ -155,43 +139,31 @@ SoundEngine::Scene& SoundEngine::StopScene(Scene* scene, bool remove)
 	return *scene;
 }
 
-void SoundEngine::RegisterEffectControl(EffectControl const& control)
-{
-	effectControls_[control.soundKey].push_back(
-		std::make_pair(control.effectKey, control)
-	);
-}
-
-void SoundEngine::RegisterEffectControl(float* controlVarPtr, const char* soundKeyCStr, const char* effectKeyCStr, float controlMin, float controlMax)
-{
-	EffectControl e = {
-		controlVarPtr,
-		std::string(soundKeyCStr),
-		std::string(effectKeyCStr),
-		controlMin,
-		controlMax };
-	RegisterEffectControl(e);
-}
-
-void SoundEngine::RegisterEffectControls(std::vector<EffectControl> const& controls)
-{
-	for (auto c : controls)
-		effectControls_[c.soundKey].push_back(
-			std::make_pair(c.effectKey, c));
-}
-
 SoundEngine::SoundEngine()
 {
+	connectionsManager_ = SoundConnectionsManager::Get();
 	Init();
 }
 
 SoundEngine::~SoundEngine()
 {
-	if (DirectXAudioEngine)
+	if (dxAudioEngine_)
 	{
-		DirectXAudioEngine->Suspend();
-		directXAudioEnginePointer.release();
+		dxAudioEngine_->Suspend();
+		dxAudioEngine_.release();
 	}
-	/*for (int i = 0; i < sounds_.size(); i++) delete sounds_[i];
-	for (auto it = sounds_.begin(); )*/
+	
+	connectionsManager_->Release();
+}
+
+FlashBang::SoundEngine::Scene::Scene(std::string key, SoundContainer* container)
+{
+	Key = std::move(key);
+	Container = container;
+
+	startCall_ = new StartCallable(this);
+	stopCall_ = new StopCallable(this);
+
+	Container->FromStateChange(SOUND_STATE::UNLOADED, startCall_);
+	Container->OnStateChange(SOUND_STATE::UNLOADED, stopCall_);
 }

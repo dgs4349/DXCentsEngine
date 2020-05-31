@@ -39,7 +39,7 @@ SoundObject* SoundObject::CopyParams(const SoundObject& s)
 	return this;
 }
 
-void SoundObject::parseParam_(const std::string& key, const json& j)
+void SoundObject::parseParam_(std::string& key, const json& j)
 {
 	switch (static_cast<SOUNDOBJECT_ARG>(key[0]))
 	{

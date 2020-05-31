@@ -3,3 +3,5 @@
 #include "Sound.hpp"
 #include "SoundContainer.hpp"
 #include "SoundEngine.hpp"
+#include "Effect.hpp"
+#include "SoundConnectionsManager.hpp"

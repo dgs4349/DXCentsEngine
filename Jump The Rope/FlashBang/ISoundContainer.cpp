@@ -1,7 +1,7 @@
 #include "ISoundContainer.hpp"
 #include <boost/algorithm/string.hpp>
 
-void ISoundContainer::parseParam_(const std::string& key, const json& j)
+void ISoundContainer::parseParam_(std::string const& key, const json& j)
 {
 	switch (static_cast<SOUNDCONTAINER_ARG>(key[0])) {
 	case SOUNDCONTAINER_ARG::PLAYBACK_BEHAVIOR:

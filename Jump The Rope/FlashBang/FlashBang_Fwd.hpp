@@ -1,6 +1,6 @@
 #pragma once
 
-#include <functional>
+#include <Audio.h>
 #include <map>
 #include <string>
 
@@ -121,6 +121,12 @@ namespace FlashBang {
 		virtual ~IParameterCallable() = default;
 	};
 	typedef IParameterCallable* ParameterCallablePtr;
+
+
+	typedef std::unique_ptr<DirectX::SoundEffect> DirectXSoundEffect;
+	typedef std::unique_ptr<DirectX::SoundEffectInstance> DirectXSoundEffectInstance;
+
+	
 
 	// forward declarations, so far no need to declare other functionality in forwards
 	extern class Sound; // includes SoundObject, effects
