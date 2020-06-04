@@ -280,6 +280,7 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <Import Project="..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" />
     <Import Project="..\packages\directxtex_desktop_2017.2020.6.2.1\build\native\directxtex_desktop_2017.targets" Condition="Exists('..\packages\directxtex_desktop_2017.2020.6.2.1\build\native\directxtex_desktop_2017.targets')" />
     <Import Project="..\packages\directxtk_uwp.2020.6.2.1\build\native\directxtk_uwp.targets" Condition="Exists('..\packages\directxtk_uwp.2020.6.2.1\build\native\directxtk_uwp.targets')" />
+    <Import Project="..\packages\directxtk_desktop_win10.2020.6.2.1\build\native\directxtk_desktop_win10.targets" Condition="Exists('..\packages\directxtk_desktop_win10.2020.6.2.1\build\native\directxtk_desktop_win10.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -288,5 +289,6 @@ xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     <Error Condition="!Exists('..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets'))" />
     <Error Condition="!Exists('..\packages\directxtex_desktop_2017.2020.6.2.1\build\native\directxtex_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_2017.2020.6.2.1\build\native\directxtex_desktop_2017.targets'))" />
     <Error Condition="!Exists('..\packages\directxtk_uwp.2020.6.2.1\build\native\directxtk_uwp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_uwp.2020.6.2.1\build\native\directxtk_uwp.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_win10.2020.6.2.1\build\native\directxtk_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_win10.2020.6.2.1\build\native\directxtk_desktop_win10.targets'))" />
   </Target>
 </Project>

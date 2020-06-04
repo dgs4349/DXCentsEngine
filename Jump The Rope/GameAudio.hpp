@@ -22,24 +22,50 @@ public:
 	{
 
 		engine = SoundEngine::Get();
-		
+
 		SoundContainer menu = R"(
-			"Menu" : {
-				"Container": {
-					"v": 0.35,
-					"type": "Playlist",
-					"effects": [
-						{ "key": "menuFade", "param": "v", "low": 0.35, "high": 0.0 }
-					],
-					"items": [
-						{ "Scema": {
-							"files": L"Assets/Audio/audio_background_|intro,loop|.wav",
-							"keys": "|intro,loop|"
-						}}
-					]
+			{
+				"Menu": {
+					"Container": {
+						"v": 0.35,
+						"type": "Playlist",
+						"effects": [{
+							"key": "menuFade",
+							"param": "v",
+							"low": 0.35,
+							"high": 0.0
+						}],
+						"items": [{
+							"Scema": {
+								"files": "Assets/Audio/audio_background_|intro,loop|.wav",
+								"keys": "|intro,loop|"
+							}
+						}]
+					}
 				}
 			}
 		)"_json;
+
+		/*SoundContainer menu = json({
+			"Menu", {
+				"Container", {
+					{"v", 0.35f},
+					{"type", "Playlist"},
+					{"effects", {
+						{"key", "menuFade"},
+						{"param","v"},
+						{"low", 0.35f},
+						{"high", 0.f },
+					}},
+					{"items",
+						{
+							{"Schema",
+								{{"files", "Assets/Audio/audio_background_|intro,loop|.wav"}
+						}
+					}
+				}
+			}
+		});*/
 
 		SoundContainer game = R"(
 			"Background": {

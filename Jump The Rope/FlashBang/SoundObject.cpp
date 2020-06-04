@@ -3,7 +3,7 @@
 /////////////////////// Parsing ///////////////////////
 
 void SoundObject::from_json(json const& j, SoundObject& s) {
-	if (j.size() == 1 && j[0].is_object()) {
+	if (j.size() == 1 && j.at(0).is_object()) {
 		s.Key = j.begin().key();
 		from_json(j[0], s);
 	}

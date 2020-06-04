@@ -79,8 +79,8 @@ public:
 	}
 	
 	/////////////////////// Parsing ///////////////////////
-	std::string Key = nullptr;
-	std::string File = nullptr;
+	std::string Key;
+	std::string File;
 	std::map<std::string, Effect*> Effects;
 
 	// this method sadly has to be snake case and I don't like snake case :c
