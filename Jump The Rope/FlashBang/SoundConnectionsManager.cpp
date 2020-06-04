@@ -3,6 +3,10 @@
 using namespace FlashBang;
 
 
+SoundConnectionsManager* SoundConnectionsManager::instance_ = nullptr;
+int SoundConnectionsManager::refs_ = 0;
+bool SoundConnectionsManager::initiated_ = false;
+
 void SoundConnectionsManager::RegisterEffectControl(EffectControl const& control)
 {
 	effectControls_[control.soundKey].push_back(

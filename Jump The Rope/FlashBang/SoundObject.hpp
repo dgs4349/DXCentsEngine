@@ -84,7 +84,7 @@ public:
 	std::map<std::string, Effect*> Effects;
 
 	// this method sadly has to be snake case and I don't like snake case :c
-	static void from_json(const json& j, SoundObject& s);
+	static void from_json(json const& j, SoundObject& s);
 
 	// todo: handle non char keys, such as Position and the like
 	static ParameterCallablePtr GetParameterCallable(SOUND_PARAM p, SoundObject& s);
@@ -264,7 +264,7 @@ protected:
 	};
 
 	// overridden in ISoundContainer
-	virtual void parseParam_(const std::string& key, const json& j);
+	virtual void parseParam_(std::string& key, const json& j);
 
 	void parseEffects_(const std::string& key, const json& j);
 	void throwEffectError_(int i, const std::string& key, const json& j) const;

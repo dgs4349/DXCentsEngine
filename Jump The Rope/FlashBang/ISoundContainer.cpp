@@ -1,7 +1,7 @@
 #include "ISoundContainer.hpp"
 #include <boost/algorithm/string.hpp>
 
-void ISoundContainer::parseParam_(std::string const& key, const json& j)
+void ISoundContainer::parseParam_(std::string& key, const json& j)
 {
 	switch (static_cast<SOUNDCONTAINER_ARG>(key[0])) {
 	case SOUNDCONTAINER_ARG::PLAYBACK_BEHAVIOR:
@@ -83,7 +83,7 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 	boost::split(split, " " + str + " ", boost::is_any_of("|"));
 
 	// remove all spaces, also removes padding
-	for (auto i : split) boost::erase_all(i, ' ');
+	for (auto i : split) boost::erase_all(i, " ");
 
 	if (split.size() <= 2) throw std::exception(); //missing |
 

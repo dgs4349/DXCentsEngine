@@ -2,14 +2,16 @@
 
 /////////////////////// Parsing ///////////////////////
 
-void SoundObject::from_json(const json& j, SoundObject& s) {
+void SoundObject::from_json(json const& j, SoundObject& s) {
 	if (j.size() == 1 && j[0].is_object()) {
 		s.Key = j.begin().key();
 		from_json(j[0], s);
 	}
 
 	for (auto i : j.items()) {
-		s.parseParam_(i.key(), j);
+		// move to non const for casting, we can probs do better
+		std::string key = i.key(); 
+		s.parseParam_(key, j);
 	}
 }
 
@@ -52,8 +54,13 @@ void SoundObject::parseParam_(std::string& key, const json& j)
 	case (SOUNDOBJECT_ARG)SOUND_PARAM::LOOP: j[key].get_to(loop_); break;
 
 	default:
-		auto * funcPtr = GetParameterCallable((SOUND_PARAM)key[0], *this);
-		if (funcPtr != nullptr) (*funcPtr)(j[key].get<float>());
+		ParameterCallablePtr funcPtr = GetParameterCallable((SOUND_PARAM)key[0], *this);
+		if (funcPtr != nullptr)
+		{
+			float value;
+			j[key].get_to(value);
+			(*funcPtr)(value);
+		}
 		break;
 	}
 }

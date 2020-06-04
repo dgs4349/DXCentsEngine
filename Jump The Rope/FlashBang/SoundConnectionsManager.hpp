@@ -148,7 +148,7 @@ public:
 private:
 
 
-	std::vector<const std::string> unregisterCache_;
+	std::vector<std::string> unregisterCache_;
 	float unregisterTimer_ = -1.f;
 
 	// list of effect key-value pairs, assigned to a sound key

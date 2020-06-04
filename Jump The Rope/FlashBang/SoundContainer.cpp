@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <random>
+#include <algorithm>
 
 using namespace FlashBang;
 
@@ -57,7 +58,10 @@ void SoundContainer::reset_(const bool resetIndices)
 		if (orderSet_) return; // if order already set and we're in order, no need to continue
 		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
 		break;
-	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM_EACH:
+	case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM:
+		std::shuffle(queueOrder_.begin(), queueOrder_.end(), randomDevice_);
+		break;
+	/*case SOUNDCONTAINER_PLAYBACK_ORDER::RANDOM_EACH:
 		std::iota(std::begin(queueOrder_), std::end(queueOrder_), 0);
 		std::shuffle(
 			std::begin(queueOrder_),
@@ -76,7 +80,7 @@ void SoundContainer::reset_(const bool resetIndices)
 			std::begin(queueOrder_),
 			std::end(queueOrder_),
 			RandomOther
-		);
+		);*/
 	}
 	orderSet_ = true;
 

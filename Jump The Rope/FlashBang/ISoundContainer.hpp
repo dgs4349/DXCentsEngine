@@ -29,7 +29,7 @@ public:
 	// todo: deleting sounds at an index or string could be useful
 	// void operator delete(void*);
 
-	static void from_json(const json& j, ISoundContainer& s) { SoundObject::from_json(j, s); }
+	static void from_json(json const& j, ISoundContainer& s) { SoundObject::from_json(j, s); }
 
 	virtual int AddSoundObject(SoundObject* soundObject) = 0;
 	virtual int AddSoundObject(std::string const& key, SoundObject* soundObject) = 0;
@@ -79,7 +79,7 @@ protected:
 
 	virtual SoundObject* createSound_(json const& j) = 0;
 
-	void parseParam_(const std::string& key, const json& j) override;
+	void parseParam_(std::string& key, const json& j) override;
 	void parseItems_(const json& items);
 
 	void parseSchema_(const json& schema);

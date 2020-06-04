@@ -100,7 +100,10 @@ namespace FlashBang {
 	};
 
 	enum class SOUNDCONTAINER_PLAYBACK_BEHAVIOR : char { PLAYLIST = 'P', ONE_SHOT = 'O' };
-	enum class SOUNDCONTAINER_PLAYBACK_ORDER : char { IN_ORDER = 'I', RANDOM = 'R', RANDOM_EACH = 'E', RANDOM_OTHER = 'O' };
+	enum class SOUNDCONTAINER_PLAYBACK_ORDER : char { IN_ORDER = 'I', RANDOM = 'R',
+		//RANDOM_EACH = 'E', RANDOM_OTHER = 'O' //random => random_each, do we really need all these options?
+		// TODO: RTPC on order, necessary for certain types of containers such as vertical
+	};
 
 	// generic functionoid
 	class ICallable
