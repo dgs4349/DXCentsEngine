@@ -49,7 +49,7 @@ Game::Game(HINSTANCE hInstance) : DXCore(hInstance, const_cast<char*>("DirectX G
 	soundEngine->RegisterEffectControl(
 		&ropeSpeed, 
 		"jump", 
-		"jumpPitch", 
+		"jumpTune", 
 		startRopeSpeed, 
 		speedIncreaseMax);
 }

@@ -18,33 +18,57 @@ public:
 	 * TODO: top level attr to sound, access outside scenes? ["mysound"]() instead of ["myscene"]["mysound"]
 	 */
 	
+
+
+	/* 
+		Notes:
+
+		key ALWAYS before type
+			"Menu": { "Container": {...} }
+		even for Schema, where a key isn't necessary
+			"MenuSchema": { "Schema": {...} }
+	
+	*/
+
+
 	GameAudio()
 	{
 
 		engine = SoundEngine::Get();
 
-		SoundContainer menu = R"(
+		SoundContainer menu = 
+R"(
+{
+	"Menu": 
+	{
+		"Container": 
+		{
+			"v": 0.35,
+			"type": "Playlist",
+			"effects": 
 			{
-				"Menu": {
-					"Container": {
-						"v": 0.35,
-						"type": "Playlist",
-						"effects": [{
-							"key": "menuFade",
-							"param": "v",
-							"low": 0.35,
-							"high": 0.0
-						}],
-						"items": [{
-							"Scema": {
-								"files": "Assets/Audio/audio_background_|intro,loop|.wav",
-								"keys": "|intro,loop|"
-							}
-						}]
+				"menuFade": 
+				{ 
+					"param": "vol", 
+					"min": 0.35, 
+					"max": 0.0
+				}
+			},
+			"items": 
+			{
+				"menuSchema":
+				{
+					"Schema": 
+					{
+						"files": "Assets/Audio/audio_background_|intro,loop|.wav",
+						"keys": "|intro,loop|"
 					}
 				}
 			}
-		)"_json;
+		}
+	}
+}
+)"_json;
 
 		/*SoundContainer menu = json({
 			"Menu", {
@@ -67,36 +91,66 @@ public:
 			}
 		});*/
 
-		SoundContainer game = R"(
-			"Background": {
-				"Container": {
-					"v": 0.35,
-					"type": "Playlist",
-					"items" : [
-						{ "Schema": {
-							"files": L"Assets/Audio/audio_background_|intro,loop|.wav"
-							"keys": "|intro,loop|",
-						}}
-					],
-		)"_json;
-
-		SoundContainer SFX = R"(
-			"Jump": {
-				"Container": {
-					"v": 0.5,
-					"p": 0.95,
-					"type": "OneShot",
-					"items": [
-						{ "Schema": {
-							"files": L"Assets/Audio/sfx/jump_[0-4].wav",
-							"keys": "|0-4|",
-						}}
-					],
-					"effects": [
-						{ "key": "jumpPitch", "param": "pan", "low": -0.1, "high": 0.75 }
-					],
+		SoundContainer game = 
+R"(
+{
+	"Background": 
+	{
+		"Container": 
+		{
+			"v": 0.35,
+			"type": "Playlist",
+			"items" : 
+			{
+				"bgAudioSchema":
+				{ 
+					"Schema": 
+					{
+						"files": "Assets/Audio/audio_background_|intro,loop|.wav",
+						"keys": "|intro,loop|"
+					}
 				}
-		)"_json;
+			}
+		}
+	}
+}
+)"_json;
+
+
+		SoundContainer SFX = 
+R"(
+{
+	"Jump": 
+	{
+		"Container": 
+		{
+			"v": 0.5,
+			"p": 0.95,
+			"type": "OneShot",
+			"items": 
+			{ 
+				"jumpSchema":
+				{
+					"Schema": 
+					{
+						"files": "Assets/Audio/sfx/jump_[0-4].wav",
+						"keys": "|0-4|"
+					}
+				}
+			},
+			"effects": 
+			{
+				"jumpTune": 
+				{
+					"param": "tune",
+					"min": -0.1,
+					"max": 0.75
+				}
+			}
+		}
+	}
+}
+)"_json;
 
 		// todo: move to schema args
 		menu[menu.size() - 1].Loop(-1);

@@ -10,7 +10,7 @@ void ISoundContainer::from_json(json const& j, ISoundContainer& s)
 		switch(getItemType_(key))
 		{
 		/*
-		* in case the single arg is Container we can ignore, we know this is a container
+		* in case the single arg is "Container" (type-definition) we can ignore, we know this is a container
 		*	but if we have the key, we can handle this in SoundObject logic
 		*/
 		case SOUNDCONTAINER_ITEM_TYPE::CONTAINER:
@@ -52,23 +52,45 @@ void ISoundContainer::parseParam_(std::string& key, const json& j)
 }
 
 void ISoundContainer::parseItems_(const json& items) {
-	// iterate through array
-	// check if Container/Schema
-	// default: parse soundobject
-	//
 
-	// todo: check for key {schema, etc, maybe just try a from_json call?
-
-	for (auto [key, value] : items.items()) {
-		switch (getItemType_(key))
+	/*
+		"items":
 		{
-		case SOUNDCONTAINER_ITEM_TYPE::SCHEMA:
-			parseSchema_(value);
-			break;
-		case SOUNDCONTAINER_ITEM_TYPE::CONTAINER:
-			createSoundContainer_(value);
-			break;
-		default: createSound_(value); break;
+			"OneSound": { ... },
+			"MySoundContainer":
+			{
+				"Container":
+				{
+					...
+				}
+			},
+			"MySoundSchema": // must give schema a name even though it is not used
+			{
+				"Schema":
+				{
+
+				}
+			}
+
+		}
+	*/
+
+	for (auto [itemKey, itemVal] : items.items()) {
+		// key will ALWAYS be before type, if no type (obj.size() > 1) it is a sound
+		if (itemVal.size() > 1) {
+			createSound_(itemVal);
+		}
+		else {
+			auto [objType, obj] = itemVal.items().begin();
+			switch (getItemType_(objType)) {
+			case SOUNDCONTAINER_ITEM_TYPE::SCHEMA:
+				parseSchema_(obj);
+				break;
+			case SOUNDCONTAINER_ITEM_TYPE::CONTAINER:
+				createSoundContainer_(obj);
+				break;
+			default: createSound_(obj); break;
+			}
 		}
 	}
 }

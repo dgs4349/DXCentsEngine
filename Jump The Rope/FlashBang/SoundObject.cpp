@@ -51,7 +51,7 @@ void SoundObject::parseParam_(std::string& key, const json& j)
 	case SOUNDOBJECT_ARG::FILE: j[key].get_to(File);  break;
 	case SOUNDOBJECT_ARG::KEY:	j[key].get_to(Key); break;
 
-	case SOUNDOBJECT_ARG::EFFECTS: parseEffects_(key, j); break;
+	case SOUNDOBJECT_ARG::EFFECTS: parseEffects_(j[key]); break;
 
 		// move to default once int parameters implemented
 	case (SOUNDOBJECT_ARG)SOUND_PARAM::LOOP: j[key].get_to(loop_); break;
@@ -68,95 +68,60 @@ void SoundObject::parseParam_(std::string& key, const json& j)
 	}
 }
 
-void SoundObject::parseEffects_(const std::string& key, const json& j)
-{
-	// currentEffect array syntax: [ key "jump_vol", param "vol", float min, float max ]
+void SoundObject::parseEffects_(const json& effectsJsonObj) {
 	/*
-		"name" : { param: "vol", low: min, high: max }
-		or { key: "name", param ... }
+		PARAMETER key MUST BE "param"
 
+		"effectsJsonObj":
+		{
+			"effect1Key":
+			{
+				"param": "vol",
+				"min": 0.f,
+				"max": 1.f
+			}
+			"effect2Key:"
+			{
+				...
+			}
+			...
+		}
 	*/
 
+	for (auto [effectKey, effectObj] : effectsJsonObj.items()) {
 
-	////////// Start here, what is going on
 
-	// same deal as sound
-	json currentEffect = json(NULL);
-
-	// range based loop to keep reference to index used in exception handling
-	for (unsigned int i = 0; i < j[key].size(); ++i) {
-		try {
-			currentEffect = j[key][i];
-
-			// array effect
-			if (currentEffect.is_array()) {
-				auto* effect = new Effect(
-					// currentEffect[1] = "volume", currentEffect[1][0] = 'v' = SOUND_PARAM::VOLUME
-					GetParameterCallable((SOUND_PARAM)(currentEffect[1])[0], *this),
-					currentEffect[2],
-					currentEffect[3]
-				);
-				AddEffect(currentEffect[0], effect);
-				continue;
-			}
-
-			//object effect
-			std::string effectName;
-
-			// name-first object, store name then continue to body
-			if (currentEffect.size() == 1) {
-				effectName = currentEffect.begin().key();
-				currentEffect = currentEffect[effectName];
-			}
-
-			auto * effect = new Effect();
-
-			for (auto [key, value] : currentEffect.items()) {
-				switch (static_cast<EFFECT_ARG>(key[0])) {
-				case EFFECT_ARG::KEY:
-					value.get_to(effectName);
-					break;
-				case EFFECT_ARG::PARAM:
-					SOUND_PARAM param;
-					value.get_to(param);
-					effect->ParameterCallPtr = GetParameterCallable(param, *this);
-					break;
-				case EFFECT_ARG::MIN:
-					value.get_to(effect->ParameterMin);
-					break;
-				case EFFECT_ARG::MAX:
-					value.get_to(effect->ParameterMax);
-					break;
-				}
-			}
-
-			AddEffect(key, effect);
+		try
+		{
+			auto* effect = new Effect();
+			// "param": "vol" => obj["param"][0] = 'v'
+			std::string param;
+			effectObj["param"].get_to<std::string>(param);
+			effect->ParameterCallPtr = GetParameterCallable(static_cast<SOUND_PARAM>(param[0]), *this);
+			effectObj["min"].get_to<float>(effect->ParameterMin);
+			effectObj["max"].get_to<float>(effect->ParameterMax);
+			AddEffect(effectKey, effect);
 		}
-		catch (std::exception& effect) {
-			printf(effect.what());
-			throwEffectError_(i, key, j);
+		catch (std::exception e)
+		{
+			const char* message = R"(
+				Error parsing effect. Please correct syntax.
+				Correct Syntax:
+				
+				"effects": 
+				{
+					"effect1Key": { "param": "vol", "min": 0.0f, "max": 1.0f },
+					"effect2Key" : { ... }
+				}	
+
+				Parameter Key must be "param", Min and Max value keys must be "min" and "max"
+			)";
+
+			printf(e.what());
+
+			throw std::exception(message);
 		}
 	}
-}
-
-void SoundObject::throwEffectError_(int i, const std::string& key, const json& j) const {
-	const char* message = R"(
-		Error parsing effect. Please double check effect schema:
-			- Array: [ key "jump_vol", param "vol", float min, float max ]
-			- Object: { key: "keyName", param: "vol", low: floatMin, high: floatMax }
-			- Object-Alt: "key" : { param: "vol", low: floatMin, high: floatMax }
-	)";
-
-	const auto currentEffect = j[key][i];
-	auto effectIssue = std::string("\nEffect index: ") + std::to_string(i) + "\n";
-
-	if (currentEffect.size() < 4) {
-		effectIssue += "Effect is not the right length!"
-			+ std::string("\nEffect length: ") + std::to_string(currentEffect.size());
-	}
-	// other issues involve complex currentEffect parsing which i don't feel like doing right now
-
-	throw std::exception((message + effectIssue).c_str());
 }
 
 /////////////////////// Sound Methods ///////////////////////

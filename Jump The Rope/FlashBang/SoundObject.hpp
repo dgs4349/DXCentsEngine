@@ -265,7 +265,6 @@ protected:
 
 	// overridden in ISoundContainer
 	virtual void parseParam_(std::string& key, const json& j);
+	void parseEffects_(const json& effectsJsonObj);
 
-	void parseEffects_(const std::string& key, const json& j);
-	void throwEffectError_(int i, const std::string& key, const json& j) const;
 };
