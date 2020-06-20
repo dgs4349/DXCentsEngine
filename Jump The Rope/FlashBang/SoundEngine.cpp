@@ -118,6 +118,7 @@ SoundEngine::Scene* SoundEngine::RemoveScene(std::string const& sceneKey)
 
 SoundEngine::Scene& SoundEngine::StartScene(Scene* scene)
 {
+	if (!initiated_) Init();
 	if (scene->active_) return *scene;
 
 	if (scenes_.find(scene->Key) == scenes_.end())
@@ -142,7 +143,6 @@ SoundEngine::Scene& SoundEngine::StopScene(Scene* scene, bool remove)
 SoundEngine::SoundEngine()
 {
 	connectionsManager_ = SoundConnectionsManager::Get();
-	Init();
 }
 
 SoundEngine::~SoundEngine()

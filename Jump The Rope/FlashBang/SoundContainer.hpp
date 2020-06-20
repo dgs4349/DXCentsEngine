@@ -6,13 +6,7 @@
 #include "ISoundContainer.hpp"
 #include "Sound.hpp"
 
-
-
-
-
-
-
-
+// TODO: SoundContainer in instance of Key { Container { does not work }} need to call after we registered type
 
 using namespace FlashBang;
 
@@ -122,6 +116,7 @@ protected:
 	virtual SOUNDCONTAINER_PLAYBACK_ORDER handlePlayback_(SOUNDCONTAINER_PLAYBACK_ORDER val) override;
 
 	SoundObject* createSound_(json const& j) override;
+	SoundObject* createSoundContainer_(json const& j) override;
 
 	virtual void handlePlay_() override;
 	virtual void handlePause_() override;

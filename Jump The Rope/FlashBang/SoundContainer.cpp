@@ -216,13 +216,6 @@ void SoundContainer::updateCurrentIndex_()
 	if (playbackBehavior_ == SOUNDCONTAINER_PLAYBACK_BEHAVIOR::PLAYLIST) queueNext_();
 }
 
-SoundObject* SoundContainer::createSound_(json const& j)
-{
-	Sound sound = j;
-	AddSoundObject(&sound);
-	return &sound;
-}
-
 float SoundContainer::handleVolume_(float val)
 {
 	soundObjects_[currentSoundObjectIndex_]->Volume(val);
@@ -245,6 +238,20 @@ float SoundContainer::handlePan_(float val)
 SOUNDCONTAINER_PLAYBACK_ORDER SoundContainer::handlePlayback_(SOUNDCONTAINER_PLAYBACK_ORDER val)
 {
 	return SOUNDCONTAINER_PLAYBACK_ORDER();
+}
+
+SoundObject* FlashBang::SoundContainer::createSound_(json const& j)
+{
+	auto* container = new SoundContainer(j);
+	AddSoundObject(container);
+	return container;
+}
+
+SoundObject* FlashBang::SoundContainer::createSoundContainer_(json const& j)
+{
+	auto* sound = new Sound(j);
+	AddSoundObject(sound);
+	return sound;
 }
 
 void SoundContainer::handlePlay_()

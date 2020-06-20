@@ -29,7 +29,7 @@ public:
 	// todo: deleting sounds at an index or string could be useful
 	// void operator delete(void*);
 
-	static void from_json(json const& j, ISoundContainer& s) { SoundObject::from_json(j, s); }
+	static void from_json(json const& j, ISoundContainer& s);
 
 	virtual int AddSoundObject(SoundObject* soundObject) = 0;
 	virtual int AddSoundObject(std::string const& key, SoundObject* soundObject) = 0;
@@ -78,6 +78,7 @@ protected:
 	virtual SOUNDCONTAINER_PLAYBACK_ORDER handlePlayback_(SOUNDCONTAINER_PLAYBACK_ORDER val) = 0;
 
 	virtual SoundObject* createSound_(json const& j) = 0;
+	virtual SoundObject* createSoundContainer_(json const& j) = 0;
 
 	void parseParam_(std::string& key, const json& j) override;
 	void parseItems_(const json& items);
@@ -89,8 +90,11 @@ protected:
 
 	static SOUNDCONTAINER_ITEM_TYPE getItemType_(const std::string& itemKey) {
 		auto const it = SOUNDCONATINER_ITEM_TYPE_ARGS.find(itemKey);
-		if (it != SOUNDCONATINER_ITEM_TYPE_ARGS.end()) return SOUNDCONTAINER_ITEM_TYPE::SOUND;
-		return it->second;
+		if (it != SOUNDCONATINER_ITEM_TYPE_ARGS.end()) {
+			SOUNDCONTAINER_ITEM_TYPE s = it->second;
+			return s;
+		}
+		return  SOUNDCONTAINER_ITEM_TYPE::SOUND;
 	}
 
 private:

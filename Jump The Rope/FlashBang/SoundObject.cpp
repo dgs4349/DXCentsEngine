@@ -3,15 +3,18 @@
 /////////////////////// Parsing ///////////////////////
 
 void SoundObject::from_json(json const& j, SoundObject& s) {
-	if (j.size() == 1 && j.at(0).is_object()) {
-		s.Key = j.begin().key();
-		from_json(j[0], s);
+
+	auto [key, value] = j.items().begin();
+
+	if (j.size() == 1 && value.is_object()) {
+		s.Key = key;
+		from_json(value, s);
 	}
 
-	for (auto i : j.items()) {
+	for (auto [k, v] : j.items()) {
 		// move to non const for casting, we can probs do better
-		std::string key = i.key(); 
-		s.parseParam_(key, j);
+		std::string str = k;
+		s.parseParam_(str, j);
 	}
 }
 
@@ -73,6 +76,9 @@ void SoundObject::parseEffects_(const std::string& key, const json& j)
 		or { key: "name", param ... }
 
 	*/
+
+
+	////////// Start here, what is going on
 
 	// same deal as sound
 	json currentEffect = json(NULL);

@@ -1,6 +1,37 @@
 #include "ISoundContainer.hpp"
 #include <boost/algorithm/string.hpp>
 
+void ISoundContainer::from_json(json const& j, ISoundContainer& s)
+{
+	auto [key, value] = j.items().begin();
+
+	if (j.size() == 1 && value.is_object()) {
+
+		switch(getItemType_(key))
+		{
+		/*
+		* in case the single arg is Container we can ignore, we know this is a container
+		*	but if we have the key, we can handle this in SoundObject logic
+		*/
+		case SOUNDCONTAINER_ITEM_TYPE::CONTAINER:
+			ISoundContainer::from_json(value, s);
+			break;
+		default:
+			SoundObject::from_json(value, s);
+			break;
+		}
+	}
+
+	for (auto [k, v] : j.items()) {
+		// move to non const for casting, we can probs do better
+		std::string str = k;
+		s.parseParam_(str, j);
+	}
+}
+
+
+
+
 void ISoundContainer::parseParam_(std::string& key, const json& j)
 {
 	switch (static_cast<SOUNDCONTAINER_ARG>(key[0])) {
@@ -24,12 +55,21 @@ void ISoundContainer::parseItems_(const json& items) {
 	// iterate through array
 	// check if Container/Schema
 	// default: parse soundobject
+	//
+
+	// todo: check for key {schema, etc, maybe just try a from_json call?
 
 	for (auto [key, value] : items.items()) {
-		if (getItemType_(key) == SOUNDCONTAINER_ITEM_TYPE::SCHEMA) {
+		switch (getItemType_(key))
+		{
+		case SOUNDCONTAINER_ITEM_TYPE::SCHEMA:
 			parseSchema_(value);
+			break;
+		case SOUNDCONTAINER_ITEM_TYPE::CONTAINER:
+			createSoundContainer_(value);
+			break;
+		default: createSound_(value); break;
 		}
-		else createSound_(value);
 	}
 }
 
