@@ -22,6 +22,8 @@ public:
 
 	virtual SoundObject& operator[] (const char* key) = 0;
 	virtual SoundObject& operator[] (int i) = 0;
+
+	virtual size_t size() = 0;
 	
 	/*virtual bool operator== (ISoundContainer const& other) { return Files == other.Files; }
 	virtual bool operator!= (ISoundContainer const& other) { return !(*this == other); }

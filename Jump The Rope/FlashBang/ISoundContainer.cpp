@@ -1,8 +1,14 @@
 #include "ISoundContainer.hpp"
 #include <boost/algorithm/string.hpp>
+#include <string>
+#include <iostream>
 
 void ISoundContainer::from_json(json const& j, ISoundContainer& s)
 {
+
+	std::cout << "test cout SC" << std::endl;
+	printf("test printf SC");
+
 	auto [key, value] = j.items().begin();
 
 	if (j.size() == 1 && value.is_object()) {
@@ -24,10 +30,15 @@ void ISoundContainer::from_json(json const& j, ISoundContainer& s)
 		}
 	}
 
+	// do we need this copied here? or can we call SoundObject::from_json
+	//	with parseParam_ overridden we might be able to do that, idk try it later
 	for (auto [k, v] : j.items()) {
-		// move to non const for casting, we can probs do better
-		std::string str = k;
-		s.parseParam_(str, j);
+		try {
+			// move to non const for casting, we can probs do better
+			std::string str = k;
+			s.parseParam_(str, j);
+		}
+		catch (std::exception e) { handleParseError_(s.Key, k, e); }
 	}
 }
 
@@ -137,7 +148,7 @@ void ISoundContainer::parseSchema_(const json& schema) {
 		}
 	}
 	catch (std::exception& e) {
-		printf(e.what());
+		printf(e.what() + '\n');
 		throwSchemaError_(fileStr, keyStr);
 	};
 }
@@ -148,21 +159,26 @@ std::vector<std::string>& ISoundContainer::processSchemaString_(
 	const std::string& str,
 	std::vector<std::string>& resultsVector
 	)  {
+
 	auto split = std::vector<std::string>(3);
 
 	//pad string in case no prefix or suffix
 	boost::split(split, " " + str + " ", boost::is_any_of("|"));
 
-	// remove all spaces, also removes padding
-	for (auto i : split) boost::erase_all(i, " ");
-
 	if (split.size() <= 2) throw std::exception(); //missing |
+
+	// remove padding
+	// padding was added in case there was no leading or trailing characters
+	boost::trim_left(split[0]);
+	boost::trim_right(split[2]);
 
 	// split = ["prefix", "args", "suffix"], split[1] is args
 
 	// make sure there are no ' ' characters in array items
 	std::vector<std::string> parsedArgs;
 
+
+	//////// ARRAY ARGS
 	// parse a list such as |a,b,c|, this is pretty straight forward
 	if (split[1].find(',') != std::string::npos)
 	{
@@ -175,6 +191,8 @@ std::vector<std::string>& ISoundContainer::processSchemaString_(
 		}
 	}
 
+
+	/////// INT ARGS
 	// parse a range such as |0-4-1| into a for loop, much harder tbh
 	else if (split[1].find('-') != std::string::npos)
 	{
@@ -182,13 +200,17 @@ std::vector<std::string>& ISoundContainer::processSchemaString_(
 		boost::split(parsedArgs, split[1], boost::is_any_of("-"));
 
 		// for (i = 0; i < 4; i += 1), add "aud" + i + ".wav"
-		for (
-			auto i = std::stoi(parsedArgs[0]);
-			i < std::stoi(parsedArgs[1]);
-			i += (parsedArgs.size() > 2) ? std::stoi(parsedArgs[2]) : 1
-			)
+
+		int start = std::stoi(parsedArgs[0]);
+		int stop = std::stoi(parsedArgs[1]);
+		int step = 1;
+		if (parsedArgs.size() > 2) {
+			step = std::stoi(parsedArgs[2]);
+		}
+
+		for (int i = start; i < stop; i+=step)
 		{
-			resultsVector.push_back(parsedArgs[0] + std::to_string(i) + parsedArgs[2]);
+			resultsVector.push_back(split[0] + std::to_string(i) + split[2]);
 		}
 	}
 
@@ -209,5 +231,5 @@ void ISoundContainer::throwSchemaError_(
 
 	const auto vars = "\nFiles String: " + files + "\nKeys String: " + keys;
 
-	throw std::exception((message + vars).c_str());
+	throw std::exception((message + vars).c_str() + '\n');
 }

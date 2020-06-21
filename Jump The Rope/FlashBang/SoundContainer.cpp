@@ -11,17 +11,17 @@ SoundContainer::SoundContainer()
 	srand(randomDevice_());
 }
 
+//////////////////// this won't work as a constructor1
+
 SoundContainer::SoundContainer(const json& j)
 {
-	auto* container = new SoundContainer();
-	from_json(j, *container);
+	from_json(j, *this);
 }
 
 SoundContainer::SoundContainer(const std::string& s)
 {
 	json j = s;
-	auto* container = new SoundContainer();
-	from_json(j, *container);
+	from_json(j, *this);
 }
 
 //TODO: fix incorrect = operator
@@ -233,7 +233,7 @@ float SoundContainer::handleTune_(float val)
 
 float SoundContainer::handlePan_(float val)
 {
-	if (soundObjects_.size() < 0) return val;
+	if (soundObjects_.size() <= 0) return val;
 	soundObjects_[currentSoundObjectIndex_]->Pan(val);
 	return val;
 }
@@ -245,16 +245,16 @@ SOUNDCONTAINER_PLAYBACK_ORDER SoundContainer::handlePlayback_(SOUNDCONTAINER_PLA
 
 SoundObject* FlashBang::SoundContainer::createSound_(json const& j)
 {
-	auto* container = new SoundContainer(j);
-	AddSoundObject(container);
-	return container;
+	auto* sound = new Sound(j);
+	AddSoundObject(sound);
+	return sound;
 }
 
 SoundObject* FlashBang::SoundContainer::createSoundContainer_(json const& j)
 {
-	auto* sound = new Sound(j);
-	AddSoundObject(sound);
-	return sound;
+	auto* container = new SoundContainer(j);
+	AddSoundObject(container);
+	return container;
 }
 
 void SoundContainer::handlePlay_()

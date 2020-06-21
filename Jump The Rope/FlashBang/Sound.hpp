@@ -60,16 +60,16 @@ private:
 	
 protected:
 	float handleVolume_(float val) override {
-		DXSoundEffectInstance->SetVolume(val);
+		if(Loaded()) DXSoundEffectInstance->SetVolume(val);
 		return val;
 	}
 	float handlePan_(float val)	override {
-		DXSoundEffectInstance->SetPan(val);
+		if (Loaded()) DXSoundEffectInstance->SetPan(val);
 		return val;
 	}
 
 	float handleTune_(float val) override {
-		DXSoundEffectInstance->SetPitch(val);
+		if (Loaded()) DXSoundEffectInstance->SetPitch(val);
 		duration_ = getDuration_(val);
 		return val;
 	}

@@ -102,6 +102,8 @@ public:
 
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
+	
+	bool Loaded() { return state_ != SOUND_STATE::UNLOADED; }
 
 	// could do a small optimization with needsUpdate_, but we'd need special SOUND_STATE logic
 	void Update(float dt);
@@ -268,8 +270,8 @@ protected:
 	void parseEffects_(const json& effectsJsonObj);
 
 	static void handleParseError_(
-		std::string& soundObjectKey,
-		std::string& itemKey,
-		std::exception& e);
+		std::string const& soundObjectKey,
+		std::string const& itemKey,
+		std::exception const& e);
 
 };

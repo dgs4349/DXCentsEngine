@@ -1,31 +1,38 @@
 #include "SoundObject.hpp"
 #include <boost/stacktrace.hpp>
 #include <iostream>
+#include <string>
 
 /////////////////////// Parsing ///////////////////////
 
 void SoundObject::from_json(json const& j, SoundObject& s) {
 	
+	std::cout << "test cout SO" << std::endl;
+	printf("test printf SO");
+
 	auto [key, value] = j.items().begin();
 
-	try {
-		if (j.size() == 1 && value.is_object()) {
-			s.Key = key;
-			from_json(value, s);
-		}
+	if (j.size() == 1 && value.is_object()) {
+		s.Key = key;
+		from_json(value, s);
+	}
 
-		for (auto [k, v] : j.items()) {
+	for (auto [k, v] : j.items()) {
+		try {
 			// move to non const for casting, we can probs do better
 			std::string str = k;
 			s.parseParam_(str, j);
 		}
+		catch (std::exception e) { handleParseError_(s.Key, k, e); };
 	}
-	// this is wrong anyways since auto [k, v]
-	catch (std::exception e) { handleParseError_(s.Key, key, e); };
+
 }
 
 
-void SoundObject::handleParseError_(std::string& soundObjectKey, std::string& itemKey, std::exception& e)
+void SoundObject::handleParseError_(
+	std::string const& soundObjectKey, 
+	std::string const& itemKey, 
+	std::exception const& e)
 {
 
 	std::cout << boost::stacktrace::stacktrace();
@@ -138,9 +145,9 @@ void SoundObject::parseEffects_(const json& effectsJsonObj) {
 				Parameter Key must be "param", Min and Max value keys must be "min" and "max"
 			)";
 
-			printf(e.what());
+			printf(e.what() + '\n');
 
-			throw std::exception(message);
+			throw std::exception(message + '\n');
 		}
 	}
 }

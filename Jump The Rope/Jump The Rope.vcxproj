@@ -104,6 +104,9 @@
       <Command>xcopy /e /d /y "$(SolutionDir)_Include\lua\lib\lua52.dll" "$(OutDir)"
 xcopy /I /E /S /Y "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
     </PostBuildEvent>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

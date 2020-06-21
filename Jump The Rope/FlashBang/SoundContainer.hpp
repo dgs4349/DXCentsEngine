@@ -29,6 +29,8 @@ public:
 	SoundObject& operator[] (const char* key) { return *At(key); }
 	SoundObject& operator[] (int i) { return *At(i); }
 
+	size_t size() override { return soundObjects_.size(); }
+
 	void Load() override;
 	void Unload() override;
 	virtual void Reset() override { reset_(true); }
