@@ -44,7 +44,7 @@ R"(
 		"Container": 
 		{
 			"v": 0.35,
-			"type": "Playlist",
+			"behavior": "Playlist",
 			"effects": 
 			{
 				"menuFade": 
@@ -99,7 +99,7 @@ R"(
 		"Container": 
 		{
 			"v": 0.35,
-			"type": "Playlist",
+			"behavior": "Playlist",
 			"items" : 
 			{
 				"bgAudioSchema":
@@ -126,14 +126,14 @@ R"(
 		{
 			"v": 0.5,
 			"p": 0.95,
-			"type": "OneShot",
+			"behavior": "OneShot",
 			"items": 
 			{ 
 				"jumpSchema":
 				{
 					"Schema": 
 					{
-						"files": "Assets/Audio/sfx/jump_[0-4].wav",
+						"files": "Assets/Audio/sfx/jump_|0-4|.wav",
 						"keys": "|0-4|"
 					}
 				}

@@ -1,21 +1,42 @@
 #include "SoundObject.hpp"
+#include <boost/stacktrace.hpp>
+#include <iostream>
 
 /////////////////////// Parsing ///////////////////////
 
 void SoundObject::from_json(json const& j, SoundObject& s) {
-
+	
 	auto [key, value] = j.items().begin();
 
-	if (j.size() == 1 && value.is_object()) {
-		s.Key = key;
-		from_json(value, s);
-	}
+	try {
+		if (j.size() == 1 && value.is_object()) {
+			s.Key = key;
+			from_json(value, s);
+		}
 
-	for (auto [k, v] : j.items()) {
-		// move to non const for casting, we can probs do better
-		std::string str = k;
-		s.parseParam_(str, j);
+		for (auto [k, v] : j.items()) {
+			// move to non const for casting, we can probs do better
+			std::string str = k;
+			s.parseParam_(str, j);
+		}
 	}
+	// this is wrong anyways since auto [k, v]
+	catch (std::exception e) { handleParseError_(s.Key, key, e); };
+}
+
+
+void SoundObject::handleParseError_(std::string& soundObjectKey, std::string& itemKey, std::exception& e)
+{
+
+	std::cout << boost::stacktrace::stacktrace();
+	std::cout << e.what();
+	if (!soundObjectKey.empty()) {
+		std::cout << "Error parsing SoundObject: " << soundObjectKey << std::endl;
+	}
+	else {
+		std::cout << "Error parsing (unkown) SoundObject." << std::endl;
+	}
+	std::cout << "Parse errored on itemKey: " << itemKey << std::endl;
 }
 
 /*
@@ -48,23 +69,23 @@ void SoundObject::parseParam_(std::string& key, const json& j)
 {
 	switch (static_cast<SOUNDOBJECT_ARG>(key[0]))
 	{
-	case SOUNDOBJECT_ARG::FILE: j[key].get_to(File);  break;
-	case SOUNDOBJECT_ARG::KEY:	j[key].get_to(Key); break;
+		case SOUNDOBJECT_ARG::FILE: j[key].get_to<std::string>(File);  break;
+		case SOUNDOBJECT_ARG::KEY:	j[key].get_to<std::string>(Key); break;
 
-	case SOUNDOBJECT_ARG::EFFECTS: parseEffects_(j[key]); break;
+		case SOUNDOBJECT_ARG::EFFECTS: parseEffects_(j[key]); break;
 
-		// move to default once int parameters implemented
-	case (SOUNDOBJECT_ARG)SOUND_PARAM::LOOP: j[key].get_to(loop_); break;
+			// move to default once int parameters implemented
+		case (SOUNDOBJECT_ARG)SOUND_PARAM::LOOP: j[key].get_to<int>(loop_); break;
 
-	default:
-		ParameterCallablePtr funcPtr = GetParameterCallable((SOUND_PARAM)key[0], *this);
-		if (funcPtr != nullptr)
-		{
-			float value;
-			j[key].get_to(value);
-			(*funcPtr)(value);
-		}
-		break;
+		default:
+			ParameterCallablePtr funcPtr = GetParameterCallable((SOUND_PARAM)key[0], *this);
+			if (funcPtr != nullptr)
+			{
+				float value;
+				j[key].get_to<float>(value);
+				(*funcPtr)(value);
+			}
+			break;
 	}
 }
 

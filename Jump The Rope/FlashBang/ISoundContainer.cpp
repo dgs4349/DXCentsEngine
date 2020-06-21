@@ -10,14 +10,16 @@ void ISoundContainer::from_json(json const& j, ISoundContainer& s)
 		switch(getItemType_(key))
 		{
 		/*
-		* in case the single arg is "Container" (type-definition) we can ignore, we know this is a container
-		*	but if we have the key, we can handle this in SoundObject logic
+		* if we have a single arg object, i.e. ContainerKey: { Container: { ... } }
+			we need to record the key, or otherwise ignore the argument and recurse
+			type related actions are only necesssary explicitly via parseItems_
 		*/
-		case SOUNDCONTAINER_ITEM_TYPE::CONTAINER:
+		case SOUNDCONTAINER_ITEM_TYPE::SOUND:
+			s.Key = key;
 			ISoundContainer::from_json(value, s);
 			break;
 		default:
-			SoundObject::from_json(value, s);
+			ISoundContainer::from_json(value, s);
 			break;
 		}
 	}
@@ -30,17 +32,22 @@ void ISoundContainer::from_json(json const& j, ISoundContainer& s)
 }
 
 
-
-
 void ISoundContainer::parseParam_(std::string& key, const json& j)
 {
+	std::string val;
+
 	switch (static_cast<SOUNDCONTAINER_ARG>(key[0])) {
+
 	case SOUNDCONTAINER_ARG::PLAYBACK_BEHAVIOR:
-		j[key].get_to(playbackBehavior_);
+		j[key].get_to<std::string>(val);
+		playbackBehavior_ = static_cast<SOUNDCONTAINER_PLAYBACK_BEHAVIOR>(val[0]);
 		break;
+
 	case SOUNDCONTAINER_ARG::PLAYBACK_ORDER:
-		j[key].get_to(playbackOrder_);
+		j[key].get_to<std::string>(val);
+		playbackOrder_ = static_cast<SOUNDCONTAINER_PLAYBACK_ORDER>(val[0]);
 		break;
+
 	case SOUNDCONTAINER_ARG::ITEMS:
 		parseItems_(j[key]);
 		break;
@@ -101,32 +108,32 @@ void ISoundContainer::parseSchema_(const json& schema) {
 	std::string fileStr;
 	std::string keyStr;
 
-	std::string fileKey; //keep keys for properly copying
-	std::string keyKey;
+	json soundJson;
 
 	for (auto [key, value] : schema.items()) {
 		switch (static_cast<SOUNDOBJECT_ARG>(key[0])) {
 		case SOUNDOBJECT_ARG::FILE:
-			fileKey = key;
-			value.get_to(fileStr);
+			value.get_to<std::string>(fileStr);
 			break;
 		case SOUNDOBJECT_ARG::KEY:
-			keyKey = key;
-			value.get_to(keyStr);
+			value.get_to<std::string>(keyStr);
 			break;
-		default: break;
+		default: 
+			soundJson[key] = value;
+			break;
 		}
 	}
 
 	try {
-		const auto files = processSchemaString_(fileStr);
-		const auto keys = processSchemaString_(keyStr);
+		std::vector<std::string> files;
+		std::vector<std::string> keys;
+		files = processSchemaString_(fileStr, files);
+		keys = processSchemaString_(keyStr, keys);
 
-		json j = schema;
 		for (int i = 0; i < files.size(); ++i) {
-			j[fileKey] = files[i];
-			j[keyKey] = keys[i];
-			createSound_(j);
+			soundJson["file"] = files[i];
+			soundJson["key"] = keys[i];
+			createSound_(soundJson);
 		}
 	}
 	catch (std::exception& e) {
@@ -137,8 +144,10 @@ void ISoundContainer::parseSchema_(const json& schema) {
 
 
 // TODO, Schema param? say the last sound should play infinitely?
-std::vector<std::string> const& ISoundContainer::processSchemaString_(
-	const std::string& str) const {
+std::vector<std::string>& ISoundContainer::processSchemaString_(
+	const std::string& str,
+	std::vector<std::string>& resultsVector
+	)  {
 	auto split = std::vector<std::string>(3);
 
 	//pad string in case no prefix or suffix
@@ -153,7 +162,6 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 
 	// make sure there are no ' ' characters in array items
 	std::vector<std::string> parsedArgs;
-	std::vector<std::string> results;
 
 	// parse a list such as |a,b,c|, this is pretty straight forward
 	if (split[1].find(',') != std::string::npos)
@@ -163,7 +171,7 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 
 		// for each item {a,b,c} add "aud" + "a" + ".wav
 		for (auto item : parsedArgs) {
-			results.push_back(split[0] + item + split[2]);
+			resultsVector.push_back(split[0] + item + split[2]);
 		}
 	}
 
@@ -180,11 +188,11 @@ std::vector<std::string> const& ISoundContainer::processSchemaString_(
 			i += (parsedArgs.size() > 2) ? std::stoi(parsedArgs[2]) : 1
 			)
 		{
-			results.push_back(parsedArgs[0] + std::to_string(i) + parsedArgs[2]);
+			resultsVector.push_back(parsedArgs[0] + std::to_string(i) + parsedArgs[2]);
 		}
 	}
 
-	return results;
+	return resultsVector;
 }
 
 void ISoundContainer::throwSchemaError_(

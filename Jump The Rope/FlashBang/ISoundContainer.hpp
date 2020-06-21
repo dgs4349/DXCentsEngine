@@ -84,7 +84,10 @@ protected:
 	void parseItems_(const json& items);
 
 	void parseSchema_(const json& schema);
-	std::vector<std::string> const& processSchemaString_(const std::string& str) const;
+	std::vector<std::string>& processSchemaString_(
+		const std::string& str,
+		std::vector<std::string>& resultsVector
+	);
 
 	static void throwSchemaError_(const std::string& files, const std::string& keys);
 

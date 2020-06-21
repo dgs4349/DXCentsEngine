@@ -267,4 +267,9 @@ protected:
 	virtual void parseParam_(std::string& key, const json& j);
 	void parseEffects_(const json& effectsJsonObj);
 
+	static void handleParseError_(
+		std::string& soundObjectKey,
+		std::string& itemKey,
+		std::exception& e);
+
 };

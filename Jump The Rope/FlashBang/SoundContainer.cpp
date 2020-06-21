@@ -218,12 +218,14 @@ void SoundContainer::updateCurrentIndex_()
 
 float SoundContainer::handleVolume_(float val)
 {
+	if (soundObjects_.size() <= 0) return val;
 	soundObjects_[currentSoundObjectIndex_]->Volume(val);
 	return val;
 }
 
 float SoundContainer::handleTune_(float val)
 {
+	if (soundObjects_.size() <= 0) return val;
 	soundObjects_[currentSoundObjectIndex_]->Tune(val);
 	getDuration_(val);
 	return val;
@@ -231,6 +233,7 @@ float SoundContainer::handleTune_(float val)
 
 float SoundContainer::handlePan_(float val)
 {
+	if (soundObjects_.size() < 0) return val;
 	soundObjects_[currentSoundObjectIndex_]->Pan(val);
 	return val;
 }
@@ -263,11 +266,13 @@ void SoundContainer::handlePlay_()
 
 void SoundContainer::handlePause_()
 {
+	if (soundObjects_.size() <= 0) return;
 	soundObjects_[currentSoundObjectIndex_]->Pause();
 }
 
 void SoundContainer::handleResume_()
 {
+	if (soundObjects_.size() <= 0) return;
 	soundObjects_[currentSoundObjectIndex_]->Resume();
 }
 
@@ -278,6 +283,7 @@ void SoundContainer::handleFinish_()
 
 void SoundContainer::handleStop_()
 {
+	if (soundObjects_.size() <= 0) return;
 	soundObjects_[currentSoundObjectIndex_]->Stop();
 	Reset();
 }
@@ -307,5 +313,5 @@ float SoundContainer::getDuration_(float tune) {
 	//	still calculate tune effects. Since we're doing this on the whole
 	//	container, this may not be terribly accurate
 	// additionally, do we need to figure out the difference between tunes?
-	return duration_ *= pow(2, tune);
+	return duration_ *= pow(2.f, tune);
 }
