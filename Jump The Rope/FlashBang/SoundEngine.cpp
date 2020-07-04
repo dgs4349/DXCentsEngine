@@ -159,7 +159,7 @@ SoundEngine::~SoundEngine()
 FlashBang::SoundEngine::Scene::Scene(std::string key, SoundContainer* container)
 {
 	Key = std::move(key);
-	Container = container;
+	Container = std::move(container);
 
 	startCall_ = new StartCallable(this);
 	stopCall_ = new StopCallable(this);

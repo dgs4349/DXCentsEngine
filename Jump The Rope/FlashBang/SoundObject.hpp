@@ -109,10 +109,13 @@ public:
 	void Update(float dt);
 
 	void Play();
-	void Pause() { State(SOUND_STATE::PAUSED); handlePause_(); }
-	void Resume() { State(SOUND_STATE::PLAYING); handleResume_(); }
-	void Finish() { State(SOUND_STATE::FINISHING); handleFinish_(); }
-	void Stop() { State(SOUND_STATE::COMPLETE); handleStop_(); }
+	void Pause() { SoundObject::State(SOUND_STATE::PAUSED); handlePause_(); }
+	void Resume() { SoundObject::State(SOUND_STATE::PLAYING); handleResume_(); }
+	void Finish() { SoundObject::State(SOUND_STATE::FINISHING); handleFinish_(); }
+	void Stop() { 
+		State(SOUND_STATE::COMPLETE); 
+		handleStop_(); 
+	}
 
 	bool Playing() const { return state_ == SOUND_STATE::PLAYING || state_ == SOUND_STATE::FINISHING; }
 	unsigned int CurrentLoop() const { return currentLoop_; }
@@ -160,13 +163,13 @@ public:
 	int Loop() const { return loop_; }
 	int Loop(const int val, const bool resetCurrentLoop = false)
 	{
-		loop_ = handleLoop_(val);
+		loop_ = SoundObject::handleLoop_(val);
 		if (resetCurrentLoop) currentLoop_ = 0;
 		return loop_;
 	}
 
 	SOUND_STATE State() const { return state_; }
-	virtual SOUND_STATE State(const SOUND_STATE val) {
+	SOUND_STATE State(const SOUND_STATE val) {
 		if(state_ != val)
 		{
 			if (!FromStateChangeHooks[state_].empty())
@@ -261,7 +264,7 @@ protected:
 	virtual float handlePan_(float val) = 0;
 
 	virtual int handleLoop_(int val) {
-		if (currentLoop_ == loop_) Finish();
+		if (Playing() && currentLoop_ == loop_) Finish();
 		return val < 0 ? LOOP_CAP : val;
 	};
 

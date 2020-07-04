@@ -76,8 +76,20 @@ public:
 		SoundContainer& operator[](std::string const& key)
 		const { return *(instance_->scenes_[key]->Container); }
 
+
+		/*
+			it looks like all scenes are recieving shallow copies of containers
+		
+		*/
+
 		SoundContainer& operator[](const char* key)
-		const { return *(instance_->scenes_[std::string(key)]->Container); }
+		const { 
+			auto& scene = instance_->scenes_[key];
+			auto* container = scene->Container;
+			return *container;
+
+			//return *(instance_->scenes_[std::string(key)]->Container); 
+		}
 	};
 
 	struct GetScene
@@ -89,7 +101,8 @@ public:
 		const { return *(instance_->scenes_[std::string(key)]); }
 	};
 
-
+	static inline GetContainer Containers = {};
+	static inline GetScene Scenes = {};
 
 
 	/////////////// Methods /////////////////
@@ -105,9 +118,6 @@ public:
 	void Suspend() const;
 	void Resume() const;
 
-	
-	static inline GetContainer Containers = {};
-	static inline GetScene Scenes = {};
 
 	static void SystemSuspend() { instance_->Suspend(); }
 	static void SystemResume() { instance_->Resume(); }

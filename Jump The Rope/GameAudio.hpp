@@ -30,13 +30,17 @@ public:
 	
 	*/
 
+	SoundContainer* menu;
+	SoundContainer* game;
+	SoundContainer* sfx;
 
 	GameAudio()
 	{
 
 		engine = SoundEngine::Get();
 
-		SoundContainer menu = 
+
+		json menuJson = 
 R"(
 {
 	"Menu": 
@@ -70,28 +74,8 @@ R"(
 }
 )"_json;
 
-		/*SoundContainer menu = json({
-			"Menu", {
-				"Container", {
-					{"v", 0.35f},
-					{"type", "Playlist"},
-					{"effects", {
-						{"key", "menuFade"},
-						{"param","v"},
-						{"low", 0.35f},
-						{"high", 0.f },
-					}},
-					{"items",
-						{
-							{"Schema",
-								{{"files", "Assets/Audio/audio_background_|intro,loop|.wav"}
-						}
-					}
-				}
-			}
-		});*/
-
-		SoundContainer game = 
+	
+		json gameJson = 
 R"(
 {
 	"Background": 
@@ -117,7 +101,7 @@ R"(
 )"_json;
 
 
-		SoundContainer SFX = 
+		json sfxJson =
 R"(
 {
 	"Jump": 
@@ -152,14 +136,25 @@ R"(
 }
 )"_json;
 
+		menu = new SoundContainer(menuJson);
+		game = new SoundContainer(gameJson);
+		sfx = new SoundContainer(sfxJson);
+
 		// todo: move to schema args
-		menu[menu.size() - 1].Loop(-1);
-		game[game.size() - 1].Loop(-1);
+		menu[menu->size() - 1].Loop(-1);
+		game[game->size() - 1].Loop(-1);
 
 		// todo: simplify, add scene init to AddScene
-		auto MenuScene = SoundEngine::Scene("MenuScene", &menu);
-		auto GameScene = SoundEngine::Scene("GameScene", &game);
-		auto SFXScene = SoundEngine::Scene("SFX", &SFX);
+		auto MenuScene = SoundEngine::Scene("MenuScene", menu);
+		auto GameScene = SoundEngine::Scene("GameScene", game);
+		auto SFXScene = SoundEngine::Scene("SFX", sfx);
+
+		/************
+			START IS CREATING SHALLOW COPIES
+			instance->StartScene(this) is causing issue
+		
+		*/
+
 
 		// todo: AddScenes
 		MenuScene.Start();
@@ -174,12 +169,13 @@ R"(
 
 	void ToMenu()
 	{
-		SoundEngine::Containers["GameScene"].Stop();
+		auto& container = SoundEngine::Containers["GameScene"];
+		container.Stop();
 	}
 	
 	~GameAudio()
 	{
-		engine->Release();
+		engine->Release(); // should clear menu/game/sfx?
 	}
 
 
