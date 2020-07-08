@@ -17,6 +17,8 @@ public:
 		from_json(j, *this);
 	}
 
+	Sound& This() { return *this; }
+
 	SoundObject& operator=(const json& j) override {
 		auto* sound = new Sound(j);
 		return  *sound;

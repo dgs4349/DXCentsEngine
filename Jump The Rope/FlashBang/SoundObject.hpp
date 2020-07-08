@@ -37,6 +37,8 @@ public:
 	virtual SoundObject& operator=(const std::string& s) = 0;
 	void operator() () { Play(); }
 
+	SoundObject(const SoundObject& s) = delete;
+
 	// if the File attributes are the same, we can probably assume they are equal, or are
 	//	the same "sound" even if they are not the same instance of SoundObject, which is useful
 
@@ -229,8 +231,6 @@ public:
 
 	
 	/////////////////////// Protected Members ///////////////////////
-
-	SoundObject(const SoundObject & s) = delete;
 	
 protected:
 	SoundObject() = default;

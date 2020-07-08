@@ -37,6 +37,7 @@ public:
 	public:
 
 		Scene() = default;
+		Scene(Scene& copy) = delete;
 		
 		class StartCallable : public ICallable {
 			Scene* s_;
@@ -55,11 +56,15 @@ public:
 		std::string Key;
 		SoundContainer* Container;
 
-		Scene(std::string key, SoundContainer* container);
+		Scene(std::string key, SoundContainer* container, bool start = true);
+		Scene(const char* key, SoundContainer* container, bool start = true);
 		~Scene() { delete startCall_; delete stopCall_; }
 
-		void Start() { instance_->StartScene(this); }
-		void Stop() { instance_->StopScene(this); }
+		// delete on remove?
+		void Start();
+		void Stop(bool remove=false);
+		void Add(bool start=true);
+		void Remove();
 
 	private:
 		StartCallable* startCall_;
@@ -81,12 +86,12 @@ public:
 			it looks like all scenes are recieving shallow copies of containers
 		
 		*/
-
+		// SHALLOW COPY STILL HERE
 		SoundContainer& operator[](const char* key)
 		const { 
 			auto& scene = instance_->scenes_[key];
-			auto* container = scene->Container;
-			return *container;
+			SoundContainer& container = *(scene->Container);
+			return *(instance_->scenes_[key]->Container);
 
 			//return *(instance_->scenes_[std::string(key)]->Container); 
 		}
@@ -125,13 +130,6 @@ public:
 	void PauseAll();
 	void ResumeAll();
 
-	Scene* AddScene(Scene* scene, bool start = true);
-	Scene* RemoveScene(std::string const& sceneKey);
-	
-	Scene& StartScene(Scene* scene);
-	Scene& StopScene(Scene* scene, bool remove = true);
-	
-
 	/* copy from soundconnections manager, TODO: find a better way instead of forwarding*/
 	void RegisterEffectControl(EffectControl const& control) const { connectionsManager_->RegisterEffectControl(control); }
 	void RegisterEffectControl(
@@ -165,6 +163,10 @@ protected:
 	static void addRef_() { ++refs_; }
 	static void releaseRef_() { --refs_; }
 
+	// we can resolve a lot of issues by moving to smart pointers
+	//	however, I would probably want to reinforce smart pointers at
+	//	the object/interface level for consistency, I'm not sure how 
+	//	I feel about that
 	std::unordered_map<std::string, Scene*> scenes_;
 	std::map<std::string, Scene*> activeScenes_;
 	

@@ -169,8 +169,8 @@ R"(
 
 	void ToMenu()
 	{
-		auto& container = SoundEngine::Containers["GameScene"];
-		container.Stop();
+		SoundContainer& container = SoundEngine::Containers["GameScene"];
+		SoundEngine::Containers["GameScene"].Stop();
 	}
 	
 	~GameAudio()

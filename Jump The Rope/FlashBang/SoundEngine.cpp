@@ -98,46 +98,53 @@ void SoundEngine::ResumeAll()
 	}
 }
 
-SoundEngine::Scene* SoundEngine::AddScene(Scene* scene, bool start)
-{
-	scenes_.at(scene->Key) = scene;
-	if (start) scene->Start();
-	return scene;
-}
 
-SoundEngine::Scene* SoundEngine::RemoveScene(std::string const& sceneKey)
-{
-	auto *const scene = scenes_[sceneKey];
-	if(scene->active_)
+void SoundEngine::Scene::Add(bool start) {
+
+	if (!initiated_) instance_->Init();
+
+
+	if (start) 
 	{
-		activeScenes_.erase(scene->Key);
+		Start();
 	}
-	scenes_.erase(scene->Key);
-	return scene;
-}
-
-SoundEngine::Scene& SoundEngine::StartScene(Scene* scene)
-{
-	if (!initiated_) Init();
-	if (scene->active_) return *scene;
-
-	if (scenes_.find(scene->Key) == scenes_.end())
+	else if (instance_->scenes_.find(Key) == instance_->scenes_.end()) 
 	{
-		scenes_[scene->Key] = scene;
+		instance_->scenes_[Key] = std::move(this);
 	}
 
-	activeScenes_[scene->Key] = scene;
-	scene->active_ = true;
+}
+
+void SoundEngine::Scene::Start() {
+
+	if (active_) return;
+
+	if (!initiated_) instance_->Init();
+
+	if (instance_->scenes_.find(Key) == instance_->scenes_.end())
+		instance_->scenes_[Key] = std::move(this);
+
+	if (instance_->activeScenes_.find(Key) == instance_->activeScenes_.end())
+		instance_->activeScenes_[Key] = std::move(this);
+
+	active_ = true;
+}
+
+void SoundEngine::Scene::Remove() {
+	if (active_) {
+		instance_->activeScenes_.erase(Key);
+	}
+	instance_->scenes_.erase(Key);
+}
+
+
+void SoundEngine::Scene::Stop(bool remove) {
+	if (remove) Remove();
+	if (!active_) return;
 	
-	return *scene;
-}
-
-SoundEngine::Scene& SoundEngine::StopScene(Scene* scene, bool remove)
-{
-	if(scene->active_) activeScenes_.erase(scene->Key);
-	scene->active_ = false;
-	if (remove) scenes_.erase(scene->Key);
-	return *scene;
+	Container->Stop();
+	instance_->activeScenes_.erase(Key);
+	active_ = false;
 }
 
 SoundEngine::SoundEngine()
@@ -156,11 +163,20 @@ SoundEngine::~SoundEngine()
 	connectionsManager_->Release();
 }
 
-FlashBang::SoundEngine::Scene::Scene(std::string key, SoundContainer* container)
+FlashBang::SoundEngine::Scene::Scene(const char* key, SoundContainer* container, bool start) {
+	Key = std::string(key);
+	Container = std::move(container);
+	startCall_ = new StartCallable(this);
+	stopCall_ = new StopCallable(this);
+
+	Container->FromStateChange(SOUND_STATE::UNLOADED, startCall_);
+	Container->OnStateChange(SOUND_STATE::UNLOADED, stopCall_);
+}
+
+FlashBang::SoundEngine::Scene::Scene(std::string key, SoundContainer* container, bool start)
 {
 	Key = std::move(key);
 	Container = std::move(container);
-
 	startCall_ = new StartCallable(this);
 	stopCall_ = new StopCallable(this);
 
