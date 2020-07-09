@@ -20,7 +20,6 @@ public:
 		for (auto *el : soundObjects_) {
 			delete el;
 		}
-		delete indexCallable_;
 		SoundConnectionsManager::QueueUnregisterEffectControls(Key);
 	}
 
@@ -70,6 +69,15 @@ public:
 		return prev;
 	}
 	
+	class UpdateIndexCallable : ICallable
+	{
+		friend class SoundContainer;
+		SoundContainer* c_;
+	public:
+		UpdateIndexCallable(SoundContainer* c) { c_ = std::move(c); }
+		void operator()() override { c_->updateCurrentIndex_(); }
+	};
+
 private:
 	SoundContainer();
 
@@ -94,19 +102,6 @@ private:
 	void queueNext_();
 
 	void updateCurrentIndex_();
-	
-	class UpdateIndexCallable : ICallable
-	{
-		friend class SoundContainer;
-		SoundContainer* c_;
-	public:
-		UpdateIndexCallable(SoundContainer* c) { c_ = c; }
-		void operator()() override { c_->updateCurrentIndex_(); }
-	};
-
-	UpdateIndexCallable* indexCallable_ = new UpdateIndexCallable(this);
-	
-	StateChangeHook onCompleteHook_ = { SOUND_STATE::COMPLETE, indexCallable_ };
 
 protected:
 

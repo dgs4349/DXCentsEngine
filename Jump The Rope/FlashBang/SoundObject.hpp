@@ -31,6 +31,13 @@ public:
 		delete VolumeCall;
 		delete TuneCall;
 		delete PanCall;
+
+		for (auto [key, list] : StateChangeHooks) {
+			for (auto el : list) { delete el; }
+		}
+		for (auto [key, list] : FromStateChangeHooks) {
+			for (auto el : list) { delete el; }
+		}
 	}
 
 	virtual SoundObject& operator=(const json& j) = 0;

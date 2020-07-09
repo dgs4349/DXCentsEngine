@@ -42,14 +42,14 @@ public:
 		class StartCallable : public ICallable {
 			Scene* s_;
 		public:
-			StartCallable(Scene* s) { s_ = s; }
+			StartCallable(Scene* s) { s_ = std::move(s); }
 			void operator()() override { s_->Start(); }
 		};
 
 		class StopCallable : public ICallable {
 			Scene* s_;
 		public:
-			StopCallable(Scene* s) { s_ = s; }
+			StopCallable(Scene* s) { s_ = std::move(s); }
 			void operator()() override { s_->Stop(); }
 		};
 
@@ -58,7 +58,6 @@ public:
 
 		Scene(std::string key, SoundContainer* container, bool start = true);
 		Scene(const char* key, SoundContainer* container, bool start = true);
-		~Scene() { delete startCall_; delete stopCall_; }
 
 		// delete on remove?
 		void Start();
@@ -67,8 +66,6 @@ public:
 		void Remove();
 
 	private:
-		StartCallable* startCall_;
-		StopCallable* stopCall_;
 
 		bool active_ = false;
 	};
@@ -81,20 +78,11 @@ public:
 		SoundContainer& operator[](std::string const& key)
 		const { return *(instance_->scenes_[key]->Container); }
 
-
-		/*
-			it looks like all scenes are recieving shallow copies of containers
-		
-		*/
-		// TODO: TRACK DOWN [std::string()] to prevent double hashing
+		// TODO: object falls out of scope after creation
 		SoundContainer& operator[](const char* key)
 		const { 
-			auto& scene = instance_->scenes_[key];
-			SoundContainer& container = *(scene->Container);
-			//return container;
-
-			return *(instance_->scenes_[key]->Container);
-			//return *(instance_->scenes_[std::string(key)]->Container); 
+			auto* instance = instance_;
+			return *(instance_->scenes_[key]->Container); 
 		}
 	};
 
@@ -104,7 +92,7 @@ public:
 		const { return *(instance_->scenes_[key]); }
 
 		Scene& operator[](const char* key)
-		const { return *(instance_->scenes_[std::string(key)]); }
+		const { return *(instance_->scenes_[key]); }
 	};
 
 	static inline GetContainer Containers = {};

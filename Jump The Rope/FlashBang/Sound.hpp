@@ -86,9 +86,9 @@ protected:
 		return DXSoundEffect->GetSampleDuration() * pow(2, tune);
 	}
 
-	virtual void handlePlay_()		override { DXSoundEffectInstance->Play(loop_ != 0); }
-	virtual void handlePause_()		override { DXSoundEffectInstance->Pause(); }
-	virtual void handleResume_()	override { DXSoundEffectInstance->Resume(); }
-	virtual void handleFinish_()	override { DXSoundEffectInstance->Stop(false); }
-	virtual void handleStop_()		override { DXSoundEffectInstance->Stop(true); }
+	virtual void handlePlay_()		override { if (DXSoundEffectInstance) DXSoundEffectInstance->Play(loop_ != 0); }
+	virtual void handlePause_()		override { if (DXSoundEffectInstance) DXSoundEffectInstance->Pause(); }
+	virtual void handleResume_()	override { if (DXSoundEffectInstance) DXSoundEffectInstance->Resume(); }
+	virtual void handleFinish_()	override { if (DXSoundEffectInstance) DXSoundEffectInstance->Stop(false); }
+	virtual void handleStop_()		override { if (DXSoundEffectInstance) DXSoundEffectInstance->Stop(true); }
 };

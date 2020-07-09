@@ -166,20 +166,16 @@ SoundEngine::~SoundEngine()
 FlashBang::SoundEngine::Scene::Scene(const char* key, SoundContainer* container, bool start) {
 	Key = std::string(key);
 	Container = std::move(container);
-	startCall_ = new StartCallable(this);
-	stopCall_ = new StopCallable(this);
 
-	Container->FromStateChange(SOUND_STATE::UNLOADED, startCall_);
-	Container->OnStateChange(SOUND_STATE::UNLOADED, stopCall_);
+	Container->FromStateChange(SOUND_STATE::UNLOADED, new StartCallable(this));
+	Container->OnStateChange(SOUND_STATE::UNLOADED, new StopCallable(this));
 }
 
 FlashBang::SoundEngine::Scene::Scene(std::string key, SoundContainer* container, bool start)
 {
 	Key = std::move(key);
 	Container = std::move(container);
-	startCall_ = new StartCallable(this);
-	stopCall_ = new StopCallable(this);
 
-	Container->FromStateChange(SOUND_STATE::UNLOADED, startCall_);
-	Container->OnStateChange(SOUND_STATE::UNLOADED, stopCall_);
+	Container->FromStateChange(SOUND_STATE::UNLOADED, new StartCallable(this));
+	Container->OnStateChange(SOUND_STATE::UNLOADED, new StopCallable(this));
 }

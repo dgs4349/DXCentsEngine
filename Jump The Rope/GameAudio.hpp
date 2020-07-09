@@ -169,6 +169,9 @@ R"(
 
 		//GameScene.Stop();
 
+		//  tODO: make From/OnStateChange to return a reference to newly created
+		//		functionoids to handle deletion in parent
+
 	}
 
 
@@ -181,9 +184,15 @@ R"(
 
 	void ToMenu()
 	{
-		SoundContainer& container = SoundEngine::Containers["GameScene"];
-
+		// first one works, second one throws read access issue
 		GameSceneContainer->Stop();
+
+		SoundContainer* ptrcontainer = &SoundEngine::Containers["GameScene"];
+		ptrcontainer->Stop();
+
+		SoundContainer& container = SoundEngine::Containers["GameScene"];
+		container.Stop();
+
 
 		SoundEngine::Containers["GameScene"].Stop();
 	}

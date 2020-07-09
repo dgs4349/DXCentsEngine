@@ -162,18 +162,26 @@ void SoundContainer::QueueChild(std::string const& key, bool finishCurrent)
 	QueueChild(Index(key), finishCurrent);
 }
 
+
+// TODO: this didn't seem to be the issue it's the UNLOADED state change hook thats failing
+//	WHICH IS IN SCENE
+
 int SoundContainer::AddSoundObject(SoundObject* soundObject)
 {
-	soundObject->OnStateChange(&onCompleteHook_);
+	// we probably need to create the new hook here not just pass it in
+	soundObject->OnStateChange(SOUND_STATE::COMPLETE, new UpdateIndexCallable(this));
 	soundObjects_.push_back(soundObject);
+	queueOrder_.push_back(queueOrder_.size());
+
 	orderSet_ = false;
 	return soundObjects_.size() - 1;
 }
 
 int SoundContainer::AddSoundObject(std::string const& key, SoundObject* soundObject)
 {
-	soundObject->OnStateChange(&onCompleteHook_);
+	soundObject->OnStateChange(SOUND_STATE::COMPLETE, new UpdateIndexCallable(this));
 	soundObjects_.push_back(soundObject);
+	queueOrder_.push_back(queueOrder_.size());
 	int i = soundObjects_.size() - 1;
 	static_cast<json>(*this)[key] = i;
 	orderSet_ = false;
