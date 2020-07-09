@@ -86,13 +86,14 @@ public:
 			it looks like all scenes are recieving shallow copies of containers
 		
 		*/
-		// SHALLOW COPY STILL HERE
+		// TODO: TRACK DOWN [std::string()] to prevent double hashing
 		SoundContainer& operator[](const char* key)
 		const { 
 			auto& scene = instance_->scenes_[key];
 			SoundContainer& container = *(scene->Container);
-			return *(instance_->scenes_[key]->Container);
+			//return container;
 
+			return *(instance_->scenes_[key]->Container);
 			//return *(instance_->scenes_[std::string(key)]->Container); 
 		}
 	};

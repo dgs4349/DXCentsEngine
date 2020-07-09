@@ -160,7 +160,19 @@ R"(
 		MenuScene.Start();
 		GameScene.Start();
 		SFXScene.Start();
+
+		GameSceneContainer = &SoundEngine::Containers["GameScene"];
+
+		
+
+		//SoundEngine::Scene& scene = SoundEngine::Scenes["GameScene"];
+
+		//GameScene.Stop();
+
 	}
+
+
+	SoundContainer* GameSceneContainer;
 
 	void ToGame()
 	{
@@ -170,6 +182,9 @@ R"(
 	void ToMenu()
 	{
 		SoundContainer& container = SoundEngine::Containers["GameScene"];
+
+		GameSceneContainer->Stop();
+
 		SoundEngine::Containers["GameScene"].Stop();
 	}
 	
